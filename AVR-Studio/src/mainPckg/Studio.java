@@ -1,6 +1,7 @@
 package mainPckg;
 
 import com.sun.glass.ui.Cursor;
+import gnu.io.CommPortIdentifier;
 import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
@@ -34,6 +35,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.beans.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import javax.swing.border.*;
 import javax.swing.UIManager.*;
@@ -53,6 +56,7 @@ public class Studio extends javax.swing.JFrame {
     private boolean temporary = false;
     private int warning_count = 0;
 
+    private String prog_option = null;
     private String mmcu = null;
     private String parentPath = null;
     private String cPath = null;
@@ -209,14 +213,12 @@ public class Studio extends javax.swing.JFrame {
     private void saveAsFunction() {
         if (temporary) {
             try {
-                temporary = false;
                 LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
                 String[] cmd = (info.getName().toLowerCase().equals("windows"))
                         ? new String[]{"cmd", "/c", "rm -rf " + temporaryFileToOpen.getParentFile()}
                         : new String[]{"/bin/sh", "-c", "rm -rf " + temporaryFileToOpen.getParentFile()};
                 System.out.println(cmd[2]);
                 new ProcessBuilder(cmd).start();
-                saveAsFunction();
             } catch (IOException ex) {
                 System.err.println(ex.toString());
             }
@@ -228,6 +230,7 @@ public class Studio extends javax.swing.JFrame {
         String selected = fd.getDirectory() + fd.getFile();
         if (!selected.contains("null")) {
             try {
+                temporary = false;
                 File x = new File(fd.getFiles()[0].getPath().replace(".c", ""));
                 x.mkdir();
                 LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
@@ -251,7 +254,7 @@ public class Studio extends javax.swing.JFrame {
             } catch (FileNotFoundException | UnsupportedEncodingException ex) {
                 System.err.println(ex.toString());
             }
-        }
+        } 
     }
 
     private void saveFunction() {
@@ -493,7 +496,7 @@ public class Studio extends javax.swing.JFrame {
                                 LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
                                 if (info.getName().toLowerCase().equals("windows")) {
                                     try {
-                                        String[] cmd = {"cmd", "/c", "avrdude -c usbasp -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                        String[] cmd = {"cmd", "/c", "avrdude -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
                                         //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
                                         System.out.println(cmd[2]);
                                         appendToPane(consolePane, cmd[2] + "\n", 4);
@@ -529,7 +532,7 @@ public class Studio extends javax.swing.JFrame {
                                     }
                                 } else {
                                     try {
-                                        String[] cmd = {"/bin/sh", "-c", "sudo avrdude -c usbasp -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                        String[] cmd = {"/bin/sh", "-c", "sudo avrdude -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
                                         //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
                                         System.out.println(cmd[2]);
                                         appendToPane(consolePane, cmd[2] + "\n", 4);
@@ -598,6 +601,8 @@ public class Studio extends javax.swing.JFrame {
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.setLocation(screen_width / 3, screen_height / 9);
 
+        port_menu.setEnabled(false);
+        prog_option = "usbasp";
         mcuCombo.setSelectedItem("atmega16");
         mmcu = mcuCombo.getSelectedItem().toString();
 
@@ -752,6 +757,7 @@ public class Studio extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        programmer_options_button_group = new javax.swing.ButtonGroup();
         splitPane = new javax.swing.JSplitPane();
         consoleScrollPane = new javax.swing.JScrollPane();
         consolePane = new javax.swing.JTextPane();
@@ -764,15 +770,19 @@ public class Studio extends javax.swing.JFrame {
         mcuCombo = new javax.swing.JComboBox();
         tabFileLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
-        fileMenu = new javax.swing.JMenu();
+        file_menu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
         saveMenuItem = new javax.swing.JMenuItem();
         saveAsMenuItem = new javax.swing.JMenuItem();
         aboutMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
+        tools_menu = new javax.swing.JMenu();
         verifyMenuItem = new javax.swing.JMenuItem();
         uploadMenuItem = new javax.swing.JMenuItem();
+        prog_options_menu = new javax.swing.JMenu();
+        usbasp_item = new javax.swing.JCheckBoxMenuItem();
+        stk500v1_item = new javax.swing.JCheckBoxMenuItem();
+        port_menu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("AVR Studio");
@@ -855,7 +865,7 @@ public class Studio extends javax.swing.JFrame {
 
         tabFileLabel.setForeground(new java.awt.Color(1, 1, 1));
 
-        fileMenu.setText("File");
+        file_menu.setText("File");
 
         openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         openMenuItem.setBackground(new java.awt.Color(235, 235, 235));
@@ -866,7 +876,7 @@ public class Studio extends javax.swing.JFrame {
                 openMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(openMenuItem);
+        file_menu.add(openMenuItem);
 
         saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         saveMenuItem.setMnemonic('s');
@@ -877,7 +887,7 @@ public class Studio extends javax.swing.JFrame {
                 saveMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(saveMenuItem);
+        file_menu.add(saveMenuItem);
 
         saveAsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         saveAsMenuItem.setMnemonic('a');
@@ -887,7 +897,7 @@ public class Studio extends javax.swing.JFrame {
                 saveAsMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(saveAsMenuItem);
+        file_menu.add(saveAsMenuItem);
 
         aboutMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
         aboutMenuItem.setMnemonic('a');
@@ -897,7 +907,7 @@ public class Studio extends javax.swing.JFrame {
                 aboutMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(aboutMenuItem);
+        file_menu.add(aboutMenuItem);
 
         exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK));
         exitMenuItem.setMnemonic('e');
@@ -907,11 +917,11 @@ public class Studio extends javax.swing.JFrame {
                 exitMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(exitMenuItem);
+        file_menu.add(exitMenuItem);
 
-        menuBar.add(fileMenu);
+        menuBar.add(file_menu);
 
-        jMenu1.setText("Tools");
+        tools_menu.setText("Tools");
 
         verifyMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F6, java.awt.event.InputEvent.SHIFT_MASK));
         verifyMenuItem.setText("Verify");
@@ -920,7 +930,7 @@ public class Studio extends javax.swing.JFrame {
                 verifyMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(verifyMenuItem);
+        tools_menu.add(verifyMenuItem);
 
         uploadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F7, java.awt.event.InputEvent.SHIFT_MASK));
         uploadMenuItem.setText("Upload");
@@ -929,9 +939,35 @@ public class Studio extends javax.swing.JFrame {
                 uploadMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(uploadMenuItem);
+        tools_menu.add(uploadMenuItem);
 
-        menuBar.add(jMenu1);
+        prog_options_menu.setText("Programmer");
+
+        programmer_options_button_group.add(usbasp_item);
+        usbasp_item.setSelected(true);
+        usbasp_item.setText("USBasp");
+        usbasp_item.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usbasp_itemActionPerformed(evt);
+            }
+        });
+        prog_options_menu.add(usbasp_item);
+
+        programmer_options_button_group.add(stk500v1_item);
+        stk500v1_item.setText("Atmel STK500 Version 1.x firmware (stk500v1)");
+        stk500v1_item.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stk500v1_itemActionPerformed(evt);
+            }
+        });
+        prog_options_menu.add(stk500v1_item);
+
+        tools_menu.add(prog_options_menu);
+
+        port_menu.setText("Port");
+        tools_menu.add(port_menu);
+
+        menuBar.add(tools_menu);
 
         setJMenuBar(menuBar);
 
@@ -1271,6 +1307,35 @@ public class Studio extends javax.swing.JFrame {
         mmcu = mcuCombo.getSelectedItem().toString();
     }//GEN-LAST:event_mcuComboItemStateChanged
 
+    private void usbasp_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usbasp_itemActionPerformed
+        prog_option = "usbasp";
+    }//GEN-LAST:event_usbasp_itemActionPerformed
+
+    private void stk500v1_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stk500v1_itemActionPerformed
+        port_menu.setEnabled(true);
+
+        Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+        ButtonGroup ports_button_group = new ButtonGroup();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (portEnum.hasMoreElements()) {
+                    CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+                    JCheckBoxMenuItem new_port = new JCheckBoxMenuItem(currPortId.getName());
+                    new_port.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            prog_option = "stk500v1 -b19200 -P " + currPortId.getName();
+                            System.out.println(prog_option);
+                        }
+                    });
+                    ports_button_group.add(new_port);
+                    port_menu.add(new_port);
+                }
+            }
+        }).start();
+    }//GEN-LAST:event_stk500v1_itemActionPerformed
+
     public static void main(String args[]) {
         try {
             LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
@@ -1296,19 +1361,24 @@ public class Studio extends javax.swing.JFrame {
     public static javax.swing.JTextPane editingPane;
     public static javax.swing.JScrollPane editingScrollPane;
     private javax.swing.JMenuItem exitMenuItem;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu file_menu;
     private javax.swing.JComboBox mcuCombo;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
+    private javax.swing.JMenu port_menu;
+    private javax.swing.JMenu prog_options_menu;
+    private javax.swing.ButtonGroup programmer_options_button_group;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JTextField searchField;
     private javax.swing.JSplitPane splitPane;
+    private javax.swing.JCheckBoxMenuItem stk500v1_item;
     private javax.swing.JLabel tabFileLabel;
     private javax.swing.JToolBar toolBar;
+    private javax.swing.JMenu tools_menu;
     private javax.swing.JButton uploadButton;
     private javax.swing.JMenuItem uploadMenuItem;
+    private javax.swing.JCheckBoxMenuItem usbasp_item;
     private javax.swing.JButton verifyButton;
     private javax.swing.JMenuItem verifyMenuItem;
     // End of variables declaration//GEN-END:variables
