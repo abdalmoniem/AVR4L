@@ -2,9 +2,11 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
+    <Component class="javax.swing.ButtonGroup" name="programmer_options_button_group">
+    </Component>
     <Menu class="javax.swing.JMenuBar" name="menuBar">
       <SubComponents>
-        <Menu class="javax.swing.JMenu" name="fileMenu">
+        <Menu class="javax.swing.JMenu" name="file_menu">
           <Properties>
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
@@ -75,7 +77,7 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="jMenu1">
+        <Menu class="javax.swing.JMenu" name="tools_menu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Tools"/>
           </Properties>
@@ -102,6 +104,41 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="uploadMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <Menu class="javax.swing.JMenu" name="prog_options_menu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Programmer"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="usbasp_item">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="programmer_options_button_group"/>
+                    </Property>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="USBasp"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="usbasp_itemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="stk500v1_item">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="programmer_options_button_group"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Atmel STK500 Version 1.x firmware (stk500v1)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stk500v1_itemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
+            <Menu class="javax.swing.JMenu" name="port_menu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Port"/>
+              </Properties>
+            </Menu>
           </SubComponents>
         </Menu>
       </SubComponents>
@@ -142,8 +179,8 @@
           <Component id="toolBar" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabFileLabel" min="-2" pref="310" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="tabFileLabel" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -154,7 +191,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tabFileLabel" min="-2" pref="17" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="splitPane" pref="467" max="32767" attributes="0"/>
+              <Component id="splitPane" pref="471" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -190,6 +227,9 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="null"/>
                 </Property>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Consolas" size="12" style="0"/>
+                </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="fe" green="fe" red="fe" type="rgb"/>
                 </Property>
@@ -216,6 +256,11 @@
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
             <Component class="javax.swing.JTextPane" name="editingPane">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Consolas" size="12" style="0"/>
+                </Property>
+              </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="Studio_editingPane"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
@@ -274,284 +319,205 @@
         <Component class="javax.swing.JComboBox" name="mcuCombo">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="270">
-                <StringItem index="0" value="at43usb320"/>
-                <StringItem index="1" value="at43usb355"/>
-                <StringItem index="2" value="at76c711"/>
-                <StringItem index="3" value="at86rf401"/>
-                <StringItem index="4" value="at90c8534"/>
-                <StringItem index="5" value="at90can128"/>
-                <StringItem index="6" value="at90can32"/>
-                <StringItem index="7" value="at90can64"/>
-                <StringItem index="8" value="at90pwm1"/>
-                <StringItem index="9" value="at90pwm161"/>
-                <StringItem index="10" value="at90pwm2"/>
-                <StringItem index="11" value="at90pwm216"/>
-                <StringItem index="12" value="at90pwm2b"/>
-                <StringItem index="13" value="at90pwm3"/>
-                <StringItem index="14" value="at90pwm316"/>
-                <StringItem index="15" value="at90pwm3b"/>
-                <StringItem index="16" value="at90pwm81"/>
-                <StringItem index="17" value="at90s1200"/>
-                <StringItem index="18" value="at90s2313"/>
-                <StringItem index="19" value="at90s2323"/>
-                <StringItem index="20" value="at90s2333"/>
-                <StringItem index="21" value="at90s2343"/>
-                <StringItem index="22" value="at90s4414"/>
-                <StringItem index="23" value="at90s4433"/>
-                <StringItem index="24" value="at90s4434"/>
-                <StringItem index="25" value="at90s8515"/>
-                <StringItem index="26" value="at90s8535"/>
-                <StringItem index="27" value="at90scr100"/>
-                <StringItem index="28" value="at90usb1286"/>
-                <StringItem index="29" value="at90usb1287"/>
-                <StringItem index="30" value="at90usb162"/>
-                <StringItem index="31" value="at90usb646"/>
-                <StringItem index="32" value="at90usb647"/>
-                <StringItem index="33" value="at90usb82"/>
-                <StringItem index="34" value="at94k"/>
-                <StringItem index="35" value="ata5272"/>
-                <StringItem index="36" value="ata5505"/>
-                <StringItem index="37" value="ata5702m322"/>
-                <StringItem index="38" value="ata5782"/>
-                <StringItem index="39" value="ata5790"/>
-                <StringItem index="40" value="ata5790n"/>
-                <StringItem index="41" value="ata5795"/>
-                <StringItem index="42" value="ata5831"/>
-                <StringItem index="43" value="ata6285"/>
-                <StringItem index="44" value="ata6286"/>
-                <StringItem index="45" value="ata6289"/>
-                <StringItem index="46" value="ata6612c"/>
-                <StringItem index="47" value="ata6613c"/>
-                <StringItem index="48" value="ata6614q"/>
-                <StringItem index="49" value="ata6616c"/>
-                <StringItem index="50" value="ata6617c"/>
-                <StringItem index="51" value="ata664251"/>
-                <StringItem index="52" value="atmega103"/>
-                <StringItem index="53" value="atmega128"/>
-                <StringItem index="54" value="atmega1280"/>
-                <StringItem index="55" value="atmega1281"/>
-                <StringItem index="56" value="atmega1284"/>
-                <StringItem index="57" value="atmega1284p"/>
-                <StringItem index="58" value="atmega1284rfr2"/>
-                <StringItem index="59" value="atmega128a"/>
-                <StringItem index="60" value="atmega128rfa1"/>
-                <StringItem index="61" value="atmega128rfr2"/>
-                <StringItem index="62" value="atmega16"/>
-                <StringItem index="63" value="atmega161"/>
-                <StringItem index="64" value="atmega162"/>
-                <StringItem index="65" value="atmega163"/>
-                <StringItem index="66" value="atmega164a"/>
-                <StringItem index="67" value="atmega164p"/>
-                <StringItem index="68" value="atmega164pa"/>
-                <StringItem index="69" value="atmega165"/>
-                <StringItem index="70" value="atmega165a"/>
-                <StringItem index="71" value="atmega165p"/>
-                <StringItem index="72" value="atmega165pa"/>
-                <StringItem index="73" value="atmega168"/>
-                <StringItem index="74" value="atmega168a"/>
-                <StringItem index="75" value="atmega168p"/>
-                <StringItem index="76" value="atmega168pa"/>
-                <StringItem index="77" value="atmega168pb"/>
-                <StringItem index="78" value="atmega169"/>
-                <StringItem index="79" value="atmega169a"/>
-                <StringItem index="80" value="atmega169p"/>
-                <StringItem index="81" value="atmega169pa"/>
-                <StringItem index="82" value="atmega16a"/>
-                <StringItem index="83" value="atmega16hva"/>
-                <StringItem index="84" value="atmega16hva2"/>
-                <StringItem index="85" value="atmega16hvb"/>
-                <StringItem index="86" value="atmega16hvbrevb"/>
-                <StringItem index="87" value="atmega16m1"/>
-                <StringItem index="88" value="atmega16u2"/>
-                <StringItem index="89" value="atmega16u4"/>
-                <StringItem index="90" value="atmega2560"/>
-                <StringItem index="91" value="atmega2561"/>
-                <StringItem index="92" value="atmega2564rfr2"/>
-                <StringItem index="93" value="atmega256rfr2"/>
-                <StringItem index="94" value="atmega32"/>
-                <StringItem index="95" value="atmega323"/>
-                <StringItem index="96" value="atmega324a"/>
-                <StringItem index="97" value="atmega324p"/>
-                <StringItem index="98" value="atmega324pa"/>
-                <StringItem index="99" value="atmega325"/>
-                <StringItem index="100" value="atmega3250"/>
-                <StringItem index="101" value="atmega3250a"/>
-                <StringItem index="102" value="atmega3250p"/>
-                <StringItem index="103" value="atmega3250pa"/>
-                <StringItem index="104" value="atmega325a"/>
-                <StringItem index="105" value="atmega325p"/>
-                <StringItem index="106" value="atmega325pa"/>
-                <StringItem index="107" value="atmega328"/>
-                <StringItem index="108" value="atmega328p"/>
-                <StringItem index="109" value="atmega329"/>
+              <StringArray count="189">
+                <StringItem index="0" value="avr2"/>
+                <StringItem index="1" value="at90s2313"/>
+                <StringItem index="2" value="at90s2323"/>
+                <StringItem index="3" value="at90s2333"/>
+                <StringItem index="4" value="at90s2343"/>
+                <StringItem index="5" value="attiny22"/>
+                <StringItem index="6" value="attiny26"/>
+                <StringItem index="7" value="at90s4414"/>
+                <StringItem index="8" value="at90s4433"/>
+                <StringItem index="9" value="at90s4434"/>
+                <StringItem index="10" value="at90s8515"/>
+                <StringItem index="11" value="at90c8534"/>
+                <StringItem index="12" value="at90s8535"/>
+                <StringItem index="13" value="avr25"/>
+                <StringItem index="14" value="ata6289"/>
+                <StringItem index="15" value="attiny13"/>
+                <StringItem index="16" value="attiny13a"/>
+                <StringItem index="17" value="attiny2313"/>
+                <StringItem index="18" value="attiny2313a"/>
+                <StringItem index="19" value="attiny24"/>
+                <StringItem index="20" value="attiny24a"/>
+                <StringItem index="21" value="attiny4313"/>
+                <StringItem index="22" value="attiny44"/>
+                <StringItem index="23" value="attiny44a"/>
+                <StringItem index="24" value="attiny84"/>
+                <StringItem index="25" value="attiny25"/>
+                <StringItem index="26" value="attiny45"/>
+                <StringItem index="27" value="attiny85"/>
+                <StringItem index="28" value="attiny261"/>
+                <StringItem index="29" value="attiny261a"/>
+                <StringItem index="30" value="attiny461"/>
+                <StringItem index="31" value="attiny461a"/>
+                <StringItem index="32" value="attiny861"/>
+                <StringItem index="33" value="attiny861a"/>
+                <StringItem index="34" value="attiny43u"/>
+                <StringItem index="35" value="attiny87"/>
+                <StringItem index="36" value="attiny48"/>
+                <StringItem index="37" value="attiny88"/>
+                <StringItem index="38" value="at86rf401"/>
+                <StringItem index="39" value="avr3"/>
+                <StringItem index="40" value="at43usb320"/>
+                <StringItem index="41" value="at43usb355"/>
+                <StringItem index="42" value="at76c711"/>
+                <StringItem index="43" value="avr31"/>
+                <StringItem index="44" value="atmega103"/>
+                <StringItem index="45" value="avr35"/>
+                <StringItem index="46" value="at90usb82"/>
+                <StringItem index="47" value="at90usb162"/>
+                <StringItem index="48" value="atmega8u2"/>
+                <StringItem index="49" value="atmega16u2"/>
+                <StringItem index="50" value="atmega32u2"/>
+                <StringItem index="51" value="attiny167"/>
+                <StringItem index="52" value="avr4"/>
+                <StringItem index="53" value="atmega8"/>
+                <StringItem index="54" value="atmega48"/>
+                <StringItem index="55" value="atmega48a"/>
+                <StringItem index="56" value="atmega48p"/>
+                <StringItem index="57" value="atmega88"/>
+                <StringItem index="58" value="atmega88a"/>
+                <StringItem index="59" value="atmega88p"/>
+                <StringItem index="60" value="atmega88pa"/>
+                <StringItem index="61" value="atmega8515"/>
+                <StringItem index="62" value="atmega8535"/>
+                <StringItem index="63" value="atmega8hva"/>
+                <StringItem index="64" value="atmega4hvd"/>
+                <StringItem index="65" value="atmega8hvd"/>
+                <StringItem index="66" value="at90pwm1"/>
+                <StringItem index="67" value="at90pwm2"/>
+                <StringItem index="68" value="at90pwm2b"/>
+                <StringItem index="69" value="at90pwm3"/>
+                <StringItem index="70" value="at90pwm3b"/>
+                <StringItem index="71" value="at90pwm81"/>
+                <StringItem index="72" value="avr5"/>
+                <StringItem index="73" value="atmega16"/>
+                <StringItem index="74" value="atmega16a"/>
+                <StringItem index="75" value="atmega161"/>
+                <StringItem index="76" value="atmega162"/>
+                <StringItem index="77" value="atmega163"/>
+                <StringItem index="78" value="atmega164a"/>
+                <StringItem index="79" value="atmega164p"/>
+                <StringItem index="80" value="atmega165"/>
+                <StringItem index="81" value="atmega165a"/>
+                <StringItem index="82" value="atmega165p"/>
+                <StringItem index="83" value="atmega168"/>
+                <StringItem index="84" value="atmega168a"/>
+                <StringItem index="85" value="atmega168p"/>
+                <StringItem index="86" value="atmega169"/>
+                <StringItem index="87" value="atmega169a"/>
+                <StringItem index="88" value="atmega169p"/>
+                <StringItem index="89" value="atmega169pa"/>
+                <StringItem index="90" value="atmega16c1"/>
+                <StringItem index="91" value="atmega16hva"/>
+                <StringItem index="92" value="atmega16hva2"/>
+                <StringItem index="93" value="atmega16hvb"/>
+                <StringItem index="94" value="atmega16m1"/>
+                <StringItem index="95" value="atmega16u4"/>
+                <StringItem index="96" value="atmega32"/>
+                <StringItem index="97" value="atmega323"/>
+                <StringItem index="98" value="atmega324a"/>
+                <StringItem index="99" value="atmega324p"/>
+                <StringItem index="100" value="atmega324pa"/>
+                <StringItem index="101" value="atmega325"/>
+                <StringItem index="102" value="atmega325p"/>
+                <StringItem index="103" value="atmega3250"/>
+                <StringItem index="104" value="atmega3250p"/>
+                <StringItem index="105" value="atmega328"/>
+                <StringItem index="106" value="atmega328p"/>
+                <StringItem index="107" value="atmega329"/>
+                <StringItem index="108" value="atmega329p"/>
+                <StringItem index="109" value="atmega329pa"/>
                 <StringItem index="110" value="atmega3290"/>
-                <StringItem index="111" value="atmega3290a"/>
-                <StringItem index="112" value="atmega3290p"/>
-                <StringItem index="113" value="atmega3290pa"/>
-                <StringItem index="114" value="atmega329a"/>
-                <StringItem index="115" value="atmega329p"/>
-                <StringItem index="116" value="atmega329pa"/>
-                <StringItem index="117" value="atmega32a"/>
-                <StringItem index="118" value="atmega32c1"/>
-                <StringItem index="119" value="atmega32hvb"/>
-                <StringItem index="120" value="atmega32hvbrevb"/>
-                <StringItem index="121" value="atmega32m1"/>
-                <StringItem index="122" value="atmega32u2"/>
-                <StringItem index="123" value="atmega32u4"/>
-                <StringItem index="124" value="atmega32u6"/>
-                <StringItem index="125" value="atmega406"/>
-                <StringItem index="126" value="atmega48"/>
-                <StringItem index="127" value="atmega48a"/>
-                <StringItem index="128" value="atmega48p"/>
-                <StringItem index="129" value="atmega48pa"/>
-                <StringItem index="130" value="atmega48pb"/>
-                <StringItem index="131" value="atmega64"/>
-                <StringItem index="132" value="atmega640"/>
-                <StringItem index="133" value="atmega644"/>
-                <StringItem index="134" value="atmega644a"/>
-                <StringItem index="135" value="atmega644p"/>
-                <StringItem index="136" value="atmega644pa"/>
-                <StringItem index="137" value="atmega644rfr2"/>
-                <StringItem index="138" value="atmega645"/>
-                <StringItem index="139" value="atmega6450"/>
-                <StringItem index="140" value="atmega6450a"/>
-                <StringItem index="141" value="atmega6450p"/>
-                <StringItem index="142" value="atmega645a"/>
-                <StringItem index="143" value="atmega645p"/>
-                <StringItem index="144" value="atmega649"/>
-                <StringItem index="145" value="atmega6490"/>
-                <StringItem index="146" value="atmega6490a"/>
-                <StringItem index="147" value="atmega6490p"/>
-                <StringItem index="148" value="atmega649a"/>
-                <StringItem index="149" value="atmega649p"/>
-                <StringItem index="150" value="atmega64a"/>
-                <StringItem index="151" value="atmega64c1"/>
-                <StringItem index="152" value="atmega64hve"/>
-                <StringItem index="153" value="atmega64hve2"/>
-                <StringItem index="154" value="atmega64m1"/>
-                <StringItem index="155" value="atmega64rfr2"/>
-                <StringItem index="156" value="atmega8"/>
-                <StringItem index="157" value="atmega8515"/>
-                <StringItem index="158" value="atmega8535"/>
-                <StringItem index="159" value="atmega88"/>
-                <StringItem index="160" value="atmega88a"/>
-                <StringItem index="161" value="atmega88p"/>
-                <StringItem index="162" value="atmega88pa"/>
-                <StringItem index="163" value="atmega88pb"/>
-                <StringItem index="164" value="atmega8a"/>
-                <StringItem index="165" value="atmega8hva"/>
-                <StringItem index="166" value="atmega8u2"/>
-                <StringItem index="167" value="attiny10"/>
-                <StringItem index="168" value="attiny11"/>
-                <StringItem index="169" value="attiny12"/>
-                <StringItem index="170" value="attiny13"/>
-                <StringItem index="171" value="attiny13a"/>
-                <StringItem index="172" value="attiny15"/>
-                <StringItem index="173" value="attiny1634"/>
-                <StringItem index="174" value="attiny167"/>
-                <StringItem index="175" value="attiny20"/>
-                <StringItem index="176" value="attiny22"/>
-                <StringItem index="177" value="attiny2313"/>
-                <StringItem index="178" value="attiny2313a"/>
-                <StringItem index="179" value="attiny24"/>
-                <StringItem index="180" value="attiny24a"/>
-                <StringItem index="181" value="attiny25"/>
-                <StringItem index="182" value="attiny26"/>
-                <StringItem index="183" value="attiny261"/>
-                <StringItem index="184" value="attiny261a"/>
-                <StringItem index="185" value="attiny28"/>
-                <StringItem index="186" value="attiny4"/>
-                <StringItem index="187" value="attiny40"/>
-                <StringItem index="188" value="attiny4313"/>
-                <StringItem index="189" value="attiny43u"/>
-                <StringItem index="190" value="attiny44"/>
-                <StringItem index="191" value="attiny441"/>
-                <StringItem index="192" value="attiny44a"/>
-                <StringItem index="193" value="attiny45"/>
-                <StringItem index="194" value="attiny461"/>
-                <StringItem index="195" value="attiny461a"/>
-                <StringItem index="196" value="attiny48"/>
-                <StringItem index="197" value="attiny5"/>
-                <StringItem index="198" value="attiny828"/>
-                <StringItem index="199" value="attiny84"/>
-                <StringItem index="200" value="attiny841"/>
-                <StringItem index="201" value="attiny84a"/>
-                <StringItem index="202" value="attiny85"/>
-                <StringItem index="203" value="attiny861"/>
-                <StringItem index="204" value="attiny861a"/>
-                <StringItem index="205" value="attiny87"/>
-                <StringItem index="206" value="attiny88"/>
-                <StringItem index="207" value="attiny9"/>
-                <StringItem index="208" value="atxmega128a1"/>
-                <StringItem index="209" value="atxmega128a1u"/>
-                <StringItem index="210" value="atxmega128a3"/>
-                <StringItem index="211" value="atxmega128a3u"/>
-                <StringItem index="212" value="atxmega128a4u"/>
-                <StringItem index="213" value="atxmega128b1"/>
-                <StringItem index="214" value="atxmega128b3"/>
-                <StringItem index="215" value="atxmega128c3"/>
-                <StringItem index="216" value="atxmega128d3"/>
-                <StringItem index="217" value="atxmega128d4"/>
-                <StringItem index="218" value="atxmega16a4"/>
-                <StringItem index="219" value="atxmega16a4u"/>
-                <StringItem index="220" value="atxmega16c4"/>
-                <StringItem index="221" value="atxmega16d4"/>
-                <StringItem index="222" value="atxmega16e5"/>
-                <StringItem index="223" value="atxmega192a3"/>
-                <StringItem index="224" value="atxmega192a3u"/>
-                <StringItem index="225" value="atxmega192c3"/>
-                <StringItem index="226" value="atxmega192d3"/>
-                <StringItem index="227" value="atxmega256a3"/>
-                <StringItem index="228" value="atxmega256a3b"/>
-                <StringItem index="229" value="atxmega256a3bu"/>
-                <StringItem index="230" value="atxmega256a3u"/>
-                <StringItem index="231" value="atxmega256c3"/>
-                <StringItem index="232" value="atxmega256d3"/>
-                <StringItem index="233" value="atxmega32a4"/>
-                <StringItem index="234" value="atxmega32a4u"/>
-                <StringItem index="235" value="atxmega32c3"/>
-                <StringItem index="236" value="atxmega32c4"/>
-                <StringItem index="237" value="atxmega32d3"/>
-                <StringItem index="238" value="atxmega32d4"/>
-                <StringItem index="239" value="atxmega32e5"/>
-                <StringItem index="240" value="atxmega384c3"/>
-                <StringItem index="241" value="atxmega384d3"/>
-                <StringItem index="242" value="atxmega64a1"/>
-                <StringItem index="243" value="atxmega64a1u"/>
-                <StringItem index="244" value="atxmega64a3"/>
-                <StringItem index="245" value="atxmega64a3u"/>
-                <StringItem index="246" value="atxmega64a4u"/>
-                <StringItem index="247" value="atxmega64b1"/>
-                <StringItem index="248" value="atxmega64b3"/>
-                <StringItem index="249" value="atxmega64c3"/>
-                <StringItem index="250" value="atxmega64d3"/>
-                <StringItem index="251" value="atxmega64d4"/>
-                <StringItem index="252" value="atxmega8e5"/>
-                <StringItem index="253" value="avr1"/>
-                <StringItem index="254" value="avr2"/>
-                <StringItem index="255" value="avr25"/>
-                <StringItem index="256" value="avr3"/>
-                <StringItem index="257" value="avr31"/>
-                <StringItem index="258" value="avr35"/>
-                <StringItem index="259" value="avr4"/>
-                <StringItem index="260" value="avr5"/>
-                <StringItem index="261" value="avr51"/>
-                <StringItem index="262" value="avr6"/>
-                <StringItem index="263" value="avrtiny"/>
-                <StringItem index="264" value="avrxmega2"/>
-                <StringItem index="265" value="avrxmega4"/>
-                <StringItem index="266" value="avrxmega5"/>
-                <StringItem index="267" value="avrxmega6"/>
-                <StringItem index="268" value="avrxmega7"/>
-                <StringItem index="269" value="m3000"/>
+                <StringItem index="111" value="atmega3290p"/>
+                <StringItem index="112" value="atmega32c1"/>
+                <StringItem index="113" value="atmega32hvb"/>
+                <StringItem index="114" value="atmega32m1"/>
+                <StringItem index="115" value="atmega32u4"/>
+                <StringItem index="116" value="atmega32u6"/>
+                <StringItem index="117" value="atmega406"/>
+                <StringItem index="118" value="atmega64"/>
+                <StringItem index="119" value="atmega640"/>
+                <StringItem index="120" value="atmega644"/>
+                <StringItem index="121" value="atmega644a"/>
+                <StringItem index="122" value="atmega644p"/>
+                <StringItem index="123" value="atmega644pa"/>
+                <StringItem index="124" value="atmega645"/>
+                <StringItem index="125" value="atmega645a"/>
+                <StringItem index="126" value="atmega645p"/>
+                <StringItem index="127" value="atmega6450"/>
+                <StringItem index="128" value="atmega6450a"/>
+                <StringItem index="129" value="atmega6450p"/>
+                <StringItem index="130" value="atmega649"/>
+                <StringItem index="131" value="atmega649a"/>
+                <StringItem index="132" value="atmega649p"/>
+                <StringItem index="133" value="atmega6490"/>
+                <StringItem index="134" value="atmega6490a"/>
+                <StringItem index="135" value="atmega6490p"/>
+                <StringItem index="136" value="atmega64c1"/>
+                <StringItem index="137" value="atmega64m1"/>
+                <StringItem index="138" value="atmega64hve"/>
+                <StringItem index="139" value="at90can32"/>
+                <StringItem index="140" value="at90can64"/>
+                <StringItem index="141" value="at90pwm216"/>
+                <StringItem index="142" value="at90pwm316"/>
+                <StringItem index="143" value="at90scr100"/>
+                <StringItem index="144" value="at90usb646"/>
+                <StringItem index="145" value="at90usb647"/>
+                <StringItem index="146" value="at94k"/>
+                <StringItem index="147" value="avr51"/>
+                <StringItem index="148" value="atmega128"/>
+                <StringItem index="149" value="atmega1280"/>
+                <StringItem index="150" value="atmega1281"/>
+                <StringItem index="151" value="atmega1284p"/>
+                <StringItem index="152" value="atmega128rfa1"/>
+                <StringItem index="153" value="at90can128"/>
+                <StringItem index="154" value="at90usb1286"/>
+                <StringItem index="155" value="at90usb1287"/>
+                <StringItem index="156" value="m3000f"/>
+                <StringItem index="157" value="m3000s"/>
+                <StringItem index="158" value="m3001b"/>
+                <StringItem index="159" value="avr6"/>
+                <StringItem index="160" value="atmega2560"/>
+                <StringItem index="161" value="atmega2561"/>
+                <StringItem index="162" value="avrxmega2"/>
+                <StringItem index="163" value="atxmega16a4"/>
+                <StringItem index="164" value="atxmega16d4"/>
+                <StringItem index="165" value="atxmega32d4"/>
+                <StringItem index="166" value="avrxmega3"/>
+                <StringItem index="167" value="atxmega32a4"/>
+                <StringItem index="168" value="avrxmega4"/>
+                <StringItem index="169" value="atxmega64a3"/>
+                <StringItem index="170" value="atxmega64d3"/>
+                <StringItem index="171" value="avrxmega5"/>
+                <StringItem index="172" value="atxmega64a1"/>
+                <StringItem index="173" value="avrxmega6"/>
+                <StringItem index="174" value="atxmega128a3"/>
+                <StringItem index="175" value="atxmega128d3"/>
+                <StringItem index="176" value="atxmega192a3"/>
+                <StringItem index="177" value="atxmega192d3"/>
+                <StringItem index="178" value="atxmega256a3"/>
+                <StringItem index="179" value="atxmega256a3b"/>
+                <StringItem index="180" value="atxmega256d3"/>
+                <StringItem index="181" value="avrxmega7"/>
+                <StringItem index="182" value="atxmega128a1"/>
+                <StringItem index="183" value="avr1"/>
+                <StringItem index="184" value="at90s1200"/>
+                <StringItem index="185" value="attiny11"/>
+                <StringItem index="186" value="attiny12"/>
+                <StringItem index="187" value="attiny15"/>
+                <StringItem index="188" value="attiny28"/>
               </StringArray>
             </Property>
-            <Property name="selectedIndex" type="int" value="62"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[200, 27]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="mcuComboItemStateChanged"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
