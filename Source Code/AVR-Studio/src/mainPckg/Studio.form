@@ -208,6 +208,7 @@
                 <Property name="text" type="java.lang.String" value="Port"/>
               </Properties>
             </Menu>
+<<<<<<< HEAD:Source Code/AVR-Studio/src/mainPckg/Studio.form
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="view_menu">
@@ -255,6 +256,8 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+=======
+>>>>>>> origin/master:Source Code/AVR-Studio/src/mainPckg/Studio.form
           </SubComponents>
         </Menu>
       </SubComponents>
