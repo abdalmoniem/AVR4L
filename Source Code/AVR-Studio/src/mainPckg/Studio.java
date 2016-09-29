@@ -705,11 +705,12 @@ public class Studio extends javax.swing.JFrame {
                               parentPath = "\"" + fileToOpen.getParent() + "\"";
                               editingPane.setText(null);
                               Scanner scan = new Scanner(fileToOpen);
+                              String text = "";
                               while (scan.hasNext()) {
-                                    String line = scan.nextLine();
-                                    appendToPane(editingPane, line + "\n", 3);
+                                    text += scan.nextLine() + "\n";
                               }
-
+                              
+                              editingPane.setText(text);
                               if (editingPane.getText().length() > 0) {
                                     editingPane.setText(editingPane.getText().substring(0, editingPane.getText().length() - 1));
                               } else {
@@ -726,7 +727,7 @@ public class Studio extends javax.swing.JFrame {
                               System.exit(0);
 
                         }
-                  } catch (FileNotFoundException | BadLocationException ex) {
+                  } catch (FileNotFoundException ex) {
                         System.err.println(ex.getMessage());
                   }
             } else {
@@ -1228,10 +1229,11 @@ public class Studio extends javax.swing.JFrame {
                                     editingPane.setText(null);
                                     Thread.sleep(50);
                                     Scanner scan = new Scanner(fileToOpen);
+                                    String text = "";
                                     while (scan.hasNext()) {
-                                          String line = scan.nextLine();
-                                          appendToPane(editingPane, line + "\n", 3);
+                                          text += scan.nextLine() + "\n";
                                     }
+                                    editingPane.setText(text);
                                     if (editingPane.getText().length() > 0) {
                                           editingPane.setText(editingPane.getText().substring(0, editingPane.getText().length() - 1));
                                     } else {
@@ -1240,7 +1242,7 @@ public class Studio extends javax.swing.JFrame {
                                     tabFileLabel.setText(fileToOpen.getName());
                                     tabFileLabel.setForeground(Color.BLACK);
                                     choseFile = true;
-                              } catch (IOException | BadLocationException | InterruptedException ex) {
+                              } catch (IOException | InterruptedException ex) {
                                     System.err.println(ex.toString());
                               }
                         } else {
@@ -1267,10 +1269,11 @@ public class Studio extends javax.swing.JFrame {
                               parentPath = "\"" + fileToOpen.getParent() + "\"";
                               editingPane.setText(null);
                               Scanner scan = new Scanner(fileToOpen);
+                              String text = "";
                               while (scan.hasNext()) {
-                                    String line = scan.nextLine();
-                                    appendToPane(editingPane, line + "\n", 3);
+                                    text += scan.nextLine() + "\n";
                               }
+                              editingPane.setText(text);
                               if (editingPane.getText().length() > 0) {
                                     editingPane.setText(editingPane.getText().substring(0, editingPane.getText().length() - 1));
                               } else {
@@ -1280,7 +1283,7 @@ public class Studio extends javax.swing.JFrame {
                               tabFileLabel.setForeground(Color.BLACK);
                               choseFile = true;
 
-                        } catch (FileNotFoundException | BadLocationException ex) {
+                        } catch (FileNotFoundException ex) {
                               System.err.println(ex.toString());
                         }
                   }
