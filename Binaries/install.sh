@@ -2,7 +2,7 @@
 
 echo "Installing..."
 
-#apt-get update
+apt-get update
 apt-get install gcc-avr binutils-avr avr-libc
 apt-get install gdb-avr
 apt-get install avrdude
@@ -14,6 +14,7 @@ fi
 
 mkdir /usr/share/avr-studio
 cp -r ./bin/AVR-Studio.jar /usr/share/avr-studio
+cp -r ./bin/lib /usr/share/avr-studio
 cp -r ./bin/icon.png /usr/share/avr-studio
 cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
 chmod 777 /usr/share/applications/avr-studio.desktop
@@ -33,17 +34,19 @@ source $HOME/.bashrc
 
 if [ -f "/usr/share/avr-studio/AVR-Studio.jar" ]
 then
-	if [ -f "/usr/share/avr-studio/icon.png" ]
+	if [ -d "/usr/share/avr-studio/lib" ]
 	then
-		if [ -f "/usr/share/applications/avr-studio.desktop" ]
+		if [ -f "/usr/share/avr-studio/icon.png" ]
 		then
-			GREEN='\033[0;32m'
-			NC='\033[0m'
-			printf "${GREEN}\nInstalled Successfully !!!${NC}\n"
-			printf "\nPLEASE RESTART TERMINAL !!!\n"
+			if [ -f "/usr/share/applications/avr-studio.desktop" ]
+			then
+				GREEN='\033[0;32m'
+				NC='\033[0m'
+				printf "${GREEN}\nInstalled Successfully !!!${NC}\n"
+				printf "\nPLEASE RESTART TERMINAL !!!\n"
+			fi
 		fi
 	fi
-	
 else
 	RED='\033[0;31m'
 	NC='\033[0m'
