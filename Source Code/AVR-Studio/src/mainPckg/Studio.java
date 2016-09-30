@@ -937,11 +937,9 @@ public class Studio extends javax.swing.JFrame {
 
                   editingPane.setText(
                           "/**\n"
-                          + "*\n"
                           + "* author: " + username + "\n"
                           + "* date: " + date + "\n"
                           + "* blinky: toggles PORTB pins on and off every 150ms\n"
-                          + "*\n"
                           + "*/\n\n"
                           + "#define F_CPU 16000000UL\n"
                           + "#include <avr/io.h>\n"
@@ -952,7 +950,7 @@ public class Studio extends javax.swing.JFrame {
                           + "\twhile(1) {\n"
                           + "\t\t//write your code here\n"
                           + "\t\tPORTB ^= 0xff;\n"
-                          + "\t\t_delay_ms(150);"
+                          + "\t\t_delay_ms(150);\n"
                           + "\t}\n"
                           + "\treturn 0;\n"
                           + "}");
