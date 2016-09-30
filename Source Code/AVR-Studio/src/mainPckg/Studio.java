@@ -69,6 +69,7 @@ public class Studio extends javax.swing.JFrame {
       private String label = null;
 
       private int selected_tab = 0;
+      private boolean make = false;
 
       private String os = null;
       private String username = null;
@@ -405,7 +406,6 @@ public class Studio extends javax.swing.JFrame {
                               System.err.println(ex.getMessage());
                         }
                   } else {
-                        System.out.println(fileToOpen.getParent());
                         try {
                               String[] cmd = {"/bin/sh", "-c", "cd " + fileToOpen.getParent() + " && make compile"};
                               System.out.println(cmd[2]);
@@ -983,7 +983,7 @@ public class Studio extends javax.swing.JFrame {
             menuBar = new javax.swing.JMenuBar();
             file_menu = new javax.swing.JMenu();
             jMenu1 = new javax.swing.JMenu();
-            jMenuItem3 = new javax.swing.JMenuItem();
+            new_file_item = new javax.swing.JMenuItem();
             openMenuItem = new javax.swing.JMenuItem();
             saveMenuItem = new javax.swing.JMenuItem();
             saveAsMenuItem = new javax.swing.JMenuItem();
@@ -1120,9 +1120,14 @@ public class Studio extends javax.swing.JFrame {
 
             jMenu1.setText("New");
 
-            jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-            jMenuItem3.setText("File");
-            jMenu1.add(jMenuItem3);
+            new_file_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+            new_file_item.setText("File");
+            new_file_item.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        new_file_itemActionPerformed(evt);
+                  }
+            });
+            jMenu1.add(new_file_item);
 
             file_menu.add(jMenu1);
 
@@ -1529,6 +1534,15 @@ public class Studio extends javax.swing.JFrame {
             try {
                   File x = new File(selected);
                   String parent = x.getParentFile().getName();
+                  File[] files = x.getParentFile().listFiles();
+
+                  for (File f : files) {
+                        if (f.getName().toLowerCase().equals("makefile")) {
+                              make = true;
+                              break;
+                        }
+                  }
+
                   if (!selected.contains("null")) {
                         if (!selected.substring(selected.length() - 2, selected.length()).toLowerCase().equals(".c")) {
                               JOptionPane.showMessageDialog(this, "AVR-Studio can only open its own sketches and other files ending in .c",
@@ -1629,7 +1643,63 @@ public class Studio extends javax.swing.JFrame {
                               }
                         }
                   }
+
+                  if (make) {
+                        mkfl_build_item.setSelected(true);
+                        tab_pane.add("makefile", mkfl_editingScrollPane);
+                        tab_pane.setSelectedIndex(1);
+
+                        DocumentListener mkfl_listener = new DocumentListener() {
+                              @Override
+                              public void insertUpdate(DocumentEvent e) {
+                                    tabFileLabel.setText("*editing...");
+                                    tabFileLabel.setForeground(Color.ORANGE);
+
+                                    tab_pane.setTitleAt(1, "*makefile");
+                                    tab_pane.setForegroundAt(1, Color.ORANGE);
+
+                                    verified = false;
+                              }
+
+                              @Override
+                              public void removeUpdate(DocumentEvent e) {
+                                    tabFileLabel.setText("*editing...");
+                                    tabFileLabel.setForeground(Color.ORANGE);
+
+                                    tab_pane.setTitleAt(1, "*makefile");
+                                    tab_pane.setForegroundAt(1, Color.ORANGE);
+
+                                    verified = false;
+                              }
+
+                              @Override
+                              public void changedUpdate(DocumentEvent e) {
+                                    tabFileLabel.setText("*editing...");
+                                    tabFileLabel.setForeground(Color.ORANGE);
+
+                                    tab_pane.setTitleAt(1, "*makefile");
+                                    tab_pane.setForegroundAt(1, Color.ORANGE);
+
+                                    verified = false;
+                              }
+                        };
+                        mkfl_editingPane.setEditorKit(new BashSyntaxKit());
+                        mkfl_editingPane.getDocument().addDocumentListener(mkfl_listener);
+
+                        String tab_text = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
+                        makefile = os.equals("windows") ? new File(x.getParent() + "\\makefile") : new File(x.getParent() + "/makefile");
+                        Scanner scan = new Scanner(makefile);
+                        String text = "";
+                        while (scan.hasNext()) {
+                              text += scan.nextLine() + "\n";
+                        }
+                        mkfl_editingPane.setText(text);
+                        selected_tab = 1;
+                  }
+
             } catch (NullPointerException ex) {
+                  System.err.println(ex.getMessage());
+            } catch (FileNotFoundException ex) {
                   System.err.println(ex.getMessage());
             }
       }//GEN-LAST:event_openMenuItemActionPerformed
@@ -1882,91 +1952,123 @@ public class Studio extends javax.swing.JFrame {
       }//GEN-LAST:event_std_build_itemActionPerformed
 
       private void mkfl_build_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mkfl_build_itemActionPerformed
-            tab_pane.add("makefile", mkfl_editingScrollPane);
-            tab_pane.setSelectedIndex(1);
+            if (!make) {
+                  tab_pane.add("makefile", mkfl_editingScrollPane);
+                  tab_pane.setSelectedIndex(1);
 
-            DocumentListener mkfl_listener = new DocumentListener() {
-                  @Override
-                  public void insertUpdate(DocumentEvent e) {
-                        tabFileLabel.setText("*editing...");
-                        tabFileLabel.setForeground(Color.ORANGE);
+                  DocumentListener mkfl_listener = new DocumentListener() {
+                        @Override
+                        public void insertUpdate(DocumentEvent e) {
+                              tabFileLabel.setText("*editing...");
+                              tabFileLabel.setForeground(Color.ORANGE);
 
-                        tab_pane.setTitleAt(1, "*makefile");
-                        tab_pane.setForegroundAt(1, Color.ORANGE);
+                              tab_pane.setTitleAt(1, "*makefile");
+                              tab_pane.setForegroundAt(1, Color.ORANGE);
 
-                        verified = false;
-                  }
-
-                  @Override
-                  public void removeUpdate(DocumentEvent e) {
-                        tabFileLabel.setText("*editing...");
-                        tabFileLabel.setForeground(Color.ORANGE);
-
-                        tab_pane.setTitleAt(1, "*makefile");
-                        tab_pane.setForegroundAt(1, Color.ORANGE);
-
-                        verified = false;
-                  }
-
-                  @Override
-                  public void changedUpdate(DocumentEvent e) {
-                        tabFileLabel.setText("*editing...");
-                        tabFileLabel.setForeground(Color.ORANGE);
-
-                        tab_pane.setTitleAt(1, "*makefile");
-                        tab_pane.setForegroundAt(1, Color.ORANGE);
-
-                        verified = false;
-                  }
-            };
-            mkfl_editingPane.setEditorKit(new BashSyntaxKit());
-            mkfl_editingPane.getDocument().addDocumentListener(mkfl_listener);
-
-            String tab_text = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
-            mkfl_editingPane.setText(
-                    "#when compiling you must name the target to compile\n"
-                    + "#when uploading you must name the target to upload\n\n"
-                    + "compile:\n"
-                    + "\tavr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c \"" + tab_text + ".c\" -o \"" + tab_text + ".o\"\n"
-                    + "\tavr-gcc -g -mmcu=" + mmcu + " -o \"" + tab_text + ".elf\" \"" + tab_text + ".o\"\n"
-                    + "\tavr-objcopy -j .text -j .data -O ihex \"" + tab_text + ".elf\" \"" + tab_text + ".hex\"\n"
-                    + "\trm -f \"" + tab_text + ".o\" \"" + tab_text + ".elf\"\n\n"
-                    + "upload:\n"
-                    + "\tsudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:\"" + tab_text + ".hex\":i\n");
-            selected_tab = 1;
-
-            if (temporary) {
-                  PrintWriter writer;
-                  String temp_folder = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
-
-                  try {
-                        if (os.equals("windows")) {
-                              File x = new File("C:\\Users\\" + username + "\\AppData\\Local\\Temp\\" + temp_folder);
-                              makefile = new File(x.getPath() + "/makefile");
-
-                              writer = new PrintWriter(makefile);
-                              writer.println(mkfl_editingPane.getText().replaceAll("    ", "\t"));
-                              writer.close();
-                        } else {
-                              File x = new File("/home/" + username + "/.avr_studio_temp/" + temp_folder);
-                              makefile = new File(x.getPath() + "/makefile");
-                              makefile.createNewFile();
-
-                              writer = new PrintWriter(makefile);
-                              writer.println(mkfl_editingPane.getText().replaceAll("    ", "\t"));
-                              writer.close();
+                              verified = false;
                         }
-                  } catch (FileNotFoundException ex) {
-                        System.err.println(ex.getMessage());
-                  } catch (IOException ex) {
-                        System.err.println(ex.getMessage());
+
+                        @Override
+                        public void removeUpdate(DocumentEvent e) {
+                              tabFileLabel.setText("*editing...");
+                              tabFileLabel.setForeground(Color.ORANGE);
+
+                              tab_pane.setTitleAt(1, "*makefile");
+                              tab_pane.setForegroundAt(1, Color.ORANGE);
+
+                              verified = false;
+                        }
+
+                        @Override
+                        public void changedUpdate(DocumentEvent e) {
+                              tabFileLabel.setText("*editing...");
+                              tabFileLabel.setForeground(Color.ORANGE);
+
+                              tab_pane.setTitleAt(1, "*makefile");
+                              tab_pane.setForegroundAt(1, Color.ORANGE);
+
+                              verified = false;
+                        }
+                  };
+                  mkfl_editingPane.setEditorKit(new BashSyntaxKit());
+                  mkfl_editingPane.getDocument().addDocumentListener(mkfl_listener);
+
+                  String tab_text = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
+                  mkfl_editingPane.setText(
+                          "#when compiling you must name the target to compile\n"
+                          + "#when uploading you must name the target to upload\n\n"
+                          + "compile:\n"
+                          + "\tavr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c \"" + tab_text + ".c\" -o \"" + tab_text + ".o\"\n"
+                          + "\tavr-gcc -g -mmcu=" + mmcu + " -o \"" + tab_text + ".elf\" \"" + tab_text + ".o\"\n"
+                          + "\tavr-objcopy -j .text -j .data -O ihex \"" + tab_text + ".elf\" \"" + tab_text + ".hex\"\n"
+                          + "\trm -f \"" + tab_text + ".o\" \"" + tab_text + ".elf\"\n\n"
+                          + "upload:\n"
+                          + "\tsudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:\"" + tab_text + ".hex\":i\n");
+                  selected_tab = 1;
+
+                  if (temporary) {
+                        PrintWriter writer;
+                        String temp_folder = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
+
+                        try {
+                              if (os.equals("windows")) {
+                                    File x = new File("C:\\Users\\" + username + "\\AppData\\Local\\Temp\\" + temp_folder);
+                                    makefile = new File(x.getPath() + "/makefile");
+
+                                    writer = new PrintWriter(makefile);
+                                    writer.println(mkfl_editingPane.getText().replaceAll("    ", "\t"));
+                                    writer.close();
+                              } else {
+                                    File x = new File("/home/" + username + "/.avr_studio_temp/" + temp_folder);
+                                    makefile = new File(x.getPath() + "/makefile");
+                                    makefile.createNewFile();
+
+                                    writer = new PrintWriter(makefile);
+                                    writer.println(mkfl_editingPane.getText().replaceAll("    ", "\t"));
+                                    writer.close();
+                              }
+                              make = true;
+                        } catch (FileNotFoundException ex) {
+                              System.err.println(ex.getMessage());
+                        } catch (IOException ex) {
+                              System.err.println(ex.getMessage());
+                        }
                   }
             }
       }//GEN-LAST:event_mkfl_build_itemActionPerformed
 
       private void tab_paneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tab_paneMouseClicked
             selected_tab = tab_pane.getSelectedIndex();
+            System.out.println("tab #" + selected_tab);
       }//GEN-LAST:event_tab_paneMouseClicked
+
+      private void new_file_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_new_file_itemActionPerformed
+            if (os.equals("windows")) {
+                  new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                              try {
+                                    String[] cmd = {"cmd", "/c", "avr-studio"};
+                                    Process p = new ProcessBuilder(cmd).start();
+                              } catch (IOException ex) {
+                                    System.err.println(ex.getMessage());
+                              }
+                        }
+                  }).start();
+            } else {
+                  new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                              try {
+                                    String[] cmd = {"/bin/sh", "-c", "java -jar /usr/share/avr-studio/AVR-Studio.jar"};
+                                    Process p = new ProcessBuilder(cmd).start();
+                              } catch (IOException ex) {
+                                    System.err.println(ex.getMessage());
+                              }
+                        }
+                  }).start();
+            }
+      }//GEN-LAST:event_new_file_itemActionPerformed
 
       public static void main(String args[]) {
             try {
@@ -2002,12 +2104,12 @@ public class Studio extends javax.swing.JFrame {
       private javax.swing.JMenu font_menu;
       private javax.swing.JMenuItem inc_font_item;
       private javax.swing.JMenu jMenu1;
-      private javax.swing.JMenuItem jMenuItem3;
       private javax.swing.JComboBox mcuCombo;
       private javax.swing.JMenuBar menuBar;
       private javax.swing.JCheckBoxMenuItem mkfl_build_item;
       private javax.swing.JEditorPane mkfl_editingPane;
       public static javax.swing.JScrollPane mkfl_editingScrollPane;
+      private javax.swing.JMenuItem new_file_item;
       private javax.swing.JMenuItem openMenuItem;
       private javax.swing.JMenu port_menu;
       private javax.swing.JDialog privacy_dialog;
