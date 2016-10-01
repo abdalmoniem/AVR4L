@@ -74,7 +74,7 @@ public class Studio extends javax.swing.JFrame {
       private String hexPath = null;
 
       private int selected_tab = 0;
-      private String label = null;
+      private String sketch_name = null;
 
       private File makefile = null;
       private File file_to_open = null;
@@ -225,7 +225,7 @@ public class Studio extends javax.swing.JFrame {
                               cPath = "\"" + file_to_open.getAbsolutePath() + "\"";
                               parentPath = "\"" + file_to_open.getParent() + "\"";
 
-                              tab_pane.setTitleAt(0, label);
+                              tab_pane.setTitleAt(0, sketch_name);
                               tab_pane.setForegroundAt(0, Color.BLACK);
 
                               editingPane.setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.CURSOR_CROSSHAIR));
@@ -245,7 +245,7 @@ public class Studio extends javax.swing.JFrame {
                         }
 
                         if (!tab_pane.getTitleAt(0).contains("*") && !tab_pane.getTitleAt(1).contains("*")) {
-                              label = file_to_open.getName();
+                              sketch_name = file_to_open.getName();
                               status_label.setText("All Saved");
                               status_label.setForeground(Color.BLACK);
                         }
@@ -256,13 +256,13 @@ public class Studio extends javax.swing.JFrame {
                         cPath = "\"" + file_to_open.getAbsolutePath() + "\"";
                         parentPath = "\"" + file_to_open.getParent() + "\"";
 
-                        tab_pane.setTitleAt(0, label);
+                        tab_pane.setTitleAt(0, sketch_name);
                         tab_pane.setForegroundAt(0, Color.BLACK);
 
                         editingPane.setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.CURSOR_CROSSHAIR));
                         editingPane.setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.CURSOR_TEXT));
 
-                        label = file_to_open.getName();
+                        sketch_name = file_to_open.getName();
                         status_label.setText("All Saved");
                         status_label.setForeground(Color.BLACK);
                   }
@@ -311,7 +311,7 @@ public class Studio extends javax.swing.JFrame {
                               writer.println(editingPane.getText());
                         }
 
-                        tab_pane.setTitleAt(0, label);
+                        tab_pane.setTitleAt(0, sketch_name);
                         tab_pane.setForegroundAt(0, Color.BLACK);
 
                         if (makefile != null) {
@@ -326,7 +326,8 @@ public class Studio extends javax.swing.JFrame {
                         cPath = "\"" + file_to_open.getAbsolutePath() + "\"";
                         parentPath = "\"" + file_to_open.getParent() + "\"";
 
-                        label = file_to_open.getName();
+                        sketch_name = file_to_open.getName();
+                        tab_pane.setTitleAt(0, sketch_name);
                         status_label.setText("All Saved");
                         status_label.setForeground(Color.BLACK);
 
@@ -351,13 +352,13 @@ public class Studio extends javax.swing.JFrame {
             cPath = "\"" + file_to_open.getAbsolutePath() + "\"";
             parentPath = "\"" + file_to_open.getParent() + "\"";
 
-            tab_pane.setTitleAt(0, label);
+            tab_pane.setTitleAt(0, sketch_name);
             tab_pane.setForegroundAt(0, Color.BLACK);
 
             tab_pane.setTitleAt(1, "makefile");
             tab_pane.setForegroundAt(1, Color.BLACK);
 
-            label = file_to_open.getName();
+            sketch_name = file_to_open.getName();
             status_label.setText("All Saved");
             status_label.setForeground(Color.BLACK);
 
@@ -955,8 +956,8 @@ public class Studio extends javax.swing.JFrame {
             DateFormat dateFormat = new SimpleDateFormat("MMMdd_YY");
             String date = dateFormat.format(Calendar.getInstance().getTime());
 
-            label = "sketch_" + date.toLowerCase() + ".c";
-            tab_pane.setTitleAt(0, label);
+            sketch_name = "sketch_" + date.toLowerCase() + ".c";
+            tab_pane.setTitleAt(0, sketch_name);
 
             listener = new DocumentListener() {
                   @Override
@@ -964,7 +965,7 @@ public class Studio extends javax.swing.JFrame {
                         status_label.setText("*editing...");
                         status_label.setForeground(Color.ORANGE);
 
-                        tab_pane.setTitleAt(0, "*" + label);
+                        tab_pane.setTitleAt(0, "*" + sketch_name);
                         tab_pane.setForegroundAt(0, Color.ORANGE);
 
                         verified = false;
@@ -975,7 +976,7 @@ public class Studio extends javax.swing.JFrame {
                         status_label.setText("*editing...");
                         status_label.setForeground(Color.ORANGE);
 
-                        tab_pane.setTitleAt(0, "*" + label);
+                        tab_pane.setTitleAt(0, "*" + sketch_name);
                         tab_pane.setForegroundAt(0, Color.ORANGE);
 
                         verified = false;
@@ -986,7 +987,7 @@ public class Studio extends javax.swing.JFrame {
                         status_label.setText("*editing...");
                         status_label.setForeground(Color.ORANGE);
 
-                        tab_pane.setTitleAt(0, "*" + label);
+                        tab_pane.setTitleAt(0, "*" + sketch_name);
                         tab_pane.setForegroundAt(0, Color.ORANGE);
 
                         verified = false;
@@ -1035,6 +1036,7 @@ public class Studio extends javax.swing.JFrame {
                                 && file_to_open.getAbsolutePath().charAt(file_to_open.getAbsolutePath().length() - 1) == 'c') {
                               cPath = "\"" + file_to_open.getAbsolutePath() + "\"";
                               parentPath = "\"" + file_to_open.getParent() + "\"";
+
                               editingPane.setText(null);
                               Scanner scan = new Scanner(file_to_open);
                               String text = "";
@@ -1048,8 +1050,11 @@ public class Studio extends javax.swing.JFrame {
                               } else {
                                     editingPane.setText(null);
                               }
-                              status_label.setText(file_to_open.getName());
-                              status_label.setForeground(Color.BLACK);
+
+                              sketch_name = file_to_open.getName();
+                              tab_pane.setTitleAt(0, sketch_name);
+                              tab_pane.setForegroundAt(0, Color.BLACK);
+
                               chose_file = true;
                         } else {
                               JOptionPane.showMessageDialog(this, "AVR-Studio can only open its own sketches and other files ending in .c",
@@ -1135,6 +1140,7 @@ public class Studio extends javax.swing.JFrame {
             build_opts_menu = new javax.swing.JMenu();
             std_build_item = new javax.swing.JCheckBoxMenuItem();
             mkfl_build_item = new javax.swing.JCheckBoxMenuItem();
+            gen_makefile = new javax.swing.JMenuItem();
 
             privacy_scroll_pane.setBackground(new java.awt.Color(214, 214, 214));
 
@@ -1229,7 +1235,7 @@ public class Studio extends javax.swing.JFrame {
             status_label.setText("Title");
 
             iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-            iteration_label.setText("Iteration: 1,125");
+            iteration_label.setText("Iteration: 1,153");
 
             tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
                   public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1237,14 +1243,12 @@ public class Studio extends javax.swing.JFrame {
                   }
             });
 
-            splitPane.setBorder(null);
             splitPane.setDividerLocation(390);
             splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
             splitPane.setContinuousLayout(true);
 
             consolePane.setEditable(false);
             consolePane.setBackground(new java.awt.Color(1, 1, 1));
-            consolePane.setBorder(null);
             consolePane.setFont(new java.awt.Font("Consolas", 0, 12)); // NOI18N
             consolePane.setForeground(new java.awt.Color(254, 254, 254));
             consolePane.setCaretColor(new java.awt.Color(254, 254, 254));
@@ -1419,6 +1423,7 @@ public class Studio extends javax.swing.JFrame {
 
             menuBar.add(view_menu);
 
+            build_opts_menu.setBorder(null);
             build_opts_menu.setText("Build Options");
 
             build_options_button_group.add(std_build_item);
@@ -1439,6 +1444,15 @@ public class Studio extends javax.swing.JFrame {
                   }
             });
             build_opts_menu.add(mkfl_build_item);
+
+            gen_makefile.setText("Generate makefile contents");
+            gen_makefile.setEnabled(false);
+            gen_makefile.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        gen_makefileActionPerformed(evt);
+                  }
+            });
+            build_opts_menu.add(gen_makefile);
 
             menuBar.add(build_opts_menu);
 
@@ -1749,8 +1763,10 @@ public class Studio extends javax.swing.JFrame {
                                           } else {
                                                 editingPane.setText(null);
                                           }
-                                          status_label.setText(file_to_open.getName());
-                                          status_label.setForeground(Color.BLACK);
+
+                                          sketch_name = file_to_open.getName();
+                                          tab_pane.setTitleAt(0, sketch_name);
+                                          tab_pane.setForegroundAt(0, Color.BLACK);
                                           chose_file = true;
                                     } catch (IOException | InterruptedException ex) {
                                           System.err.println(ex.toString());
@@ -1790,8 +1806,10 @@ public class Studio extends javax.swing.JFrame {
                                     } else {
                                           editingPane.setText(null);
                                     }
-                                    status_label.setText(file_to_open.getName());
-                                    status_label.setForeground(Color.BLACK);
+
+                                    sketch_name = file_to_open.getName();
+                                    tab_pane.setTitleAt(0, sketch_name);
+                                    tab_pane.setForegroundAt(0, Color.BLACK);
                                     chose_file = true;
 
                               } catch (FileNotFoundException ex) {
@@ -2103,10 +2121,16 @@ public class Studio extends javax.swing.JFrame {
     }//GEN-LAST:event_def_font_itemActionPerformed
 
       private void std_build_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_std_build_itemActionPerformed
-            tab_pane.remove(1);
+            gen_makefile.setEnabled(false);
+            if (tab_pane.getTabCount() > 1) {
+                  tab_pane.remove(1);
+            }
+            make = false;
+            makefile = null;
       }//GEN-LAST:event_std_build_itemActionPerformed
 
       private void mkfl_build_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mkfl_build_itemActionPerformed
+            gen_makefile.setEnabled(true);
             if (!make) {
                   tab_pane.add("makefile", mkfl_editingScrollPane);
                   tab_pane.setSelectedIndex(1);
@@ -2148,19 +2172,23 @@ public class Studio extends javax.swing.JFrame {
                   mkfl_editingPane.setEditorKit(new BashSyntaxKit());
                   mkfl_editingPane.getDocument().addDocumentListener(mkfl_listener);
 
-                  String tab_text = tab_pane.getTitleAt(0).replace("*", "").replace(".c", "");
-
                   if (makefile == null) {
+                        sketch_name = sketch_name.replace(".c", "");
                         mkfl_editingPane.setText(
                                 "#when compiling you must name the target to compile\n"
                                 + "#when uploading you must name the target to upload\n\n"
+                                + "target=" + sketch_name + "\n\n"
                                 + "compile:\n"
-                                + "    avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c \"" + tab_text + ".c\" -o \"" + tab_text + ".o\"\n"
-                                + "    avr-gcc -g -mmcu=" + mmcu + " -o \"" + tab_text + ".elf\" \"" + tab_text + ".o\"\n"
-                                + "    avr-objcopy -j .text -j .data -O ihex \"" + tab_text + ".elf\" \"" + tab_text + ".hex\"\n"
-                                + "    rm -f \"" + tab_text + ".o\" \"" + tab_text + ".elf\"\n\n"
+                                + "    avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + "$(target).c" + " -o " + "$(target).o\n"
+                                + "    avr-gcc -g -mmcu=" + mmcu + " -o " + "$(target).elf" + " $(target).o\n"
+                                + "    avr-objcopy -j .text -j .data -O ihex " + "$(target).elf" + " $(target).hex\n"
+                                + "    rm -f " + "$(target).o " + "$(target).elf\n\n"
                                 + "upload:\n"
-                                + "    sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:\"" + tab_text + ".hex\":i\n");
+                                + "    sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n");
+                        sketch_name += ".c";
+                        if (file_to_open != null) {
+                              makefile = os.equals("windows") ? new File(file_to_open.getParent() + "\\makefile") : new File(file_to_open.getParent() + "/makefile");
+                        }
                   } else {
                         try {
                               Scanner scan = new Scanner(makefile);
@@ -2256,6 +2284,22 @@ public class Studio extends javax.swing.JFrame {
             }
       }//GEN-LAST:event_searchFieldFocusLost
 
+      private void gen_makefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gen_makefileActionPerformed
+            sketch_name = sketch_name.replace(".c", "");
+            mkfl_editingPane.setText(
+                    "#when compiling you must name the target to compile\n"
+                    + "#when uploading you must name the target to upload\n\n"
+                    + "target=" + sketch_name + "\n\n"
+                    + "compile:\n"
+                    + "    avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + "$(target).c" + " -o " + "$(target).o\n"
+                    + "    avr-gcc -g -mmcu=" + mmcu + " -o " + "$(target).elf" + " $(target).o\n"
+                    + "    avr-objcopy -j .text -j .data -O ihex " + "$(target).elf" + " $(target).hex\n"
+                    + "    rm -f " + "$(target).o " + "$(target).elf\n\n"
+                    + "upload:\n"
+                    + "    sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n");
+            sketch_name += ".c";
+      }//GEN-LAST:event_gen_makefileActionPerformed
+
       public static void main(String args[]) {
             try {
                   LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
@@ -2288,6 +2332,7 @@ public class Studio extends javax.swing.JFrame {
       private javax.swing.JMenuItem exitMenuItem;
       private javax.swing.JMenu file_menu;
       private javax.swing.JMenu font_menu;
+      private javax.swing.JMenuItem gen_makefile;
       private javax.swing.JMenuItem inc_font_item;
       private javax.swing.JLabel iteration_label;
       private javax.swing.JMenu jMenu1;
