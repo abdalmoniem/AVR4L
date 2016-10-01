@@ -9,12 +9,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="privacy_scroll_pane" alignment="0" pref="400" max="32767" attributes="0"/>
+              <Component id="privacy_scroll_pane" alignment="0" pref="700" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="privacy_scroll_pane" alignment="0" pref="300" max="32767" attributes="0"/>
+              <Component id="privacy_scroll_pane" alignment="0" pref="500" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -128,7 +128,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="aboutMenuItem">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+Q"/>
+                  <KeyStroke key="Ctrl+L"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="About"/>
@@ -139,9 +139,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+W"/>
-                </Property>
                 <Property name="mnemonic" type="int" value="101"/>
                 <Property name="text" type="java.lang.String" value="Exit"/>
               </Properties>
@@ -338,12 +335,14 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="toolBar" max="32767" attributes="0"/>
-          <Group type="102" attributes="0">
+          <Component id="tab_pane" alignment="0" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabFileLabel" max="32767" attributes="0"/>
+              <Component id="status_label" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="iteration_label" min="-2" pref="240" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tab_pane" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -351,7 +350,10 @@
           <Group type="102" alignment="1" attributes="0">
               <Component id="toolBar" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabFileLabel" min="-2" pref="17" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="status_label" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="iteration_label" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tab_pane" pref="569" max="32767" attributes="0"/>
           </Group>
@@ -393,7 +395,11 @@
         </Component>
         <Component class="javax.swing.JTextField" name="searchField">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Search Microcontrollers"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b4" green="b4" red="b4" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Find microcontrollers"/>
+            <Property name="toolTipText" type="java.lang.String" value="Search microcontrollers"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Text Cursor"/>
             </Property>
@@ -402,6 +408,8 @@
             </Property>
           </Properties>
           <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="searchFieldFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="searchFieldFocusLost"/>
             <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="searchFieldKeyTyped"/>
           </Events>
         </Component>
@@ -610,12 +618,18 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="tabFileLabel">
+    <Component class="javax.swing.JLabel" name="status_label">
       <Properties>
         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="1" green="1" red="1" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Title"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="iteration_label">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 1,125"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">
