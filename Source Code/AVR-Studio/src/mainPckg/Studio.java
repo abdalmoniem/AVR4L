@@ -1235,7 +1235,7 @@ public class Studio extends javax.swing.JFrame {
             status_label.setText("Title");
 
             iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-            iteration_label.setText("Iteration: 1,153");
+            iteration_label.setText("Iteration: 1,155");
 
             tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
                   public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1423,7 +1423,6 @@ public class Studio extends javax.swing.JFrame {
 
             menuBar.add(view_menu);
 
-            build_opts_menu.setBorder(null);
             build_opts_menu.setText("Build Options");
 
             build_options_button_group.add(std_build_item);
@@ -1941,10 +1940,19 @@ public class Studio extends javax.swing.JFrame {
       }//GEN-LAST:event_aboutMenuItemActionPerformed
 
       private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-            if (status_label.getText().toLowerCase().contains("*")) {
+            String modified_file = null;
+            
+            if (status_label.getText().contains("*")) {
+                  if(tab_pane.getTitleAt(0).toLowerCase().contains("*") && !tab_pane.getTitleAt(1).toLowerCase().contains("*")) {
+                        modified_file = tab_pane.getTitleAt(0).replace("*", "");
+                  } else if(!tab_pane.getTitleAt(0).toLowerCase().contains("*") && tab_pane.getTitleAt(1).toLowerCase().contains("*")) {
+                        modified_file = tab_pane.getTitleAt(1).replace("*", "");
+                  } else {
+                        modified_file = tab_pane.getTitleAt(0).replace("*", "") + ", " + tab_pane.getTitleAt(1).replace("*", "");
+                  }
                   int result = JOptionPane.showOptionDialog(this,
-                          "Changes has occured in file  \"" + status_label.getText().toLowerCase().replace("*", "") + "\".\nDo you want to save these changes?",
-                          "File \"" + status_label.getText().toLowerCase().replace("*", "") + "\" Modified.",
+                          "Changes occured in  \"" + modified_file + "\"\nDo you want to save these changes?",
+                          "\"" + modified_file + "\" modified.",
                           JOptionPane.YES_NO_CANCEL_OPTION,
                           JOptionPane.QUESTION_MESSAGE,
                           null,
@@ -1971,12 +1979,12 @@ public class Studio extends javax.swing.JFrame {
                         System.out.println(cmd[2]);
                         new ProcessBuilder(cmd).start();
                         int result = JOptionPane.showOptionDialog(this,
-                                "This is a temporary file.\nDo you want to save the file in a permenant location ?",
-                                "File \"" + status_label.getText().toLowerCase().replace("*", "") + "\" is Temporary.",
+                                "This is a temporary project (will be deleted on exit).\nDo you want to save the project in a permenant location ?",
+                                "Project \"" + sketch_name.replace(".c", "") + "\" is Temporary.",
                                 JOptionPane.YES_NO_CANCEL_OPTION,
                                 JOptionPane.QUESTION_MESSAGE,
                                 null,
-                                new String[]{"Save Changes", "Close Without Saving", "Cancel"},
+                                new String[]{"Save Project", "Close Without Saving", "Cancel"},
                                 "Save Changes");
                         if (result == JOptionPane.YES_OPTION) {
                               save_as_method();
