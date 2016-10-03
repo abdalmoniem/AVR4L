@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.TabStop;
 import javax.swing.text.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,17 +30,11 @@ import javax.swing.ImageIcon;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
 import java.util.Enumeration;
-import java.util.HashMap;
 import javax.swing.UIManager.*;
-import javax.swing.plaf.metal.MetalIconFactory;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.syntaxkits.BashSyntaxKit;
 import jsyntaxpane.syntaxkits.CSyntaxKit;
-import jsyntaxpane.syntaxkits.DOSBatchSyntaxKit;
 import jsyntaxpane.util.Configuration;
 
 /**
@@ -1990,6 +1983,11 @@ public class Studio extends javax.swing.JFrame {
                   + "Compiled, Edited and Designed by AbdAlMoniem AlHifnawy"
                   + "\n"
                   + "**********************************************************************************";
+
+          if (os.equals("windows")) {
+              privacy_text_pane.setFont(new Font("Consolas", Font.PLAIN, 15));
+          }
+
           privacy_text_pane.setText(copy_left);
           privacy_text_pane.setCaretPosition(0);
 
