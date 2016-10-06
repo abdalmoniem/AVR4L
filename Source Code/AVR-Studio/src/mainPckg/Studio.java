@@ -78,7 +78,7 @@ public class Studio extends javax.swing.JFrame {
     private CSyntaxKit c_editor_kit = null;
 
     private String default_font = null;
-    private final int default_font_size = 15;
+    private int default_font_size = 15;
     private int font_size = default_font_size;
 
     private void append_to_pane(JTextPane pane, String msg, int mode) throws BadLocationException {
@@ -267,7 +267,6 @@ public class Studio extends javax.swing.JFrame {
     private void save_as_method() {
         if (temporary) {
             try {
-
                 String[] cmd = (os.equals("windows"))
                         ? new String[]{"cmd", "/c", "rm -rf " + temporary_file_to_open.getParentFile()}
                         : new String[]{"/bin/sh", "-c", "rm -rf " + temporary_file_to_open.getParentFile()};
@@ -1019,7 +1018,11 @@ public class Studio extends javax.swing.JFrame {
         editingPane.setEditorKit(c_editor_kit);
         editingPane.getDocument().addDocumentListener(listener);
         editingPane.requestFocus();
-
+        
+        def_font_item.setText(def_font_item.getText() + " (" + default_font_size + ")");
+        inc_font_item.setText(inc_font_item.getText() + " (" + (default_font_size + 1) + ")");
+        dec_font_item.setText(dec_font_item.getText() + " (" + (default_font_size - 1) + ")");
+        
         if (arguments.length > 0) {
             try {
                 file_to_open = new File(arguments[0]);
@@ -1069,6 +1072,7 @@ public class Studio extends javax.swing.JFrame {
 
                 if (make) {
                     mkfl_build_item.setSelected(true);
+                    gen_makefile.setEnabled(true);
                     tab_pane.add("makefile", mkfl_editingScrollPane);
                     tab_pane.setSelectedIndex(1);
 
@@ -1161,6 +1165,7 @@ public class Studio extends javax.swing.JFrame {
         uploadButton = new javax.swing.JButton();
         searchField = new javax.swing.JTextField();
         mcuCombo = new javax.swing.JComboBox();
+        info_label = new javax.swing.JLabel();
         status_label = new javax.swing.JLabel();
         iteration_label = new javax.swing.JLabel();
         tab_pane = new javax.swing.JTabbedPane();
@@ -1188,12 +1193,15 @@ public class Studio extends javax.swing.JFrame {
         port_menu = new javax.swing.JMenu();
         view_menu = new javax.swing.JMenu();
         font_menu = new javax.swing.JMenu();
+        choose_font_item = new javax.swing.JMenuItem();
+        font_menu_sep = new javax.swing.JPopupMenu.Separator();
         def_font_item = new javax.swing.JMenuItem();
         inc_font_item = new javax.swing.JMenuItem();
         dec_font_item = new javax.swing.JMenuItem();
         build_opts_menu = new javax.swing.JMenu();
         std_build_item = new javax.swing.JCheckBoxMenuItem();
         mkfl_build_item = new javax.swing.JCheckBoxMenuItem();
+        build_menu_sep = new javax.swing.JPopupMenu.Separator();
         gen_makefile = new javax.swing.JMenuItem();
 
         privacy_scroll_pane.setBackground(new java.awt.Color(214, 214, 214));
@@ -1238,6 +1246,14 @@ public class Studio extends javax.swing.JFrame {
         verifyButton.setFocusable(false);
         verifyButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         verifyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        verifyButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                verifyButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                verifyButtonMouseExited(evt);
+            }
+        });
         verifyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 verifyButtonActionPerformed(evt);
@@ -1249,6 +1265,14 @@ public class Studio extends javax.swing.JFrame {
         uploadButton.setFocusable(false);
         uploadButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         uploadButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        uploadButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                uploadButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                uploadButtonMouseExited(evt);
+            }
+        });
         uploadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 uploadButtonActionPerformed(evt);
@@ -1269,6 +1293,14 @@ public class Studio extends javax.swing.JFrame {
                 searchFieldFocusLost(evt);
             }
         });
+        searchField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                searchFieldMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                searchFieldMouseExited(evt);
+            }
+        });
         searchField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 searchFieldKeyTyped(evt);
@@ -1283,13 +1315,24 @@ public class Studio extends javax.swing.JFrame {
                 mcuComboItemStateChanged(evt);
             }
         });
+        mcuCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                mcuComboMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                mcuComboMouseExited(evt);
+            }
+        });
         toolBar.add(mcuCombo);
 
+        info_label.setText(" Font Size: 15");
+        toolBar.add(info_label);
+
         status_label.setForeground(new java.awt.Color(1, 1, 1));
-        status_label.setText("Title");
+        status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 1,163");
+        iteration_label.setText("Iteration: 1,674");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1315,7 +1358,7 @@ public class Studio extends javax.swing.JFrame {
 
         splitPane.setLeftComponent(editingScrollPane);
 
-        tab_pane.addTab("tab1", splitPane);
+        tab_pane.addTab("TAB", splitPane);
 
         file_menu.setText("File");
 
@@ -1446,6 +1489,15 @@ public class Studio extends javax.swing.JFrame {
 
         font_menu.setText("Font");
 
+        choose_font_item.setText("Choose font");
+        choose_font_item.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                choose_font_itemActionPerformed(evt);
+            }
+        });
+        font_menu.add(choose_font_item);
+        font_menu.add(font_menu_sep);
+
         def_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
         def_font_item.setText("Default size");
         def_font_item.addActionListener(new java.awt.event.ActionListener() {
@@ -1497,6 +1549,7 @@ public class Studio extends javax.swing.JFrame {
             }
         });
         build_opts_menu.add(mkfl_build_item);
+        build_opts_menu.add(build_menu_sep);
 
         gen_makefile.setText("Generate makefile contents");
         gen_makefile.setEnabled(false);
@@ -1871,7 +1924,7 @@ public class Studio extends javax.swing.JFrame {
 
               if (make) {
                   mkfl_build_item.setSelected(true);
-                  gen_makefile.setSelected(true);
+                  gen_makefile.setEnabled(true);
                   tab_pane.add("makefile", mkfl_editingScrollPane);
                   tab_pane.setSelectedIndex(1);
 
@@ -2163,6 +2216,8 @@ public class Studio extends javax.swing.JFrame {
         editingPane.getDocument().addDocumentListener(listener);
         editingPane.setText(text);
         editingPane.setCaretPosition(caret_position);
+        
+        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_inc_font_itemActionPerformed
 
     private void dec_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dec_font_itemActionPerformed
@@ -2175,6 +2230,8 @@ public class Studio extends javax.swing.JFrame {
         editingPane.getDocument().addDocumentListener(listener);
         editingPane.setText(text);
         editingPane.setCaretPosition(caret_position);
+        
+        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_dec_font_itemActionPerformed
 
     private void def_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_def_font_itemActionPerformed
@@ -2187,6 +2244,8 @@ public class Studio extends javax.swing.JFrame {
         editingPane.getDocument().addDocumentListener(listener);
         editingPane.setText(text);
         editingPane.setCaretPosition(caret_position);
+        
+        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_def_font_itemActionPerformed
 
       private void std_build_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_std_build_itemActionPerformed
@@ -2373,6 +2432,81 @@ public class Studio extends javax.swing.JFrame {
           sketch_name += ".c";
       }//GEN-LAST:event_gen_makefileActionPerformed
 
+    private void verifyButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_verifyButtonMouseEntered
+        info_label.setText(" verify");
+    }//GEN-LAST:event_verifyButtonMouseEntered
+
+    private void verifyButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_verifyButtonMouseExited
+        info_label.setText(" Font Size: " + font_size);
+    }//GEN-LAST:event_verifyButtonMouseExited
+
+    private void uploadButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadButtonMouseEntered
+        info_label.setText(" upload");
+    }//GEN-LAST:event_uploadButtonMouseEntered
+
+    private void uploadButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadButtonMouseExited
+        info_label.setText(" Font Size: " + font_size);
+    }//GEN-LAST:event_uploadButtonMouseExited
+
+    private void searchFieldMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchFieldMouseEntered
+        info_label.setText(" search");
+    }//GEN-LAST:event_searchFieldMouseEntered
+
+    private void searchFieldMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchFieldMouseExited
+        info_label.setText(" Font Size: " + font_size);
+    }//GEN-LAST:event_searchFieldMouseExited
+
+    private void mcuComboMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mcuComboMouseEntered
+        info_label.setText(" select");
+    }//GEN-LAST:event_mcuComboMouseEntered
+
+    private void mcuComboMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mcuComboMouseExited
+        info_label.setText(" Font Size: " + font_size);
+    }//GEN-LAST:event_mcuComboMouseExited
+
+    private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choose_font_itemActionPerformed
+        JFontChooser fc = new JFontChooser();
+        fc.showDialog(null);
+        default_font = fc.getSelectedFont().getFontName() + " ";
+        default_font_size = font_size = fc.getSelectedFontSize();
+        int font_style = fc.getSelectedFontStyle();
+        System.out.println(default_font + default_font_size + " " + font_style);
+        
+        DefaultSyntaxKit.initKit();
+        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+        config.put("DefaultFont", default_font + default_font_size);
+
+        //Style.KEYWORD     if, else, for, while, break...
+        //Style.KEYWORD2    #define, #include, #if, #else...
+        //Style.NUMBER      1, 2, 3, 0xFF, 0b111...
+        //Style.STRING      "any string"
+        //Style.TYPE        int, char, float, static...
+        //Style.COMMENT     comments
+        //Style.OPERATOR    +, -, *, /...
+        //Style.IDENTIFIER  variable names, other text
+        //color, number
+        //number:
+        //  0 = normal
+        //  1 = bold
+        //  2 = italic
+        //  3 = bold italic
+        c_editor_kit = new CSyntaxKit();
+        c_editor_kit.setProperty("Style.KEYWORD", "0x1e06c2, " + font_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", "0x1e06c2, " + font_style);
+        c_editor_kit.setProperty("Style.NUMBER", "0xbc2b13, " + font_style);
+        c_editor_kit.setProperty("Style.STRING", "0xfaba12, 2" + font_style);
+        c_editor_kit.setProperty("Style.TYPE", "0x1e06c2, " + font_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
+        
+        String text = editingPane.getText();
+        editingPane.setEditorKit(c_editor_kit);
+        editingPane.getDocument().addDocumentListener(listener);
+        editingPane.requestFocus();
+        editingPane.setText(text);
+        
+        info_label.setText("Font Size: " + font_size);
+    }//GEN-LAST:event_choose_font_itemActionPerformed
+
     public static void main(String args[]) {
         try {
             LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
@@ -2394,8 +2528,10 @@ public class Studio extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JCheckBoxMenuItem arduino_item;
+    private javax.swing.JPopupMenu.Separator build_menu_sep;
     private javax.swing.ButtonGroup build_options_button_group;
     private javax.swing.JMenu build_opts_menu;
+    private javax.swing.JMenuItem choose_font_item;
     private javax.swing.JTextPane consolePane;
     private javax.swing.JScrollPane consoleScrollPane;
     private javax.swing.JMenuItem dec_font_item;
@@ -2405,8 +2541,10 @@ public class Studio extends javax.swing.JFrame {
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu file_menu;
     private javax.swing.JMenu font_menu;
+    private javax.swing.JPopupMenu.Separator font_menu_sep;
     private javax.swing.JMenuItem gen_makefile;
     private javax.swing.JMenuItem inc_font_item;
+    private javax.swing.JLabel info_label;
     private javax.swing.JLabel iteration_label;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JComboBox mcuCombo;
