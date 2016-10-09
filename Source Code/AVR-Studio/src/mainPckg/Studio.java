@@ -1114,6 +1114,8 @@ public class Studio extends javax.swing.JFrame {
 
                         }
 
+                        save_method();
+
                         if (make) {
                               mkfl_build_item.setSelected(true);
                               gen_makefile.setEnabled(true);
@@ -1204,10 +1206,10 @@ public class Studio extends javax.swing.JFrame {
                               }
                               mkfl_editingPane.setText(text);
                               selected_tab = 1;
+
+                              save_all_method();
+                              mkfl_editingPane.requestFocus();
                         }
-                        
-                        save_all_method();
-                        mkfl_editingPane.requestFocus();
                   } catch (FileNotFoundException ex) {
                         System.err.println(ex.getMessage());
                   }
@@ -1420,7 +1422,7 @@ public class Studio extends javax.swing.JFrame {
             status_label.setText("Status");
 
             iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-            iteration_label.setText("Iteration: 1,935");
+            iteration_label.setText("Iteration: 1,937");
 
             tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
                   public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -2119,7 +2121,7 @@ public class Studio extends javax.swing.JFrame {
                   }
 
                   save_all_method();
-                  
+
                   mkfl_editingPane.requestFocus();
 
             } catch (NullPointerException ex) {
@@ -2560,7 +2562,7 @@ public class Studio extends javax.swing.JFrame {
                         }
                   }
             }
-            
+
             mkfl_editingPane.requestFocus();
       }//GEN-LAST:event_mkfl_build_itemActionPerformed
 
@@ -2627,7 +2629,7 @@ public class Studio extends javax.swing.JFrame {
                     + "upload:\n"
                     + upload_string);
             sketch_name += ".c";
-            
+
             mkfl_editingPane.requestFocus();
       }//GEN-LAST:event_gen_makefileActionPerformed
 
