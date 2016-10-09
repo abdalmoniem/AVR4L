@@ -357,11 +357,20 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="toolBar" max="32767" attributes="0"/>
           <Component id="tab_pane" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="status_label" max="32767" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="iteration_label" min="-2" pref="240" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="status_label" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="iteration_label" min="-2" pref="240" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="char_ins_label" min="-2" pref="267" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="row_col_label" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -376,7 +385,13 @@
                   <Component id="iteration_label" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tab_pane" pref="569" max="32767" attributes="0"/>
+              <Component id="tab_pane" pref="534" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="row_col_label" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="char_ins_label" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -663,7 +678,7 @@
     <Component class="javax.swing.JLabel" name="iteration_label">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="Iteration: 1,674"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 1,935"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">
@@ -675,7 +690,7 @@
       <SubComponents>
         <Container class="javax.swing.JSplitPane" name="splitPane">
           <Properties>
-            <Property name="dividerLocation" type="int" value="390"/>
+            <Property name="dividerLocation" type="int" value="330"/>
             <Property name="orientation" type="int" value="0"/>
             <Property name="continuousLayout" type="boolean" value="true"/>
           </Properties>
@@ -740,5 +755,16 @@
         </Container>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="char_ins_label">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Characters Inserted: 0"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="row_col_label">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="text" type="java.lang.String" value="0:0"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
