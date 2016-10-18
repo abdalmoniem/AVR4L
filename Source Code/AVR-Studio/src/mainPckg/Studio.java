@@ -35,6 +35,8 @@ import java.awt.event.FocusListener;
 import java.util.Enumeration;
 import javax.swing.UIManager.*;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.Lexer;
+import jsyntaxpane.Token;
 import jsyntaxpane.syntaxkits.BashSyntaxKit;
 import jsyntaxpane.syntaxkits.CSyntaxKit;
 import jsyntaxpane.util.Configuration;
@@ -91,6 +93,18 @@ public class Studio extends javax.swing.JFrame {
       private int default_font_size = 15;
       private int font_size = default_font_size;
 
+      Color color = null;
+      int style = -1;
+
+      String keyword_color = null;
+      String keyword2_color = null;
+      String number_color = null;
+      String string_color = null;
+      String type_color = null;
+      String comment_color = null;
+      String operator_color = null;
+      String identifier_color = null;
+
       private void append_to_pane(JTextPane pane, String msg, int mode) throws BadLocationException {
             StyledDocument doc = pane.getStyledDocument();
             SimpleAttributeSet attr = new SimpleAttributeSet();
@@ -127,6 +141,21 @@ public class Studio extends javax.swing.JFrame {
                         StyleConstants.setItalic(attr, true);
                         doc.insertString(doc.getLength(), msg, attr);
                         break;
+            }
+      }
+
+      private String get_style(int style) {
+            switch (style) {
+                  case 0:
+                        return "normal";
+                  case 1:
+                        return "bold";
+                  case 2:
+                        return "italic";
+                  case 3:
+                        return "bold italic";
+                  default:
+                        return null;
             }
       }
 
@@ -934,6 +963,23 @@ public class Studio extends javax.swing.JFrame {
             }).start();
       }
 
+      private String[] get_font() {
+            JFontChooser fc = new JFontChooser();
+            int result = fc.showDialog(null);
+
+            String new_font = null;
+            String new_font_size = null;
+            String new_font_style = null;
+
+            if (result == JFontChooser.OK_OPTION) {
+                  new_font = fc.getSelectedFont().getFontName() + " ";
+                  new_font_size = Integer.toString(fc.getSelectedFontSize());
+                  new_font_style = Integer.toString(fc.getSelectedFontStyle());
+            }
+
+            return new String[]{new_font, new_font_size, new_font_style};
+      }
+
       public Studio(String[] arguments) {
             initComponents();
 
@@ -1128,12 +1174,18 @@ public class Studio extends javax.swing.JFrame {
             //  1 = bold
             //  2 = italic
             //  3 = bold italic
+            keyword_color = "0x1e06c2, ";
+            keyword2_color = "0x1e06c2, ";
+            number_color = "0xbc2b13, ";
+            string_color = "0xfaba12, ";
+            type_color = "0x1e06c2, ";
+
             c_editor_kit = new CSyntaxKit();
-            c_editor_kit.setProperty("Style.KEYWORD", "0x1e06c2, 1");
-            c_editor_kit.setProperty("Style.KEYWORD2", "0x1e06c2, 1");
-            c_editor_kit.setProperty("Style.NUMBER", "0xbc2b13, 1");
-            c_editor_kit.setProperty("Style.STRING", "0xfaba12, 2");
-            c_editor_kit.setProperty("Style.TYPE", "0x1e06c2, 1");
+            c_editor_kit.setProperty("Style.KEYWORD", keyword_color + "1");
+            c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + "1");
+            c_editor_kit.setProperty("Style.NUMBER", number_color + "1");
+            c_editor_kit.setProperty("Style.STRING", string_color + "2");
+            c_editor_kit.setProperty("Style.TYPE", type_color + "1");
 
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
@@ -1283,6 +1335,26 @@ public class Studio extends javax.swing.JFrame {
             build_options_button_group = new javax.swing.ButtonGroup();
             mkfl_editing_scroll_pane = new javax.swing.JScrollPane();
             mkfl_editing_pane = new javax.swing.JEditorPane();
+            pref_frame = new javax.swing.JFrame();
+            pref_category_scroll_pane = new javax.swing.JScrollPane();
+            pref_category_list = new javax.swing.JList();
+            pref_cancel_btn = new javax.swing.JButton();
+            pref_apply_btn = new javax.swing.JButton();
+            pref_ok_btn = new javax.swing.JButton();
+            pref_export_btn = new javax.swing.JButton();
+            pref_import_btn = new javax.swing.JButton();
+            pref_preview_scroll_pane = new javax.swing.JScrollPane();
+            pref_preview_editing_pane = new javax.swing.JEditorPane();
+            pref_preview_label = new javax.swing.JLabel();
+            pref_font_label = new javax.swing.JLabel();
+            pref_font_txt_fld = new javax.swing.JTextField();
+            pref_font_btn = new javax.swing.JButton();
+            pref_style_btn = new javax.swing.JButton();
+            pref_style_label = new javax.swing.JLabel();
+            pref_style_txt_fld = new javax.swing.JTextField();
+            pref_color_btn = new javax.swing.JButton();
+            pref_color_txt_fld = new javax.swing.JTextField();
+            pref_color_label = new javax.swing.JLabel();
             toolbar = new javax.swing.JToolBar();
             verify_button = new javax.swing.JButton();
             upload_button = new javax.swing.JButton();
@@ -1306,6 +1378,7 @@ public class Studio extends javax.swing.JFrame {
             openMenuItem = new javax.swing.JMenuItem();
             save_menu_item = new javax.swing.JMenuItem();
             save_as_menu_item = new javax.swing.JMenuItem();
+            pref_menu_item = new javax.swing.JMenuItem();
             about_menu_item = new javax.swing.JMenuItem();
             exit_menu_item = new javax.swing.JMenuItem();
             tools_menu = new javax.swing.JMenu();
@@ -1349,6 +1422,150 @@ public class Studio extends javax.swing.JFrame {
             );
 
             mkfl_editing_scroll_pane.setViewportView(mkfl_editing_pane);
+
+            pref_frame.setTitle("Preferences");
+            pref_frame.setResizable(false);
+
+            pref_category_list.setBorder(javax.swing.BorderFactory.createTitledBorder("Category:"));
+            pref_category_list.setModel(new javax.swing.AbstractListModel() {
+                  String[] strings = { "Keywords", "Preprocessor Keywords", "Numbers", "Strings", "Comments", "Types", "Operators", "Identifiers" };
+                  public int getSize() { return strings.length; }
+                  public Object getElementAt(int i) { return strings[i]; }
+            });
+            pref_category_scroll_pane.setViewportView(pref_category_list);
+
+            pref_cancel_btn.setText("Cancel");
+            pref_cancel_btn.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        pref_cancel_btnActionPerformed(evt);
+                  }
+            });
+
+            pref_apply_btn.setText("Apply");
+
+            pref_ok_btn.setText("Ok");
+
+            pref_export_btn.setText("Export");
+
+            pref_import_btn.setText("Import");
+
+            pref_preview_editing_pane.setEditable(false);
+            pref_preview_scroll_pane.setViewportView(pref_preview_editing_pane);
+
+            pref_preview_label.setText("Preview:");
+
+            pref_font_label.setText("Font:");
+
+            pref_font_txt_fld.setEditable(false);
+
+            pref_font_btn.setText("...");
+            pref_font_btn.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        pref_font_btnActionPerformed(evt);
+                  }
+            });
+
+            pref_style_btn.setText("...");
+
+            pref_style_label.setText("Style:");
+
+            pref_style_txt_fld.setEditable(false);
+
+            pref_color_btn.setText("...");
+            pref_color_btn.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        pref_color_btnActionPerformed(evt);
+                  }
+            });
+
+            pref_color_txt_fld.setEditable(false);
+
+            pref_color_label.setText("Color:");
+
+            javax.swing.GroupLayout pref_frameLayout = new javax.swing.GroupLayout(pref_frame.getContentPane());
+            pref_frame.getContentPane().setLayout(pref_frameLayout);
+            pref_frameLayout.setHorizontalGroup(
+                  pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                  .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                                    .addComponent(pref_export_btn)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_import_btn)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(pref_ok_btn)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_apply_btn)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_cancel_btn))
+                              .addComponent(pref_preview_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                              .addGroup(pref_frameLayout.createSequentialGroup()
+                                    .addComponent(pref_font_label)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_font_txt_fld)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_font_btn))
+                              .addGroup(pref_frameLayout.createSequentialGroup()
+                                    .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                          .addComponent(pref_preview_label)
+                                          .addGroup(pref_frameLayout.createSequentialGroup()
+                                                .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                                                            .addComponent(pref_color_label)
+                                                            .addGap(18, 18, 18))
+                                                      .addGroup(pref_frameLayout.createSequentialGroup()
+                                                            .addComponent(pref_style_label)
+                                                            .addGap(22, 22, 22)))
+                                                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                      .addGroup(pref_frameLayout.createSequentialGroup()
+                                                            .addComponent(pref_style_txt_fld)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                            .addComponent(pref_style_btn))
+                                                      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                                                            .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                            .addComponent(pref_color_btn)))))
+                                    .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+            );
+            pref_frameLayout.setVerticalGroup(
+                  pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                  .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                              .addGroup(pref_frameLayout.createSequentialGroup()
+                                    .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                          .addComponent(pref_font_label)
+                                          .addComponent(pref_font_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                          .addComponent(pref_font_btn))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                              .addGroup(pref_frameLayout.createSequentialGroup()
+                                    .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                          .addComponent(pref_color_label)
+                                          .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                          .addComponent(pref_color_btn))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                          .addComponent(pref_style_label)
+                                          .addComponent(pref_style_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                          .addComponent(pref_style_btn))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_preview_label)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_preview_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                              .addComponent(pref_cancel_btn)
+                              .addComponent(pref_apply_btn)
+                              .addComponent(pref_ok_btn)
+                              .addComponent(pref_export_btn)
+                              .addComponent(pref_import_btn))
+                        .addContainerGap())
+            );
 
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
             setTitle("AVR Studio");
@@ -1457,7 +1674,7 @@ public class Studio extends javax.swing.JFrame {
             status_label.setText("Status");
 
             iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-            iteration_label.setText("Iteration: 2,399");
+            iteration_label.setText("Iteration: 3,513");
 
             tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
                   public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1536,6 +1753,16 @@ public class Studio extends javax.swing.JFrame {
                   }
             });
             file_menu.add(save_as_menu_item);
+
+            pref_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+            pref_menu_item.setText("Preferences");
+            pref_menu_item.setEnabled(false);
+            pref_menu_item.addActionListener(new java.awt.event.ActionListener() {
+                  public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        pref_menu_itemActionPerformed(evt);
+                  }
+            });
+            file_menu.add(pref_menu_item);
 
             about_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
             about_menu_item.setMnemonic('a');
@@ -1722,7 +1949,7 @@ public class Studio extends javax.swing.JFrame {
                               .addComponent(status_label, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                               .addComponent(iteration_label))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tab_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+                        .addComponent(tab_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                               .addComponent(row_col_label)
@@ -2556,6 +2783,28 @@ public class Studio extends javax.swing.JFrame {
 
       private void tab_paneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tab_paneMouseClicked
             selected_tab = tab_pane.getSelectedIndex();
+
+            if (selected_tab == 0) {
+                  int caret_pos = editing_pane.getCaretPosition();
+
+                  if (caret_pos != editing_pane.getText().length()) {
+                        editing_pane.setCaretPosition(editing_pane.getText().length());
+                        editing_pane.setCaretPosition(caret_pos);
+                  } else {
+                        editing_pane.setCaretPosition(0);
+                        editing_pane.setCaretPosition(caret_pos);
+                  }
+            } else {
+                  int caret_pos = mkfl_editing_pane.getCaretPosition();
+                  
+                  if (caret_pos != mkfl_editing_pane.getText().length()) {
+                        mkfl_editing_pane.setCaretPosition(mkfl_editing_pane.getText().length());
+                        mkfl_editing_pane.setCaretPosition(caret_pos);
+                  } else {
+                        mkfl_editing_pane.setCaretPosition(0);
+                        mkfl_editing_pane.setCaretPosition(caret_pos);
+                  }
+            }
       }//GEN-LAST:event_tab_paneMouseClicked
 
       private void new_file_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_new_file_itemActionPerformed
@@ -2653,52 +2902,202 @@ public class Studio extends javax.swing.JFrame {
     }//GEN-LAST:event_mcuComboMouseExited
 
     private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choose_font_itemActionPerformed
-          JFontChooser fc = new JFontChooser();
-          int result = fc.showDialog(null);
+          String[] reslut = get_font();
+          default_font = reslut[0];
+          default_font_size = font_size = Integer.parseInt(reslut[1]);
+          int font_style = Integer.parseInt(reslut[2]);
 
-          if (result == JFontChooser.OK_OPTION) {
-                default_font = fc.getSelectedFont().getFontName() + " ";
-                default_font_size = font_size = fc.getSelectedFontSize();
-                int font_style = fc.getSelectedFontStyle();
-                System.out.println(default_font + default_font_size + " " + font_style);
+          DefaultSyntaxKit.initKit();
+          config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+          config.put("DefaultFont", default_font + default_font_size);
 
-                DefaultSyntaxKit.initKit();
-                config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-                config.put("DefaultFont", default_font + default_font_size);
+          c_editor_kit = new CSyntaxKit();
+          c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
+          c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
+          c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
+          c_editor_kit.setProperty("Style.STRING", string_color + font_style);
+          c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
+          //c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
 
-                //Style.KEYWORD     if, else, for, while, break...
-                //Style.KEYWORD2    #define, #include, #if, #else...
-                //Style.NUMBER      1, 2, 3, 0xFF, 0b111...
-                //Style.STRING      "any string"
-                //Style.TYPE        int, char, float, static...
-                //Style.COMMENT     comments
-                //Style.OPERATOR    +, -, *, /...
-                //Style.IDENTIFIER  variable names, other text
-                //color, number
-                //number:
-                //  0 = normal
-                //  1 = bold
-                //  2 = italic
-                //  3 = bold italic
-                c_editor_kit = new CSyntaxKit();
-                c_editor_kit.setProperty("Style.KEYWORD", "0x1e06c2, " + font_style);
-                c_editor_kit.setProperty("Style.KEYWORD2", "0x1e06c2, " + font_style);
-                c_editor_kit.setProperty("Style.NUMBER", "0xbc2b13, " + font_style);
-                c_editor_kit.setProperty("Style.STRING", "0xfaba12, 2" + font_style);
-                c_editor_kit.setProperty("Style.TYPE", "0x1e06c2, " + font_style);
-                c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
+          String text = editing_pane.getText();
+          editing_pane.setEditorKit(c_editor_kit);
+          editing_pane.addFocusListener(f_listener);
+          editing_pane.addCaretListener(c_listener);
+          editing_pane.getDocument().addDocumentListener(listener);
+          editing_pane.requestFocus();
+          editing_pane.setText(text);
 
-                String text = editing_pane.getText();
-                editing_pane.setEditorKit(c_editor_kit);
-                editing_pane.addFocusListener(f_listener);
-                editing_pane.addCaretListener(c_listener);
-                editing_pane.getDocument().addDocumentListener(listener);
-                editing_pane.requestFocus();
-                editing_pane.setText(text);
-
-                info_label.setText("Font Size: " + font_size);
-          }
+          info_label.setText("Font Size: " + font_size);
     }//GEN-LAST:event_choose_font_itemActionPerformed
+
+      private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
+            pref_frame.setLocation(getLocation().x - 40, getLocation().y + 10);
+            pref_frame.setSize(630, 600);
+            pref_frame.setVisible(true);
+
+            pref_font_txt_fld.setText(default_font);
+
+            ListSelectionListener list_sel_listener = new ListSelectionListener() {
+                  @Override
+                  public void valueChanged(ListSelectionEvent e) {
+                        try {
+                              switch (pref_category_list.getSelectedIndex()) {
+                                    case 0:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                                          break;
+                                    case 1:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                                          break;
+                                    case 2:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                                          break;
+                                    case 3:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                                          break;
+                                    case 4:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                                          break;
+                                    case 5:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                                          break;
+                                    case 6:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                                          break;
+                                    case 7:
+                                          color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[0].replace("0x", ""), 16));
+                                          style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                                          break;
+                              }
+                              
+                              pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
+                              pref_color_txt_fld.setBackground(color);
+                              pref_style_txt_fld.setText(get_style(style));
+                        } catch (Exception ex) {
+                              System.err.println(ex.toString());
+                        }
+                  }
+            };
+
+            pref_category_list.addListSelectionListener(list_sel_listener);
+            pref_category_list.setSelectedIndex(0);
+
+            pref_preview_editing_pane.setEditorKit(c_editor_kit);
+            pref_preview_editing_pane.setText(
+                    "/**\n"
+                    + "* author: " + username + "\n"
+                    + "* blinky: toggles PORTB pins on and off every 150ms\n"
+                    + "*/\n\n"
+                    + "#define F_CPU 16000000UL\n"
+                    + "#include <avr/io.h>\n"
+                    + "#include <avr/interrupt.h>\n"
+                    + "#include <util/delay.h>\n\n"
+                    + "int main() {\n"
+                    + "\tchar* a_string = \"this is a string\";\n"
+                    + "\tDDRB = 0xff;\n"
+                    + "\twhile(1) {\n"
+                    + "\t\t//write your code here\n"
+                    + "\t\tPORTB ^= 0xff;\n"
+                    + "\t\t_delay_ms(150);\n"
+                    + "\t}\n"
+                    + "\treturn 0;\n"
+                    + "}");
+      }//GEN-LAST:event_pref_menu_itemActionPerformed
+
+      private void pref_color_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_btnActionPerformed
+            Color c = JColorChooser.showDialog(null, "Choose Color", color);
+
+            if (c != null) {
+                  color = c;
+                  try {
+                        switch (pref_category_list.getSelectedIndex()) {
+                              case 0:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                                    String color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.KEYWORD", color_style);
+                                    break;
+                              case 1:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.KEYWORD2", color_style);
+                                    break;
+                              case 2:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.NUMBER", color_style);
+                                    break;
+                              case 3:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.STRING", color_style);
+                                    break;
+                              case 4:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.COMMENT", color_style);
+                                    break;
+                              case 5:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.TYPE", color_style);
+                                    break;
+                              case 6:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.OPERATOR", color_style);
+                                    break;
+                              case 7:
+                                    style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                                    c_editor_kit.setProperty("Style.IDENTIFIER", color_style);
+                                    break;
+                        }
+                        pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
+                        pref_color_txt_fld.setBackground(color);
+                        pref_style_txt_fld.setText(get_style(style));
+
+                        String text = pref_preview_editing_pane.getText();
+                        pref_preview_editing_pane.setEditorKit(c_editor_kit);
+                        pref_preview_editing_pane.setText(text);
+                  } catch (Exception ex) {
+                        System.err.println(ex.toString());
+                  }
+
+            }
+
+      }//GEN-LAST:event_pref_color_btnActionPerformed
+
+      private void pref_cancel_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_cancel_btnActionPerformed
+            pref_frame.setVisible(false);
+      }//GEN-LAST:event_pref_cancel_btnActionPerformed
+
+      private void pref_font_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_font_btnActionPerformed
+            String[] reslut = get_font();
+            String new_font = reslut[0];
+            int new_font_size = Integer.parseInt(reslut[1]);
+            int font_style = Integer.parseInt(reslut[2]);
+
+            DefaultSyntaxKit.initKit();
+            Configuration new_config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+            new_config.put("DefaultFont", new_font + new_font_size);
+
+            CSyntaxKit pref_c_editor_kit = new CSyntaxKit();
+            pref_c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
+            pref_c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
+            pref_c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
+            pref_c_editor_kit.setProperty("Style.STRING", string_color + font_style);
+            pref_c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
+
+            String text = pref_preview_editing_pane.getText();
+            pref_preview_editing_pane.setEditorKit(pref_c_editor_kit);
+            pref_preview_editing_pane.setText(text);
+      }//GEN-LAST:event_pref_font_btnActionPerformed
 
       public static void main(String args[]) {
             try {
@@ -2749,6 +3148,27 @@ public class Studio extends javax.swing.JFrame {
       private javax.swing.JMenu new_menu;
       private javax.swing.JMenuItem openMenuItem;
       private javax.swing.JMenu port_menu;
+      private javax.swing.JButton pref_apply_btn;
+      private javax.swing.JButton pref_cancel_btn;
+      private javax.swing.JList pref_category_list;
+      private javax.swing.JScrollPane pref_category_scroll_pane;
+      private javax.swing.JButton pref_color_btn;
+      private javax.swing.JLabel pref_color_label;
+      private javax.swing.JTextField pref_color_txt_fld;
+      private javax.swing.JButton pref_export_btn;
+      private javax.swing.JButton pref_font_btn;
+      private javax.swing.JLabel pref_font_label;
+      private javax.swing.JTextField pref_font_txt_fld;
+      private javax.swing.JFrame pref_frame;
+      private javax.swing.JButton pref_import_btn;
+      private javax.swing.JMenuItem pref_menu_item;
+      private javax.swing.JButton pref_ok_btn;
+      private javax.swing.JEditorPane pref_preview_editing_pane;
+      private javax.swing.JLabel pref_preview_label;
+      private javax.swing.JScrollPane pref_preview_scroll_pane;
+      private javax.swing.JButton pref_style_btn;
+      private javax.swing.JLabel pref_style_label;
+      private javax.swing.JTextField pref_style_txt_fld;
       private javax.swing.JDialog privacy_dialog;
       private javax.swing.JScrollPane privacy_scroll_pane;
       private javax.swing.JTextPane privacy_text_pane;
