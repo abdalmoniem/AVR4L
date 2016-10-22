@@ -24,6 +24,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -406,6 +407,7 @@ public class JFontChooser extends JComponent {
     public int showDialog(Component parent) {
         dialogResultValue = ERROR_OPTION;
         JDialog dialog = createDialog(parent);
+        dialog.setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
         dialog.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 dialogResultValue = CANCEL_OPTION;
