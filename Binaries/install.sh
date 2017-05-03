@@ -1,36 +1,65 @@
 #!/bin/bash
 
+#################################################################
+#	Filename: install.h														 #
+#	Modification Date: Sun, Oct  9 2016 01:00:04						 #
+#	Creator: hifnawy_moniem@hotmail.com									 #
+#	Description: installs AVR-Studio for linux and all its		 #
+#					 dependencies and creates an alias for it.		 #
+#################################################################
+
+# check if user is root
+if [[ $(id -u) -ne 0 ]]
+then
+	echo "This script installs and modifies some system files, please run as root or sudo."
+	exit 1
+fi
+
 echo "Installing..."
 
+# install avr toolchain
 apt-get install gcc-avr binutils-avr avr-libc
 apt-get install gdb-avr
 apt-get install avrdude
 
+# check if the system already contains
+# the program folder and delete it to
+# start a fresh installation
 if [ -d "/usr/share/avr-studio" ]
 then
 	rm -rf /usr/share/avr-studio
 fi
 
+# copy AVR-Studio core files and folders
 mkdir /usr/share/avr-studio
 cp -r ./bin/AVR-Studio.jar /usr/share/avr-studio
 cp -r ./bin/lib /usr/share/avr-studio
 cp -r ./bin/icon.png /usr/share/avr-studio
 cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
-chmod 777 /usr/share/applications/avr-studio.desktop
 
+chmod a+rw -R /usr/share/avr-studio/*
+chmod a+x -R /usr/share/avr-studio/lib
+chmod a+x /usr/share/applications/avr-studio.desktop
+
+# check if an alias already exists
+# if not add it
 if [ -f "$HOME/.bash_aliases" ]
 then
 	if ! grep -Fxq "alias avr-studio=\"java -jar /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
 	then
 		echo "alias avr-studio=\"java -jar /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
-		echo "added alias to $HOME/.bash_aliases"
+		printf "\nAdded alias to $HOME/.bash_aliases\n"
 	else
-		echo "alias already in $HOME/.bash_aliases"
+		printf "\nAlias already in $HOME/.bash_aliases\n"
 	fi
 fi
+
+# update the system environment variables by
+# sourcing the bash files
 source $HOME/.bash_aliases
 source $HOME/.bashrc
 
+# check if installation has gone all the way down
 if [ -f "/usr/share/avr-studio/AVR-Studio.jar" ]
 then
 	if [ -d "/usr/share/avr-studio/lib" ]
