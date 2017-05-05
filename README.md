@@ -14,7 +14,7 @@ developing Codes for microcontrollers based on Atmel's AVR families
 4. restart your terminal session in order to activate the program's alias.
 5. you can now type `avr-studio` in any terminal session or find it in the dash if you have `Ubuntu` installed.
 
-# Features
+# Features:
 1. Cross platform (Linux, Mac OSX, Windows)
 2. Creative and intuitive text editor with auto-complete and suggestions.
 3. Two options for compiling your code: normal compilation mode and makefile mode.
