@@ -1,4 +1,4 @@
-## The Life Of Dino
+## AVR-Studio
 
 ![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot.png)
 
