@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=AVR Studio
 Comment=AVR Studio IDE and USBasp Programmer
-Exec=java -jar /usr/share/avr-studio/AVR-Studio.jar %f
+Exec=java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar %f
 Icon=/usr/share/avr-studio/icon.png
 Terminal=false
 Type=Application

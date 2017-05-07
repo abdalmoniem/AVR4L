@@ -1,6 +1,7 @@
 ## AVR-Studio
 
-![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot.png)
+![AVR-Studio Screenshot 1](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_2.png)
+![AVR-Studio Screenshot 2](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_1.png)
 
 # About
 AVR-Studio aims to deliver an easy to use and user friendly Integrated Development Environment for

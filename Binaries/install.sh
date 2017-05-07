@@ -35,6 +35,7 @@ mkdir /usr/share/avr-studio
 cp -r ./bin/AVR-Studio.jar /usr/share/avr-studio
 cp -r ./bin/lib /usr/share/avr-studio
 cp -r ./bin/icon.png /usr/share/avr-studio
+cp -r ./bin/avr-studio-about.png /usr/share/avr-studio
 cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
 
 chmod a+rw -R /usr/share/avr-studio/*
