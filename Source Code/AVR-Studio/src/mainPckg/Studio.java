@@ -1743,7 +1743,7 @@ public class Studio extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 6,912");
+        iteration_label.setText("Iteration: 7,112");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -3192,7 +3192,7 @@ public class Studio extends javax.swing.JFrame {
 
     private void serial_terminal_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serial_terminal_menu_itemActionPerformed
         JSerialPanel serial_panel = new JSerialPanel();
-        
+
         serial_panel.set_sending_text_field(serial_send_txt_fld);
         serial_panel.set_send_btn(serial_send_btn);
         serial_panel.set_receiving_pane(serial_rcv_text_pane);
@@ -3200,7 +3200,7 @@ public class Studio extends javax.swing.JFrame {
         serial_panel.set_baud_rate_como_box(serial_baud_rate_combo_bx);
         serial_panel.set_serial_frame(serial_frame);
         serial_panel.set_port(port);
-        
+
         serial_panel.showPanel();
     }//GEN-LAST:event_serial_terminal_menu_itemActionPerformed
 

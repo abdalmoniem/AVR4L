@@ -15,6 +15,12 @@ then
 	exit 1
 fi
 
+if [ -z $JAVA_HOME ]
+then
+	echo "You called the script without passing the environment variables, please run as sudo with -E switch."
+	exit 1
+fi
+
 echo "Installing..."
 
 # install avr toolchain
@@ -34,6 +40,10 @@ fi
 mkdir /usr/share/avr-studio
 cp -r ./bin/AVR-Studio.jar /usr/share/avr-studio
 cp -r ./bin/lib /usr/share/avr-studio
+cp -r ./bin/dependencies/RXTXcomm.jar $JAVA_HOME/jre/lib/ext/RXTXcomm.jar
+cp -r ./bin/dependencies/librxtxSerial.so $JAVA_HOME/jre/lib/amd64/librxtxSerial.so
+cp -r ./bin/dependencies/librxtxParallel.so $JAVA_HOME/jre/lib/amd64/librxtxParallel.so
+
 cp -r ./bin/icon.png /usr/share/avr-studio
 cp -r ./bin/avr-studio-about.png /usr/share/avr-studio
 cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
@@ -46,9 +56,9 @@ chmod a+x /usr/share/applications/avr-studio.desktop
 # if not add it
 if [ -f "$HOME/.bash_aliases" ]
 then
-	if ! grep -Fxq "alias avr-studio=\"java -jar /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
+	if ! grep -Fxq "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
 	then
-		echo "alias avr-studio=\"java -jar /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
+		echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
 		printf "\nAdded alias to $HOME/.bash_aliases\n"
 	else
 		printf "\nAlias already in $HOME/.bash_aliases\n"

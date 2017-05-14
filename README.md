@@ -1,6 +1,6 @@
 # AVR-Studio
 
-![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_1.png)
+![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_3.png)
 
 ## About:
 AVR-Studio aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR-Studio is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
@@ -10,7 +10,7 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
 2. Clone/download this folder to your computer.
 3. cd into the binaries directory.
-4. run `sudo ./install.sh` within this folder.
+4. run `sudo -E ./install.sh` within this folder.
 5. restart your terminal session in order to activate the program's alias.
 6. you can now type `avr-studio` in any terminal session or find it in the dash if you have `Ubuntu` installed.
 

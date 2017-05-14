@@ -1055,7 +1055,7 @@
     <Component class="javax.swing.JLabel" name="iteration_label">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="Iteration: 6,912"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 7,112"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">
