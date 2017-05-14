@@ -27,7 +27,7 @@ further development and testing is needed.
 1. Cross platform (Linux, Mac OSX, Windows)
 2. Creative coding environment with auto-complete, suggestions and other features.
 3. Two options for compiling your code:
-	1. normal compilation mode.
+	1. standard mode.
 	2. makefile mode.
 4. Compiling .c files of various atmega parts or microcontrollers.
 5. Uploadind .hex files to various atmega parts or microcontrollers.
