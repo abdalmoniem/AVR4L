@@ -1,7 +1,7 @@
 package mainPckg;
 
 import com.sun.glass.ui.Cursor;
-import gnu.io.CommPortIdentifier;
+import gnu.io.*;
 import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
@@ -921,40 +921,62 @@ public class Studio extends javax.swing.JFrame {
         }
     }
 
+    private boolean is_in_ports_menu(JMenu menu, String other) {
+        for (int i = 0; i < menu.getMenuComponentCount(); i++) {
+            JCheckBoxMenuItem item = (JCheckBoxMenuItem) menu.getMenuComponent(i);
+
+            if (item.getText().equals(other)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void search_ports() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                boolean msg = false;
+                
+                while (true) {                    
                     try {
                         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
                         ButtonGroup ports_button_group = new ButtonGroup();
                         int counter = 0;
-
-                        if (!usbasp_item.isSelected()) {
-                            port_menu.removeAll();
-                            port_menu.setEnabled(true);
-                        } else {
-                            port_menu.setEnabled(false);
-                        }
 
                         while (portEnum.hasMoreElements()) {
                             CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
                             JCheckBoxMenuItem new_port = new JCheckBoxMenuItem(currPortId.getName());
 
                             new_port.addActionListener((ActionEvent e) -> {
-                                prog_option = usbasp_item.isSelected() ? "usbasp" : arduino_item.isSelected() ? "arduino -b57600 -P " + currPortId.getName()
-                                        : "stk500v1 -b19200 -P " + currPortId.getName();
-                                System.out.println(prog_option);
+                                port = new_port.getText();
                             });
-                            ports_button_group.add(new_port);
-                            port_menu.add(new_port);
-                            new_port.setSelected(true);
+
+                            if (!is_in_ports_menu(port_menu, new_port.getText())) {
+                                ports_button_group.add(new_port);
+                                port_menu.add(new_port);
+                                new_port.setSelected(true);
+                            }
+                            
+                            if (usbasp_item.isSelected()) {
+                                port_menu.setText("Port: You are using USBASP");
+                                port_menu.setEnabled(false);
+                            }
+                            
                             counter++;
+                            
+                            msg = false;
                         }
 
                         if (counter < 1) {
                             port_menu.setEnabled(false);
+                            msg = true;
+                        }
+
+                        if (msg) {
+                            System.out.println("no ports found");
+                            msg = !msg;
                         }
 
                         Thread.sleep(300);
@@ -986,7 +1008,9 @@ public class Studio extends javax.swing.JFrame {
     public Studio(String[] arguments) {
         initComponents();
 
-//            search_ports();
+        port_menu.setEnabled(true);
+        search_ports();
+
         int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
         int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
 
@@ -997,9 +1021,8 @@ public class Studio extends javax.swing.JFrame {
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.setLocation(screen_width / 3, screen_height / 15);
 
-        port_menu.setEnabled(false);
         prog_option = "usbasp";
-        mcuCombo.setSelectedItem("atmega16");
+        mcuCombo.setSelectedItem("atmega328p");
         mmcu = mcuCombo.getSelectedItem().toString();
 
         DateFormat dateFormat = new SimpleDateFormat("MMMdd_YY");
@@ -1405,6 +1428,7 @@ public class Studio extends javax.swing.JFrame {
         usbasp_item = new javax.swing.JCheckBoxMenuItem();
         arduino_item = new javax.swing.JCheckBoxMenuItem();
         stk500v1_item = new javax.swing.JCheckBoxMenuItem();
+        avr_isp_item = new javax.swing.JCheckBoxMenuItem();
         port_menu = new javax.swing.JMenu();
         view_menu = new javax.swing.JMenu();
         font_menu = new javax.swing.JMenu();
@@ -1743,7 +1767,7 @@ public class Studio extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 7,112");
+        iteration_label.setText("Iteration: 10,539");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1914,6 +1938,15 @@ public class Studio extends javax.swing.JFrame {
             }
         });
         prog_options_menu.add(stk500v1_item);
+
+        programmer_options_button_group.add(avr_isp_item);
+        avr_isp_item.setText("AVR ISP");
+        avr_isp_item.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avr_isp_itemActionPerformed(evt);
+            }
+        });
+        prog_options_menu.add(avr_isp_item);
 
         tools_menu.add(prog_options_menu);
 
@@ -2620,11 +2653,14 @@ public class Studio extends javax.swing.JFrame {
     private void usbasp_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usbasp_itemActionPerformed
         prog_option = "usbasp";
         port_menu.setEnabled(false);
+        port_menu.setText("Port: You are using USBASP");
+        gen_makefileActionPerformed(evt);
     }//GEN-LAST:event_usbasp_itemActionPerformed
 
     private void stk500v1_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stk500v1_itemActionPerformed
         port_menu.removeAll();
         port_menu.setEnabled(true);
+        port_menu.setText("Port");
         serial_terminal_menu_item.setEnabled(true);
 
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
@@ -2648,6 +2684,7 @@ public class Studio extends javax.swing.JFrame {
                     port = currPortId.getName();
                     new_port.setSelected(true);
                     prog_option = "stk500v1 -b19200 -P " + currPortId.getName();
+                    gen_makefileActionPerformed(evt);
                     counter++;
                 }
                 if (counter < 1) {
@@ -2661,8 +2698,9 @@ public class Studio extends javax.swing.JFrame {
     private void arduino_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arduino_itemActionPerformed
         port_menu.removeAll();
         port_menu.setEnabled(true);
+        port_menu.setText("Port");
         serial_terminal_menu_item.setEnabled(true);
-
+        
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
         ButtonGroup ports_button_group = new ButtonGroup();
         new Thread(new Runnable() {
@@ -2684,6 +2722,7 @@ public class Studio extends javax.swing.JFrame {
                     port = currPortId.getName();
                     new_port.setSelected(true);
                     prog_option = "arduino -b57600 -P " + currPortId.getName();
+                    gen_makefileActionPerformed(evt);
                     counter++;
                 }
                 if (counter < 1) {
@@ -3204,6 +3243,44 @@ public class Studio extends javax.swing.JFrame {
         serial_panel.showPanel();
     }//GEN-LAST:event_serial_terminal_menu_itemActionPerformed
 
+    private void avr_isp_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avr_isp_itemActionPerformed
+        port_menu.removeAll();
+        port_menu.setEnabled(true);
+        port_menu.setText("Port");
+        serial_terminal_menu_item.setEnabled(true);
+
+        Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+        ButtonGroup ports_button_group = new ButtonGroup();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int counter = 0;
+                while (portEnum.hasMoreElements()) {
+                    CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+                    JCheckBoxMenuItem new_port = new JCheckBoxMenuItem(currPortId.getName());
+                    new_port.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            prog_option = "avrisp -b19200 -P " + currPortId.getName();
+                            System.out.println(prog_option);
+                        }
+                    });
+                    ports_button_group.add(new_port);
+                    port_menu.add(new_port);
+                    port = currPortId.getName();
+                    new_port.setSelected(true);
+                    prog_option = "avrisp -b19200 -P " + currPortId.getName();
+                    gen_makefileActionPerformed(evt);
+                    counter++;
+                }
+                if (counter < 1) {
+                    port_menu.setEnabled(false);
+                    serial_terminal_menu_item.setEnabled(false);
+                }
+            }
+        }).start();
+    }//GEN-LAST:event_avr_isp_itemActionPerformed
+
     public static void main(String args[]) {
         try {
             LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[3];
@@ -3225,6 +3302,7 @@ public class Studio extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem about_menu_item;
     private javax.swing.JCheckBoxMenuItem arduino_item;
+    private javax.swing.JCheckBoxMenuItem avr_isp_item;
     private javax.swing.JPopupMenu.Separator build_menu_sep;
     private javax.swing.ButtonGroup build_options_button_group;
     private javax.swing.JMenu build_opts_menu;

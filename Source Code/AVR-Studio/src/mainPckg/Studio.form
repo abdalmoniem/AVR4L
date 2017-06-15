@@ -591,6 +591,17 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stk500v1_itemActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="avr_isp_item">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="programmer_options_button_group"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="AVR ISP"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="avr_isp_itemActionPerformed"/>
+                  </Events>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="port_menu">
@@ -1055,7 +1066,7 @@
     <Component class="javax.swing.JLabel" name="iteration_label">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="Iteration: 7,112"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 10,539"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">
