@@ -57,6 +57,10 @@ public class JSerialPanel {
     private String port;
 
     private static final int TIME_OUT = 2000;
+    
+    private final int MODE_WARNING = 0;
+    private final int MODE_ERROR = 1;
+    private final int MODE_CONSOLE = 2;
 
     private void append_to_pane(JTextPane pane, String msg, int mode) {
         try {
@@ -100,7 +104,7 @@ public class JSerialPanel {
 
         serial_port.addDataListener(spdl);
 
-        append_to_pane(rcv_editor_pane, "Serial Monitor Ready.\n", 2);
+        append_to_pane(rcv_editor_pane, "Serial Monitor Ready.\n", MODE_CONSOLE);
     }
 
     public void set_serial_frame(JFrame frame) {
@@ -155,7 +159,7 @@ public class JSerialPanel {
             int numRead = serial_port.readBytes(newData, newData.length);
 
             String data = new String(newData);
-            append_to_pane(rcv_editor_pane, data, 2);
+            append_to_pane(rcv_editor_pane, data, MODE_CONSOLE);
 
             if (autoscroll_chkbx.isSelected()) {
                 rcv_editor_pane.setCaretPosition(rcv_editor_pane.getDocument().getLength());

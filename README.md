@@ -1,6 +1,6 @@
 # AVR-Studio
 
-![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_4.png)
+![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_5.png)
 
 ## About:
 AVR-Studio aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR-Studio is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
@@ -38,3 +38,29 @@ further development and testing is needed.
 	3. Arduino (arduino)
 	4. USB-ASP (usbasp)
 7. Console area shows results of compilation and uploading.
+
+## Known Issues:
+1. Upload fails with message `permission denied`:
+	AVR-Studio requires super user permissions to upload sketches, you can either:
+	1. `sudo avr-studio` from a terminal
+	2. or add your user to the `dialout` group, most programmers are listed in this group:
+
+		`sudo adduser YOUR_USER dialout`
+
+		note: replace `YOUR_USER` with your linux user
+
+2. Upload fails with message `sudo no tty present and no askpass program specified`:
+	AVR-Studio requires super user permissions to upload sketches, but has not been run as root (sudo),
+	so when it tries to issue a command with sudo, there is no way for it to get the root password, so you can either:
+	1. `sudo avr-studio` from a terminal
+	2. or prevent sudo commands from requesting passwords:
+		
+		in a terminal type:
+		
+		`sudo visudo`
+		
+		and add the following to the end of the file:
+
+		`YOUR_USER ALL = NOPASSWD : ALL`
+
+		note: replace `YOUR_USER` with your linux user

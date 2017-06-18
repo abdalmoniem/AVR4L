@@ -569,16 +569,16 @@
                 <Property name="text" type="java.lang.String" value="Programmer"/>
               </Properties>
               <SubComponents>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="usbasp_item">
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="avr_isp_item">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="programmer_options_button_group"/>
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="USBasp"/>
+                    <Property name="text" type="java.lang.String" value="AVR ISP"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="usbasp_itemActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="avr_isp_itemActionPerformed"/>
                   </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="arduino_item">
@@ -603,15 +603,15 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stk500v1_itemActionPerformed"/>
                   </Events>
                 </MenuItem>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="avr_isp_item">
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="usbasp_item">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="programmer_options_button_group"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="AVR ISP"/>
+                    <Property name="text" type="java.lang.String" value="USBasp"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="avr_isp_itemActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="usbasp_itemActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>
@@ -1081,7 +1081,7 @@
     <Component class="javax.swing.JLabel" name="iteration_label">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="Iteration: 10,623"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 12,389"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">

@@ -58,6 +58,7 @@ public class Studio extends javax.swing.JFrame {
 
     private boolean chose_file = false;
     private boolean verified = false;
+    private boolean uploaded = false;
     private boolean error = false;
     private boolean temporary = false;
     private boolean make = false;
@@ -105,6 +106,12 @@ public class Studio extends javax.swing.JFrame {
     String comment_color = null;
     String operator_color = null;
     String identifier_color = null;
+    
+    private final int MODE_NO_ERROR = 0;
+    private final int MODE_WARNING = 1;
+    private final int MODE_ERROR = 2;
+    private final int MODE_EDITING = 3;
+    private final int MODE_CONSOLE = 4;
 
     private void append_to_pane(JTextPane pane, String msg, int mode) throws BadLocationException {
         StyledDocument doc = pane.getStyledDocument();
@@ -180,64 +187,69 @@ public class Studio extends javax.swing.JFrame {
                             || line.toLowerCase().contains("^")
                             || line.toLowerCase().contains("{")
                             || line.toLowerCase().contains("}")) {
-                        append_to_pane(pane, line_before_that_maybe_error + "\n", 2);
-                        append_to_pane(pane, line + "\n", 2);
+                        append_to_pane(pane, line_before_that_maybe_error + "\n", MODE_ERROR);
+                        append_to_pane(pane, line + "\n", MODE_ERROR);
                         error = true;
                     } else if (line.toLowerCase().contains("avrdude done") && error) {
-                        append_to_pane(pane, line + "\n", 2);
-                    } else if (line.toLowerCase().contains("warning") || line.toLowerCase().contains("disable")) {
-                        append_to_pane(pane, line_before_that_maybe_error + "\n", 1);
-                        append_to_pane(pane, line + "\n", 1);
+                        append_to_pane(pane, line + "\n", MODE_ERROR);
+                    } else if (line.toLowerCase().contains("warning")
+                            || line.toLowerCase().contains("disable")
+                            || line.toLowerCase().contains("at top level")) {
+                        append_to_pane(pane, line_before_that_maybe_error + "\n", MODE_WARNING);
+                        append_to_pane(pane, line + "\n", MODE_WARNING);
 
                         if (!os.contains("windows")) {
                             warning = true;
                         }
                         warning_count++;
                     } else if (line.toLowerCase().contains("note")) {
-                        append_to_pane(pane, line + "\n", 1);
+                        append_to_pane(pane, line + "\n", MODE_WARNING);
                     } else {
-                        append_to_pane(pane, line + "\n", 0);
+                        append_to_pane(pane, line + "\n", MODE_NO_ERROR);
                     }
                 } else if (line.toLowerCase().contains("error")
                         || line.toLowerCase().contains("stop")
+                        || line.toLowerCase().contains("note: previous")
                         || line.toLowerCase().contains("no such file")
                         || line.toLowerCase().contains("not found")
                         || line.toLowerCase().contains("undefined reference")
                         || line.toLowerCase().contains("double check chip")
                         || line.toLowerCase().contains("invalid")
                         || line.toLowerCase().contains("failed")) {
-                    append_to_pane(pane, line + "\n", 2);
+                    append_to_pane(pane, line + "\n", MODE_ERROR);
                     error = true;
                 } else if (line.toLowerCase().contains(";")
                         || line.toLowerCase().contains("{")
                         || line.toLowerCase().contains("}")) {
                     if (warning) {
-                        append_to_pane(pane, line + "\n", 1);
+                        append_to_pane(pane, line + "\n", MODE_WARNING);
 
                         if (!os.contains("windows")) {
                             line = br.readLine();
                             if (line != null && line.toLowerCase().contains("^")) {
-                                append_to_pane(pane, line + "\n", 1);
+                                append_to_pane(pane, line + "\n", MODE_WARNING);
                             }
                         }
                         warning_count++;
                         warning = false;
                     } else {
-                        append_to_pane(pane, line + "\n", 2);
+                        append_to_pane(pane, line + "\n", MODE_ERROR);
                         error = true;
                     }
                 } else if (line.toLowerCase().contains("^") && error) {
-                    append_to_pane(pane, line + "\n", 2);
+                    append_to_pane(pane, line + "\n", MODE_ERROR);
                 } else if (line.toLowerCase().contains("avrdude done") && error) {
-                    append_to_pane(pane, line + "\n", 2);
-                } else if (line.toLowerCase().contains("warning") || line.toLowerCase().contains("disable")) {
-                    append_to_pane(pane, line + "\n", 1);
+                    append_to_pane(pane, line + "\n", MODE_ERROR);
+                } else if (line.toLowerCase().contains("warning")
+                        || line.toLowerCase().contains("disable")
+                        || line.toLowerCase().contains("at top level")) {
+                    append_to_pane(pane, line + "\n", MODE_WARNING);
                     warning_count++;
                     warning = true;
                 } else if (line.toLowerCase().contains("note")) {
-                    append_to_pane(pane, line + "\n", 1);
+                    append_to_pane(pane, line + "\n", MODE_WARNING);
                 } else {
-                    append_to_pane(pane, line + "\n", 0);
+                    append_to_pane(pane, line + "\n", MODE_NO_ERROR);
                 }
                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
                 line = br.readLine();
@@ -399,6 +411,7 @@ public class Studio extends javax.swing.JFrame {
     }
 
     private void compile_file() {
+        console_pane.setText("");
         if (mkfl_build_item.isSelected()) {
             save_all_method();
 
@@ -416,7 +429,7 @@ public class Studio extends javax.swing.JFrame {
                 try {
                     String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make compile"};
                     System.out.println(cmd[2]);
-                    append_to_pane(console_pane, cmd[2] + "\n", 4);
+                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                     console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     Process p = new ProcessBuilder(cmd).start();
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -426,46 +439,46 @@ public class Studio extends javax.swing.JFrame {
                         if (f.exists()) {
                             if (warning_count == 1) {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), MODE_WARNING);
                             } else if (warning_count > 0) {
                                 System.out.println(String.format("\n%d errors, %d warnings", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_WARNING);
                             } else {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 0);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_NO_ERROR);
                             }
                             System.out.println("Compiled Successfully for device " + mmcu + " !!!");
-                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", 0);
+                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", MODE_NO_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                             verified = true;
                         } else {
                             if (warning_count == 1) {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                             } else if (warning_count > 0) {
                                 System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             } else {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             }
                             System.err.println("Compilation Terminated, could not generate hex file !!!");
-                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", 2);
+                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", MODE_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         }
                     } else {
                         if (warning_count == 1) {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                         } else if (warning_count > 0) {
                             System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         } else {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         }
                         System.err.println("Errors Occured During Compilation !!!");
-                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", 2);
+                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", MODE_ERROR);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     }
                 } catch (BadLocationException | IOException ex) {
@@ -475,7 +488,7 @@ public class Studio extends javax.swing.JFrame {
                 try {
                     String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make compile"};
                     System.out.println(cmd[2]);
-                    append_to_pane(console_pane, cmd[2] + "\n", 4);
+                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                     console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     Process p = new ProcessBuilder(cmd).start();
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -486,46 +499,46 @@ public class Studio extends javax.swing.JFrame {
                         if (f.exists()) {
                             if (warning_count == 1) {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), MODE_WARNING);
                             } else if (warning_count > 0) {
                                 System.out.println(String.format("\n%d errors, %d warnings", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_WARNING);
                             } else {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 0);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_NO_ERROR);
                             }
                             System.out.println("Compiled Successfully for device " + mmcu + " !!!");
-                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", 0);
+                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", MODE_NO_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                             verified = true;
                         } else {
                             if (warning_count == 1) {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                             } else if (warning_count > 0) {
                                 System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             } else {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             }
                             System.err.println("Compilation Terminated, could not generate hex file !!!");
-                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", 2);
+                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", MODE_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         }
                     } else {
                         if (warning_count == 1) {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                         } else if (warning_count > 0) {
                             System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         } else {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         }
                         System.err.println("Errors Occured During Compilation !!!");
-                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", 2);
+                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", MODE_ERROR);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     }
                 } catch (BadLocationException | IOException ex) {
@@ -551,7 +564,7 @@ public class Studio extends javax.swing.JFrame {
                 try {
                     String[] cmd = {"cmd", "/c", "avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + cPath + " -o " + oPath};
                     System.out.println(cmd[2]);
-                    append_to_pane(console_pane, cmd[2] + "\n", 4);
+                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                     console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     Process p = new ProcessBuilder(cmd).start();
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -560,7 +573,7 @@ public class Studio extends javax.swing.JFrame {
                     if (!error) {
                         cmd = new String[]{"cmd", "/c", "avr-gcc -g -mmcu=" + mmcu + " -o " + elfPath + " " + oPath};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -569,7 +582,7 @@ public class Studio extends javax.swing.JFrame {
                     if (!error) {
                         cmd = new String[]{"cmd", "/c", "avr-objcopy -j .text -j .data -O ihex " + elfPath + " " + hexPath};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -580,7 +593,7 @@ public class Studio extends javax.swing.JFrame {
                         cmd = new String[]{"cmd", "/c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
                             + file_to_open.getAbsolutePath().replace(".c", ".elf") + "\""};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -592,46 +605,46 @@ public class Studio extends javax.swing.JFrame {
                         if (f.exists()) {
                             if (warning_count == 1) {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), MODE_WARNING);
                             } else if (warning_count > 0) {
                                 System.out.println(String.format("\n%d errors, %d warnings", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_WARNING);
                             } else {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 0);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_NO_ERROR);
                             }
                             System.out.println("Compiled Successfully for device " + mmcu + " !!!");
-                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", 0);
+                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", MODE_NO_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                             verified = true;
                         } else {
                             if (warning_count == 1) {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                             } else if (warning_count > 0) {
                                 System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             } else {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             }
                             System.err.println("Compilation Terminated, could not generate hex file !!!");
-                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", 2);
+                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", MODE_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         }
                     } else {
                         if (warning_count == 1) {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                         } else if (warning_count > 0) {
                             System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         } else {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         }
                         System.err.println("Errors Occured During Compilation !!!");
-                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", 2);
+                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", MODE_ERROR);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     }
                 } catch (IOException | BadLocationException ex) {
@@ -641,7 +654,7 @@ public class Studio extends javax.swing.JFrame {
                 try {
                     String[] cmd = {"/bin/sh", "-c", "avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + cPath + " -o " + oPath};
                     System.out.println(cmd[2]);
-                    append_to_pane(console_pane, cmd[2] + "\n", 4);
+                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                     console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     Process p = new ProcessBuilder(cmd).start();
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -650,7 +663,7 @@ public class Studio extends javax.swing.JFrame {
                     if (!error) {
                         cmd = new String[]{"/bin/sh", "-c", "avr-gcc -g -mmcu=" + mmcu + " -o " + elfPath + " " + oPath};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -659,7 +672,7 @@ public class Studio extends javax.swing.JFrame {
                     if (!error) {
                         cmd = new String[]{"/bin/sh", "-c", "avr-objcopy -j .text -j .data -O ihex " + elfPath + " " + hexPath};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -670,7 +683,7 @@ public class Studio extends javax.swing.JFrame {
                         cmd = new String[]{"/bin/sh", "-c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
                             + file_to_open.getAbsolutePath().replace(".c", ".elf") + "\""};
                         System.out.println(cmd[2]);
-                        append_to_pane(console_pane, cmd[2] + "\n", 4);
+                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         p = new ProcessBuilder(cmd).start();
                         br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -682,46 +695,46 @@ public class Studio extends javax.swing.JFrame {
                         if (f.exists()) {
                             if (warning_count == 1) {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warning\n", 0, warning_count), MODE_WARNING);
                             } else if (warning_count > 0) {
                                 System.out.println(String.format("\n%d errors, %d warnings", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 1);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_WARNING);
                             } else {
                                 System.out.println(String.format("\n%d errors, %d warning", 0, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), 0);
+                                append_to_pane(console_pane, String.format("\n%d errors, %d warnings\n", 0, warning_count), MODE_NO_ERROR);
                             }
                             System.out.println("Compiled Successfully for device " + mmcu + " !!!");
-                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", 0);
+                            append_to_pane(console_pane, "Compiled Successfully for device " + mmcu + " !!!\n", MODE_NO_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                             verified = true;
                         } else {
                             if (warning_count == 1) {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                             } else if (warning_count > 0) {
                                 System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             } else {
                                 System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                                append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                             }
                             System.err.println("Compilation Terminated, could not generate hex file !!!");
-                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", 2);
+                            append_to_pane(console_pane, "Compilation Terminated, could not generate hex file !!!\n", MODE_ERROR);
                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                         }
                     } else {
                         if (warning_count == 1) {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warning\n", 1, warning_count), MODE_ERROR);
                         } else if (warning_count > 0) {
                             System.err.println(String.format("\n%d error, %d warnings", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         } else {
                             System.err.println(String.format("\n%d error, %d warning", 1, warning_count));
-                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), 2);
+                            append_to_pane(console_pane, String.format("\n%d error, %d warnings\n", 1, warning_count), MODE_ERROR);
                         }
                         System.err.println("Errors Occured During Compilation !!!");
-                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", 2);
+                        append_to_pane(console_pane, "Errors Occured During Compilation !!!\n", MODE_ERROR);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
                     }
                 } catch (IOException | BadLocationException ex) {
@@ -736,44 +749,130 @@ public class Studio extends javax.swing.JFrame {
 
     private void upload_hex() {
         try {
-            if (verified) {
-                if (error) {
-                    System.out.println("Fix compilation errors and then upload the sketch !!!");
-                    append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", 2);
-                    error = false;
-                } else //upload...
-                {
-                    if (std_build_item.isSelected()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    System.out.println("Uploading...");
-                                    append_to_pane(console_pane, "Uploading...\n", 4);
-                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                    editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
-                                    oPath = cPath.replace(".c", ".o");
-                                    elfPath = cPath.replace(".c", ".elf");
-                                    hexPath = cPath.replace(".c", ".hex");
-                                    editing_pane.setEnabled(false);
+            if (uploaded) {
+                console_pane.setText("");
+                uploaded = false;
+                upload_hex();
+            } else {
+                if (verified) {
+                    if (error) {
+                        System.out.println("Fix compilation errors and then upload the sketch !!!");
+                        append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
+                        error = false;
+                    } else { //upload...
+                        if (std_build_item.isSelected()) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        System.out.println("Uploading...");
+                                        append_to_pane(console_pane, "\nUploading...\n", MODE_CONSOLE);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
+                                        oPath = cPath.replace(".c", ".o");
+                                        elfPath = cPath.replace(".c", ".elf");
+                                        hexPath = cPath.replace(".c", ".hex");
+                                        editing_pane.setEnabled(false);
 
+                                        if (os.equals("windows")) {
+                                            try {
+                                                String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                                //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
+                                                System.out.println(cmd[2]);
+                                                append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                ProcessBuilder pb = new ProcessBuilder(cmd);
+                                                Process p = pb.start();
+                                                BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                                //checkForErrors(console_pane, br);  //no real-time output
+
+                                                int value = 0;
+                                                while (value != -1) {
+                                                    char ch = (char) value;
+                                                    System.out.print(ch);
+                                                    append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    value = br.read();
+                                                }
+                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                String output = console_pane.getText();
+                                                if (output.contains("verified")) {
+                                                    System.out.println("Uploaded Successfully !!!");
+                                                    append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    uploaded = true;
+                                                } else {
+                                                    System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                                    append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    uploaded = false;
+                                                }
+                                                editing_pane.setEnabled(true);
+
+                                            } catch (IOException | BadLocationException ex) {
+                                                System.err.println(ex.toString());
+                                            }
+                                        } else {
+                                            try {
+                                                String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                                //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
+                                                System.out.println(cmd[2]);
+                                                append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                ProcessBuilder pb = new ProcessBuilder(cmd);
+                                                Process p = pb.start();
+                                                BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                                //checkForErrors(console_pane, br);  //no real-time output
+                                                int value = 0;
+                                                while (value != -1) {
+                                                    char ch = (char) value;
+                                                    System.out.print(ch);
+                                                    append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    value = br.read();
+                                                }
+                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                String output = console_pane.getText();
+                                                if (output.contains("verified")) {
+                                                    System.out.println("Uploaded Successfully !!!");
+                                                    append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    uploaded = true;
+                                                } else {
+                                                    System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                                    append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                    uploaded = false;
+                                                }
+                                                editing_pane.setEnabled(true);
+
+                                            } catch (IOException | BadLocationException ex) {
+                                                System.err.println(ex.toString());
+                                            }
+                                        }
+                                    } catch (BadLocationException ex) {
+                                        System.err.println(ex.toString());
+                                    }
+                                }
+                            }).start();
+                        } else if (mkfl_build_item.isSelected()) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
                                     if (os.equals("windows")) {
                                         try {
-                                            String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                            //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
+                                            String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
                                             System.out.println(cmd[2]);
-                                            append_to_pane(console_pane, cmd[2] + "\n", 4);
+                                            append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            ProcessBuilder pb = new ProcessBuilder(cmd);
-                                            Process p = pb.start();
+                                            Process p = new ProcessBuilder(cmd).start();
                                             BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                             //checkForErrors(console_pane, br);  //no real-time output
-
                                             int value = 0;
                                             while (value != -1) {
                                                 char ch = (char) value;
                                                 System.out.print(ch);
-                                                append_to_pane(console_pane, ch + "", 4);
+                                                append_to_pane(console_pane, ch + "", MODE_CONSOLE);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                                 value = br.read();
                                             }
@@ -781,34 +880,32 @@ public class Studio extends javax.swing.JFrame {
                                             String output = console_pane.getText();
                                             if (output.contains("verified")) {
                                                 System.out.println("Uploaded Successfully !!!");
-                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", 0);
+                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                uploaded = true;
                                             } else {
                                                 System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", 2);
+                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                uploaded = false;
                                             }
-                                            editing_pane.setEnabled(true);
-
-                                        } catch (IOException | BadLocationException ex) {
-                                            System.err.println(ex.toString());
+                                        } catch (BadLocationException | IOException ex) {
+                                            System.err.println(ex.getMessage());
                                         }
                                     } else {
                                         try {
-                                            String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                            //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
+                                            String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
                                             System.out.println(cmd[2]);
-                                            append_to_pane(console_pane, cmd[2] + "\n", 4);
+                                            append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            ProcessBuilder pb = new ProcessBuilder(cmd);
-                                            Process p = pb.start();
+                                            Process p = new ProcessBuilder(cmd).start();
                                             BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                             //checkForErrors(console_pane, br);  //no real-time output
                                             int value = 0;
                                             while (value != -1) {
                                                 char ch = (char) value;
                                                 System.out.print(ch);
-                                                append_to_pane(console_pane, ch + "", 4);
+                                                append_to_pane(console_pane, ch + "", MODE_CONSOLE);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                                 value = br.read();
                                             }
@@ -816,105 +913,34 @@ public class Studio extends javax.swing.JFrame {
                                             String output = console_pane.getText();
                                             if (output.contains("verified")) {
                                                 System.out.println("Uploaded Successfully !!!");
-                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", 0);
+                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                uploaded = true;
                                             } else {
                                                 System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", 2);
+                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                                uploaded = false;
                                             }
-                                            editing_pane.setEnabled(true);
-
-                                        } catch (IOException | BadLocationException ex) {
-                                            System.err.println(ex.toString());
+                                        } catch (BadLocationException | IOException ex) {
+                                            System.err.println(ex.getMessage());
                                         }
-                                    }
-                                } catch (BadLocationException ex) {
-                                    System.err.println(ex.toString());
-                                }
-                            }
-                        }).start();
-                    } else if (mkfl_build_item.isSelected()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (os.equals("windows")) {
-                                    try {
-                                        String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
-                                        System.out.println(cmd[2]);
-                                        append_to_pane(console_pane, cmd[2] + "\n", 4);
-                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        Process p = new ProcessBuilder(cmd).start();
-                                        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                        //checkForErrors(console_pane, br);  //no real-time output
-                                        int value = 0;
-                                        while (value != -1) {
-                                            char ch = (char) value;
-                                            System.out.print(ch);
-                                            append_to_pane(console_pane, ch + "", 4);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            value = br.read();
-                                        }
-                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        String output = console_pane.getText();
-                                        if (output.contains("verified")) {
-                                            System.out.println("Uploaded Successfully !!!");
-                                            append_to_pane(console_pane, "Uploaded Successfully !!!\n", 0);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        } else {
-                                            System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                            append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", 2);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        }
-                                    } catch (BadLocationException | IOException ex) {
-                                        System.err.println(ex.getMessage());
-                                    }
-                                } else {
-                                    try {
-                                        String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
-                                        System.out.println(cmd[2]);
-                                        append_to_pane(console_pane, cmd[2] + "\n", 4);
-                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        Process p = new ProcessBuilder(cmd).start();
-                                        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                        //checkForErrors(console_pane, br);  //no real-time output
-                                        int value = 0;
-                                        while (value != -1) {
-                                            char ch = (char) value;
-                                            System.out.print(ch);
-                                            append_to_pane(console_pane, ch + "", 4);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            value = br.read();
-                                        }
-                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        String output = console_pane.getText();
-                                        if (output.contains("verified")) {
-                                            System.out.println("Uploaded Successfully !!!");
-                                            append_to_pane(console_pane, "Uploaded Successfully !!!\n", 0);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        } else {
-                                            System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                            append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", 2);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        }
-                                    } catch (BadLocationException | IOException ex) {
-                                        System.err.println(ex.getMessage());
                                     }
                                 }
-                            }
-                        }).start();
+                            }).start();
+                        }
                     }
-                }
-            } else {
-                compile_file();
-                if (error) {
-                    System.out.println("Fix compilation errors and then upload the sketch !!!");
-                    append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", 2);
-                    error = false;
                 } else {
-                    upload_hex();
-                }
+                    compile_file();
+                    if (error) {
+                        System.out.println("Fix compilation errors and then upload the sketch !!!");
+                        append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
+                        error = false;
+                    } else {
+                        upload_hex();
+                    }
 
+                }
             }
         } catch (BadLocationException ex) {
             System.err.println(ex.toString());
@@ -936,15 +962,13 @@ public class Studio extends javax.swing.JFrame {
     private void search_ports() {
         new Thread(new Runnable() {
             @Override
-            public void run() {                
-                while (true) {                    
+            public void run() {
+                while (true) {
                     try {
-                        mmcu_port_label.setText(mmcu + " on " + port);
-                        
                         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
                         ButtonGroup ports_button_group = new ButtonGroup();
                         int counter = 0;
-                        
+
                         while (portEnum.hasMoreElements()) {
                             CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
                             JCheckBoxMenuItem new_port = new JCheckBoxMenuItem(currPortId.getName());
@@ -958,16 +982,28 @@ public class Studio extends javax.swing.JFrame {
                                 port_menu.add(new_port);
                                 new_port.setSelected(true);
                             }
-                            
+
                             if (usbasp_item.isSelected()) {
                                 port_menu.setText("Port: You are using USBASP");
                                 port_menu.setEnabled(false);
-                                port = "usbasp";
+                            } else if (avr_isp_item.isSelected()) {
+                                port_menu.setText("Port: You are using USBASP");
+                                port_menu.setEnabled(false);
+
+                                if (port == null) {
+                                    port = new_port.getText();
+                                }
+
+                                prog_option = "avrisp -b19200 -P " + port;
                             } else {
                                 port_menu.setText("Port");
                                 port_menu.setEnabled(true);
+
+                                if (port == null) {
+                                    port = new_port.getText();
+                                }
                             }
-                            
+
                             counter++;
                         }
 
@@ -975,10 +1011,16 @@ public class Studio extends javax.swing.JFrame {
                             // System.out.println("no ports found");
                             serial_terminal_menu_item.setEnabled(false);
                             port_menu.setEnabled(false);
+
+                            port = null;
+
+                            mmcu_port_label.setText(mmcu + " on none");
                         } else {
                             serial_terminal_menu_item.setEnabled(true);
+
+                            mmcu_port_label.setText(mmcu + " on " + port);
                         }
-                        
+
                         Thread.sleep(300);
                     } catch (InterruptedException ex) {
                         System.err.println(ex.getMessage());
@@ -1021,7 +1063,7 @@ public class Studio extends javax.swing.JFrame {
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.setLocation(screen_width / 3, screen_height / 15);
 
-        prog_option = "usbasp";
+        prog_option = "avrisp -b19200 -P " + port;
         mcuCombo.setSelectedItem("atmega328p");
         mmcu = mcuCombo.getSelectedItem().toString();
 
@@ -1427,10 +1469,10 @@ public class Studio extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         serial_terminal_menu_item = new javax.swing.JMenuItem();
         prog_options_menu = new javax.swing.JMenu();
-        usbasp_item = new javax.swing.JCheckBoxMenuItem();
+        avr_isp_item = new javax.swing.JCheckBoxMenuItem();
         arduino_item = new javax.swing.JCheckBoxMenuItem();
         stk500v1_item = new javax.swing.JCheckBoxMenuItem();
-        avr_isp_item = new javax.swing.JCheckBoxMenuItem();
+        usbasp_item = new javax.swing.JCheckBoxMenuItem();
         port_menu = new javax.swing.JMenu();
         view_menu = new javax.swing.JMenu();
         font_menu = new javax.swing.JMenu();
@@ -1776,7 +1818,7 @@ public class Studio extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 10,623");
+        iteration_label.setText("Iteration: 12,389");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1922,15 +1964,15 @@ public class Studio extends javax.swing.JFrame {
 
         prog_options_menu.setText("Programmer");
 
-        programmer_options_button_group.add(usbasp_item);
-        usbasp_item.setSelected(true);
-        usbasp_item.setText("USBasp");
-        usbasp_item.addActionListener(new java.awt.event.ActionListener() {
+        programmer_options_button_group.add(avr_isp_item);
+        avr_isp_item.setSelected(true);
+        avr_isp_item.setText("AVR ISP");
+        avr_isp_item.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                usbasp_itemActionPerformed(evt);
+                avr_isp_itemActionPerformed(evt);
             }
         });
-        prog_options_menu.add(usbasp_item);
+        prog_options_menu.add(avr_isp_item);
 
         programmer_options_button_group.add(arduino_item);
         arduino_item.setText("Arduino");
@@ -1950,14 +1992,14 @@ public class Studio extends javax.swing.JFrame {
         });
         prog_options_menu.add(stk500v1_item);
 
-        programmer_options_button_group.add(avr_isp_item);
-        avr_isp_item.setText("AVR ISP");
-        avr_isp_item.addActionListener(new java.awt.event.ActionListener() {
+        programmer_options_button_group.add(usbasp_item);
+        usbasp_item.setText("USBasp");
+        usbasp_item.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                avr_isp_itemActionPerformed(evt);
+                usbasp_itemActionPerformed(evt);
             }
         });
-        prog_options_menu.add(avr_isp_item);
+        prog_options_menu.add(usbasp_item);
 
         tools_menu.add(prog_options_menu);
 
@@ -2714,7 +2756,7 @@ public class Studio extends javax.swing.JFrame {
         port_menu.setEnabled(true);
         port_menu.setText("Port");
         serial_terminal_menu_item.setEnabled(true);
-        
+
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
         ButtonGroup ports_button_group = new ButtonGroup();
         new Thread(new Runnable() {
