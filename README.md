@@ -8,7 +8,7 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 ## Installation and Running:
 ### Linux:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
-	1. How to install [here](https://java.com/en/download/help/linux_x64_install.xml)
+	1. How to install: [https://java.com/en/download/help/linux_x64_install.xml](https://java.com/en/download/help/linux_x64_install.xml)
 2. Clone/download this folder to your computer.
 3. cd into the `Binaries` directory.
 4. run `sudo -E ./install.sh` within this folder.
@@ -18,8 +18,8 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 ### Windows:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
 2. Clone/download this folder to your computer.
-3. cd into the binaries directory.
-4. run `AVR-Studio.exe`
+3. cd into the Binaries/bin directory.
+4. run `AVR-Studio.jar`
 
 ### Mac OSX:
 further development and testing is needed.
