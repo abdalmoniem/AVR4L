@@ -795,7 +795,7 @@ public class Studio extends javax.swing.JFrame {
                                         }
                                     } else {
                                         try {
-                                            String[] cmd = {"/bin/sh", "-c", "sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                            String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
                                             //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
                                             System.out.println(cmd[2]);
                                             append_to_pane(console_pane, cmd[2] + "\n", 4);
@@ -936,15 +936,15 @@ public class Studio extends javax.swing.JFrame {
     private void search_ports() {
         new Thread(new Runnable() {
             @Override
-            public void run() {
-                boolean msg = false;
-                
+            public void run() {                
                 while (true) {                    
                     try {
+                        mmcu_port_label.setText(mmcu + " on " + port);
+                        
                         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
                         ButtonGroup ports_button_group = new ButtonGroup();
                         int counter = 0;
-
+                        
                         while (portEnum.hasMoreElements()) {
                             CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
                             JCheckBoxMenuItem new_port = new JCheckBoxMenuItem(currPortId.getName());
@@ -962,23 +962,23 @@ public class Studio extends javax.swing.JFrame {
                             if (usbasp_item.isSelected()) {
                                 port_menu.setText("Port: You are using USBASP");
                                 port_menu.setEnabled(false);
+                                port = "usbasp";
+                            } else {
+                                port_menu.setText("Port");
+                                port_menu.setEnabled(true);
                             }
                             
                             counter++;
-                            
-                            msg = false;
                         }
 
                         if (counter < 1) {
+                            // System.out.println("no ports found");
+                            serial_terminal_menu_item.setEnabled(false);
                             port_menu.setEnabled(false);
-                            msg = true;
+                        } else {
+                            serial_terminal_menu_item.setEnabled(true);
                         }
-
-                        if (msg) {
-                            System.out.println("no ports found");
-                            msg = !msg;
-                        }
-
+                        
                         Thread.sleep(300);
                     } catch (InterruptedException ex) {
                         System.err.println(ex.getMessage());
@@ -1393,6 +1393,7 @@ public class Studio extends javax.swing.JFrame {
         serial_autoscroll_chk_bx = new javax.swing.JCheckBox();
         serial_rcv_scroll_pane = new javax.swing.JScrollPane();
         serial_rcv_text_pane = new javax.swing.JTextPane();
+        serial_port_label = new javax.swing.JLabel();
         toolbar = new javax.swing.JToolBar();
         verify_button = new javax.swing.JButton();
         upload_button = new javax.swing.JButton();
@@ -1409,6 +1410,7 @@ public class Studio extends javax.swing.JFrame {
         editing_pane = new javax.swing.JEditorPane();
         char_ins_label = new javax.swing.JLabel();
         row_col_label = new javax.swing.JLabel();
+        mmcu_port_label = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         file_menu = new javax.swing.JMenu();
         new_menu = new javax.swing.JMenu();
@@ -1623,6 +1625,8 @@ public class Studio extends javax.swing.JFrame {
         serial_rcv_text_pane.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         serial_rcv_scroll_pane.setViewportView(serial_rcv_text_pane);
 
+        serial_port_label.setText("Port:");
+
         javax.swing.GroupLayout serial_frameLayout = new javax.swing.GroupLayout(serial_frame.getContentPane());
         serial_frame.getContentPane().setLayout(serial_frameLayout);
         serial_frameLayout.setHorizontalGroup(
@@ -1632,15 +1636,18 @@ public class Studio extends javax.swing.JFrame {
                 .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(serial_rcv_scroll_pane)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
-                        .addComponent(serial_autoscroll_chk_bx)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 289, Short.MAX_VALUE)
-                        .addComponent(serial_baud_rate_label)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
                         .addComponent(serial_send_txt_fld)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(serial_send_btn)))
+                        .addComponent(serial_send_btn))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
+                        .addComponent(serial_autoscroll_chk_bx)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 289, Short.MAX_VALUE)
+                        .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(serial_frameLayout.createSequentialGroup()
+                                .addComponent(serial_baud_rate_label)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(serial_port_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         serial_frameLayout.setVerticalGroup(
@@ -1651,7 +1658,9 @@ public class Studio extends javax.swing.JFrame {
                     .addComponent(serial_send_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(serial_send_btn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(serial_rcv_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                .addComponent(serial_rcv_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(serial_port_label)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1767,7 +1776,7 @@ public class Studio extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 10,539");
+        iteration_label.setText("Iteration: 10,623");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1799,6 +1808,8 @@ public class Studio extends javax.swing.JFrame {
 
         row_col_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         row_col_label.setText("0:0");
+
+        mmcu_port_label.setText("mmcu on port");
 
         file_menu.setText("File");
 
@@ -2039,7 +2050,7 @@ public class Studio extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(tab_pane)
+            .addComponent(tab_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2048,9 +2059,11 @@ public class Studio extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(iteration_label, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(char_ins_label, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(row_col_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(row_col_label)
+                        .addGap(18, 18, 18)
+                        .addComponent(char_ins_label)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(mmcu_port_label)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -2066,7 +2079,8 @@ public class Studio extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(row_col_label)
-                    .addComponent(char_ins_label))
+                    .addComponent(char_ins_label)
+                    .addComponent(mmcu_port_label))
                 .addContainerGap())
         );
 
@@ -2842,8 +2856,8 @@ public class Studio extends javax.swing.JFrame {
 
               if (makefile == null) {
                   sketch_name = sketch_name.replace(".c", "");
-                  String upload_string = os.equals("windows") ? "    avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
-                          : "    sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
+                  String upload_string = os.equals("windows") ? "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
+                          : "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
                   mkfl_editing_pane.setText(
                           "#when compiling you must name the compilation rule to compile\n"
                           + "#when uploading you must name the upload rule to upload\n\n"
@@ -2979,8 +2993,8 @@ public class Studio extends javax.swing.JFrame {
 
       private void gen_makefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gen_makefileActionPerformed
           sketch_name = sketch_name.replace(".c", "");
-          String upload_string = os.equals("windows") ? "    avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
-                  : "    sudo avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
+          String upload_string = os.equals("windows") ? "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
+                  : "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
           mkfl_editing_pane.setText(
                   "#when compiling you must name the compilation rule to compile\n"
                   + "#when uploading you must name the upload rule to upload\n\n"
@@ -3236,6 +3250,7 @@ public class Studio extends javax.swing.JFrame {
         serial_panel.set_send_btn(serial_send_btn);
         serial_panel.set_receiving_pane(serial_rcv_text_pane);
         serial_panel.set_autoscroll_check_box(serial_autoscroll_chk_bx);
+        serial_panel.set_port_label(serial_port_label);
         serial_panel.set_baud_rate_como_box(serial_baud_rate_combo_bx);
         serial_panel.set_serial_frame(serial_frame);
         serial_panel.set_port(port);
@@ -3328,6 +3343,7 @@ public class Studio extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem mkfl_build_item;
     private javax.swing.JEditorPane mkfl_editing_pane;
     public static javax.swing.JScrollPane mkfl_editing_scroll_pane;
+    private javax.swing.JLabel mmcu_port_label;
     private javax.swing.JMenuItem new_file_item;
     private javax.swing.JMenu new_menu;
     private javax.swing.JMenuItem openMenuItem;
@@ -3366,6 +3382,7 @@ public class Studio extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> serial_baud_rate_combo_bx;
     private javax.swing.JLabel serial_baud_rate_label;
     private javax.swing.JFrame serial_frame;
+    private javax.swing.JLabel serial_port_label;
     private javax.swing.JScrollPane serial_rcv_scroll_pane;
     private javax.swing.JTextPane serial_rcv_text_pane;
     private javax.swing.JButton serial_send_btn;

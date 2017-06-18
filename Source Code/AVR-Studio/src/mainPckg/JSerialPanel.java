@@ -33,6 +33,7 @@ import javax.swing.text.StyledDocument;
 import com.fazecast.jSerialComm.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 
 /**
  *
@@ -50,6 +51,7 @@ public class JSerialPanel {
     private JButton send_btn;
     private JTextPane rcv_editor_pane;
     private JCheckBox autoscroll_chkbx;
+    private JLabel serial_port_label;
     private JComboBox baud_rate_combo;
     private JFrame serial_frame;
     private String port;
@@ -88,6 +90,7 @@ public class JSerialPanel {
         serial_frame.setSize(700, 500);
         serial_frame.setVisible(true);
         rcv_editor_pane.setText(null);
+        serial_port_label.setText("Port: " + port);
 
         serial_port = SerialPort.getCommPort(port);
         serial_port.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
@@ -126,6 +129,10 @@ public class JSerialPanel {
     public void set_autoscroll_check_box(JCheckBox chkbx) {
         this.autoscroll_chkbx = chkbx;
         this.autoscroll_chkbx.setSelected(true);
+    }
+    
+    public void set_port_label(JLabel lbl) {
+        this.serial_port_label = lbl;
     }
 
     public void set_baud_rate_como_box(JComboBox cmbx) {

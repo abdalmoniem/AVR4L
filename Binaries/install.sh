@@ -47,23 +47,27 @@ cp -r ./bin/dependencies/librxtxParallel.so $JAVA_HOME/jre/lib/amd64/librxtxPara
 cp -r ./bin/icon.png /usr/share/avr-studio
 cp -r ./bin/avr-studio-about.png /usr/share/avr-studio
 cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
+cp -r ./bin/avr-studio /usr/bin
 
 chmod a+rw -R /usr/share/avr-studio/*
 chmod a+x -R /usr/share/avr-studio/lib
 chmod a+x /usr/share/applications/avr-studio.desktop
+chmod a+x /usr/bin/avr-studio
 
 # check if an alias already exists
 # if not add it
-if [ -f "$HOME/.bash_aliases" ]
-then
-	if ! grep -Fxq "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
-	then
-		echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
-		printf "\nAdded alias to $HOME/.bash_aliases\n"
-	else
-		printf "\nAlias already in $HOME/.bash_aliases\n"
-	fi
-fi
+# if [ -f "$HOME/.bash_aliases" ]
+# then
+# 	if ! grep -Fxq "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
+# 	then
+# 		echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
+# 		printf "\nAdded alias to $HOME/.bash_aliases\n"
+# 	else
+# 		printf "\nAlias already in $HOME/.bash_aliases\n"
+# 	fi
+# else
+# 	echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
+# fi
 
 # update the system environment variables by
 # sourcing the bash files
@@ -81,8 +85,8 @@ then
 			then
 				GREEN='\033[0;32m'
 				NC='\033[0m'
-				printf "${GREEN}\nInstalled Successfully !!!${NC}\n"
-				printf "\nPLEASE RESTART TERMINAL !!!\n"
+				printf "${GREEN}\nAVR-Studio was installed successfully !!!${NC}\n\n"
+				# printf "\nPLEASE RESTART TERMINAL !!!\n"
 			fi
 		fi
 	fi
