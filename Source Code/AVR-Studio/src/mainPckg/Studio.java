@@ -987,8 +987,8 @@ public class Studio extends javax.swing.JFrame {
                                 port_menu.setText("Port: You are using USBASP");
                                 port_menu.setEnabled(false);
                             } else if (avr_isp_item.isSelected()) {
-                                port_menu.setText("Port: You are using USBASP");
-                                port_menu.setEnabled(false);
+                                port_menu.setText("Port");
+                                port_menu.setEnabled(true);
 
                                 if (port == null) {
                                     port = new_port.getText();

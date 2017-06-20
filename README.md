@@ -17,9 +17,19 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 
 ### Windows:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
-2. Clone/download this folder to your computer.
-3. cd into the Binaries/bin directory.
-4. run `AVR-Studio.jar`
+2. Make sure that you have the `AVR Toolchain` installed and in the environment path.
+
+[Install from here](http://www.atmel.com/tools/atmelavrtoolchainforwindows.aspx)
+
+3. Clone/download this folder to your computer.
+4. cd into the Binaries/bin directory.
+5. run `AVR-Studio.jar`
+
+note: windows version is not fully tested and may be unstable,
+it is intended for cross platform compatability.
+
+The project's full focus is on the linux version as it aims to be an alternative to Atmel's Studio for linux users.
+
 
 ### Mac OSX:
 further development and testing is needed.
