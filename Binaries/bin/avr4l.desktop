@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=AVR4L
+Comment=AVR Studio IDE and USBasp Programmer
+Exec=avr4l
+Icon=/usr/share/avr4l/icon.png
+Terminal=false
+Type=Application
+Categories=Application;Development;IDE;Programming;

@@ -1,2 +1,0 @@
-#!/bin/bash
-java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar

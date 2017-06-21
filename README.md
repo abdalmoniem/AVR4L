@@ -1,9 +1,9 @@
-# AVR-Studio
+# AVR4L
 
-![AVR-Studio Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR-Studio/master/assets/screenshot_5.png)
+![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_5.png)
 
 ## About:
-AVR-Studio aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR-Studio is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
+AVR4L aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR4L is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
 
 ## Installation and Running:
 ### Linux:
@@ -12,8 +12,7 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 2. Clone/download this folder to your computer.
 3. cd into the `Binaries` directory.
 4. run `sudo -E ./install.sh` within this folder.
-5. restart your terminal session in order to activate the program's alias.
-6. you can now type `avr-studio` in any terminal session or find it in the dash if you have `Ubuntu` installed.
+5. you can now type `avr4l` in any terminal session or find it in the dash if you have `Ubuntu` installed.
 
 ### Windows:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
@@ -23,7 +22,7 @@ AVR-Studio aims to deliver an easy to use and user friendly Integrated Developme
 
 3. Clone/download this folder to your computer.
 4. cd into the Binaries/bin directory.
-5. run `AVR-Studio.jar`
+5. run `AVR4L.jar`
 
 	note: windows version is not fully tested and may be unstable,
 	it is intended for cross platform compatability.
@@ -51,8 +50,8 @@ further development and testing is needed.
 
 ## Known Issues:
 1. Upload fails with message `permission denied`:
-	AVR-Studio requires super user permissions to upload sketches, you can either:
-	1. `sudo avr-studio` from a terminal
+	AVR4L requires super user permissions to upload sketches, you can either:
+	1. `sudo avr4l` from a terminal
 	2. or add your user to the `dialout` group, most programmers are listed in this group:
 
 		`sudo adduser YOUR_USER dialout`
@@ -60,9 +59,9 @@ further development and testing is needed.
 		note: replace `YOUR_USER` with your linux user
 
 2. Upload fails with message `sudo no tty present and no askpass program specified`:
-	AVR-Studio requires super user permissions to upload sketches, but has not been run as root (sudo),
+	AVR4L requires super user permissions to upload sketches, but has not been run as root (sudo),
 	so when it tries to issue a command with sudo, there is no way for it to get the root password, so you can either:
-	1. `sudo avr-studio` from a terminal
+	1. `sudo avr4l` from a terminal
 	2. or prevent sudo commands from requesting passwords:
 		
 		in a terminal type:

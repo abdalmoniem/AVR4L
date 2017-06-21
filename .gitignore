@@ -50,3 +50,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+/Source Code/AVR4L/nbproject/private/
+/Source Code/AVR4L/build/
+/Source Code/AVR4L/dist/

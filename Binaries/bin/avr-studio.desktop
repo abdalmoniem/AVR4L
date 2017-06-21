@@ -1,9 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Name=AVR Studio
-Comment=AVR Studio IDE and USBasp Programmer
-Exec=avr-studio
-Icon=/usr/share/avr-studio/icon.png
-Terminal=false
-Type=Application
-Categories=Application;Development;IDE;Programming;

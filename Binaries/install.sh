@@ -4,7 +4,7 @@
 #	Filename: install.h														 #
 #	Modification Date: Sun, Oct  9 2016 01:00:04						 #
 #	Creator: hifnawy_moniem@hotmail.com									 #
-#	Description: installs AVR-Studio for linux and all its		 #
+#	Description: installs AVR4L for linux and all its		 #
 #					 dependencies and creates an alias for it.		 #
 #################################################################
 
@@ -31,42 +31,42 @@ apt-get install avrdude
 # check if the system already contains
 # the program folder and delete it to
 # start a fresh installation
-if [ -d "/usr/share/avr-studio" ]
+if [ -d "/usr/share/avr4l" ]
 then
-	rm -rf /usr/share/avr-studio
+	rm -rf /usr/share/avr4l
 fi
 
-# copy AVR-Studio core files and folders
-mkdir /usr/share/avr-studio
-cp -r ./bin/AVR-Studio.jar /usr/share/avr-studio
-cp -r ./bin/lib /usr/share/avr-studio
+# copy AVR4L core files and folders
+mkdir /usr/share/avr4l
+cp -r ./bin/AVR4L.jar /usr/share/avr4l
+cp -r ./bin/lib /usr/share/avr4l
 cp -r ./bin/dependencies/RXTXcomm.jar $JAVA_HOME/jre/lib/ext/RXTXcomm.jar
 cp -r ./bin/dependencies/librxtxSerial.so $JAVA_HOME/jre/lib/amd64/librxtxSerial.so
 cp -r ./bin/dependencies/librxtxParallel.so $JAVA_HOME/jre/lib/amd64/librxtxParallel.so
 
-cp -r ./bin/icon.png /usr/share/avr-studio
-cp -r ./bin/avr-studio-about.png /usr/share/avr-studio
-cp -r ./bin/avr-studio.desktop /usr/share/applications/avr-studio.desktop
-cp -r ./bin/avr-studio /usr/bin
+cp -r ./bin/icon.png /usr/share/avr4l
+cp -r ./bin/avr4l-about.png /usr/share/avr4l
+cp -r ./bin/avr4l.desktop /usr/share/applications/avr4l.desktop
+cp -r ./bin/avr4l /usr/bin
 
-chmod a+rw -R /usr/share/avr-studio/*
-chmod a+x -R /usr/share/avr-studio/lib
-chmod a+x /usr/share/applications/avr-studio.desktop
-chmod a+x /usr/bin/avr-studio
+chmod a+rw -R /usr/share/avr4l/*
+chmod a+x -R /usr/share/avr4l/lib
+chmod a+x /usr/share/applications/avr4l.desktop
+chmod a+x /usr/bin/avr4l
 
 # check if an alias already exists
 # if not add it
 # if [ -f "$HOME/.bash_aliases" ]
 # then
-# 	if ! grep -Fxq "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" $HOME/.bash_aliases
+# 	if ! grep -Fxq "alias avr4l=\"java -jar -splash:/usr/share/avr4l/avr4l-about.png /usr/share/avr4l/AVR4L.jar\"" $HOME/.bash_aliases
 # 	then
-# 		echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
+# 		echo "alias avr4l=\"java -jar -splash:/usr/share/avr4l/avr4l-about.png /usr/share/avr4l/AVR4L.jar\"" >> $HOME/.bash_aliases
 # 		printf "\nAdded alias to $HOME/.bash_aliases\n"
 # 	else
 # 		printf "\nAlias already in $HOME/.bash_aliases\n"
 # 	fi
 # else
-# 	echo "alias avr-studio=\"java -jar -splash:/usr/share/avr-studio/avr-studio-about.png /usr/share/avr-studio/AVR-Studio.jar\"" >> $HOME/.bash_aliases
+# 	echo "alias avr4l=\"java -jar -splash:/usr/share/avr4l/avr4l-about.png /usr/share/avr4l/AVR4L.jar\"" >> $HOME/.bash_aliases
 # fi
 
 # update the system environment variables by
@@ -75,17 +75,17 @@ source $HOME/.bash_aliases
 source $HOME/.bashrc
 
 # check if installation has gone all the way down
-if [ -f "/usr/share/avr-studio/AVR-Studio.jar" ]
+if [ -f "/usr/share/avr4l/AVR4L.jar" ]
 then
-	if [ -d "/usr/share/avr-studio/lib" ]
+	if [ -d "/usr/share/avr4l/lib" ]
 	then
-		if [ -f "/usr/share/avr-studio/icon.png" ]
+		if [ -f "/usr/share/avr4l/icon.png" ]
 		then
-			if [ -f "/usr/share/applications/avr-studio.desktop" ]
+			if [ -f "/usr/share/applications/avr4l.desktop" ]
 			then
 				GREEN='\033[0;32m'
 				NC='\033[0m'
-				printf "${GREEN}\nAVR-Studio was installed successfully !!!${NC}\n\n"
+				printf "${GREEN}\nAVR for Linux was installed successfully !!!${NC}\n\n"
 				# printf "\nPLEASE RESTART TERMINAL !!!\n"
 			fi
 		fi
