@@ -106,12 +106,13 @@ public class Main_Frame extends javax.swing.JFrame {
     String comment_color = null;
     String operator_color = null;
     String identifier_color = null;
-    
+
     private final int MODE_NO_ERROR = 0;
     private final int MODE_WARNING = 1;
     private final int MODE_ERROR = 2;
     private final int MODE_EDITING = 3;
     private final int MODE_CONSOLE = 4;
+    private CSyntaxKit old_c_syntax_kit;
 
     private void append_to_pane(JTextPane pane, String msg, int mode) throws BadLocationException {
         StyledDocument doc = pane.getStyledDocument();
@@ -1415,9 +1416,6 @@ public class Main_Frame extends javax.swing.JFrame {
         pref_ok_btn = new javax.swing.JButton();
         pref_export_btn = new javax.swing.JButton();
         pref_import_btn = new javax.swing.JButton();
-        pref_preview_scroll_pane = new javax.swing.JScrollPane();
-        pref_preview_editing_pane = new javax.swing.JEditorPane();
-        pref_preview_label = new javax.swing.JLabel();
         pref_font_label = new javax.swing.JLabel();
         pref_font_txt_fld = new javax.swing.JTextField();
         pref_font_btn = new javax.swing.JButton();
@@ -1527,17 +1525,22 @@ public class Main_Frame extends javax.swing.JFrame {
         });
 
         pref_apply_btn.setText("Apply");
+        pref_apply_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_apply_btnActionPerformed(evt);
+            }
+        });
 
         pref_ok_btn.setText("Ok");
+        pref_ok_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_ok_btnActionPerformed(evt);
+            }
+        });
 
         pref_export_btn.setText("Export");
 
         pref_import_btn.setText("Import");
-
-        pref_preview_editing_pane.setEditable(false);
-        pref_preview_scroll_pane.setViewportView(pref_preview_editing_pane);
-
-        pref_preview_label.setText("Preview:");
 
         pref_font_label.setText("Font:");
 
@@ -1584,7 +1587,6 @@ public class Main_Frame extends javax.swing.JFrame {
                         .addComponent(pref_apply_btn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pref_cancel_btn))
-                    .addComponent(pref_preview_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(pref_frameLayout.createSequentialGroup()
                         .addComponent(pref_font_label)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1592,27 +1594,24 @@ public class Main_Frame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pref_font_btn))
                     .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pref_preview_label)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_color_label)
+                                .addGap(18, 18, 18))
                             .addGroup(pref_frameLayout.createSequentialGroup()
-                                .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(pref_style_label)
+                                .addGap(22, 22, 22)))
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_style_txt_fld)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                        .addComponent(pref_color_label)
-                                        .addGap(18, 18, 18))
-                                    .addGroup(pref_frameLayout.createSequentialGroup()
-                                        .addComponent(pref_style_label)
-                                        .addGap(22, 22, 22)))
-                                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(pref_frameLayout.createSequentialGroup()
-                                        .addComponent(pref_style_txt_fld)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(pref_style_btn))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                        .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(pref_color_btn)))))
+                                .addComponent(pref_style_btn))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pref_color_btn)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -1638,11 +1637,7 @@ public class Main_Frame extends javax.swing.JFrame {
                             .addComponent(pref_style_label)
                             .addComponent(pref_style_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(pref_style_btn))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pref_preview_label)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pref_preview_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pref_cancel_btn)
                     .addComponent(pref_apply_btn)
@@ -3118,7 +3113,7 @@ public class Main_Frame extends javax.swing.JFrame {
 
       private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
           pref_frame.setLocation(getLocation().x - 40, getLocation().y + 10);
-          pref_frame.setSize(630, 600);
+          pref_frame.setSize(630, 300);
           pref_frame.setVisible(true);
 
           pref_font_txt_fld.setText(default_font);
@@ -3173,32 +3168,12 @@ public class Main_Frame extends javax.swing.JFrame {
 
           pref_category_list.addListSelectionListener(list_sel_listener);
           pref_category_list.setSelectedIndex(0);
-
-          pref_preview_editing_pane.setEditorKit(c_editor_kit);
-          pref_preview_editing_pane.setText(
-                  "/**\n"
-                  + "* author: " + username + "\n"
-                  + "* blinky: toggles PORTB pins on and off every 150ms\n"
-                  + "*/\n\n"
-                  + "#define F_CPU 16000000UL\n"
-                  + "#include <avr/io.h>\n"
-                  + "#include <avr/interrupt.h>\n"
-                  + "#include <util/delay.h>\n\n"
-                  + "int main() {\n"
-                  + "\tchar* a_string = \"this is a string\";\n"
-                  + "\tDDRB = 0xff;\n"
-                  + "\twhile(1) {\n"
-                  + "\t\t//write your code here\n"
-                  + "\t\tPORTB ^= 0xff;\n"
-                  + "\t\t_delay_ms(150);\n"
-                  + "\t}\n"
-                  + "\treturn 0;\n"
-                  + "}");
       }//GEN-LAST:event_pref_menu_itemActionPerformed
 
       private void pref_color_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_btnActionPerformed
           Color c = JColorChooser.showDialog(null, "Choose Color", color);
-
+          old_c_syntax_kit = c_editor_kit;
+          
           if (c != null) {
               color = c;
               try {
@@ -3247,12 +3222,8 @@ public class Main_Frame extends javax.swing.JFrame {
                   pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
                   pref_color_txt_fld.setBackground(color);
                   pref_style_txt_fld.setText(get_style(style));
-
-                  String text = pref_preview_editing_pane.getText();
-                  pref_preview_editing_pane.setEditorKit(c_editor_kit);
-                  pref_preview_editing_pane.setText(text);
               } catch (Exception ex) {
-                  System.err.println(ex.toString());
+                  System.err.println(ex.getCause());
               }
 
           }
@@ -3261,6 +3232,8 @@ public class Main_Frame extends javax.swing.JFrame {
 
       private void pref_cancel_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_cancel_btnActionPerformed
           pref_frame.setVisible(false);
+          
+          c_editor_kit = old_c_syntax_kit;
       }//GEN-LAST:event_pref_cancel_btnActionPerformed
 
       private void pref_font_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_font_btnActionPerformed
@@ -3279,10 +3252,8 @@ public class Main_Frame extends javax.swing.JFrame {
           pref_c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
           pref_c_editor_kit.setProperty("Style.STRING", string_color + font_style);
           pref_c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
-
-          String text = pref_preview_editing_pane.getText();
-          pref_preview_editing_pane.setEditorKit(pref_c_editor_kit);
-          pref_preview_editing_pane.setText(text);
+          
+          pref_font_txt_fld.setText(new_font);
       }//GEN-LAST:event_pref_font_btnActionPerformed
 
     private void serial_terminal_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serial_terminal_menu_itemActionPerformed
@@ -3337,6 +3308,20 @@ public class Main_Frame extends javax.swing.JFrame {
             }
         }).start();
     }//GEN-LAST:event_avr_isp_itemActionPerformed
+
+    private void pref_apply_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_apply_btnActionPerformed
+        String ed_text = editing_pane.getText();
+        editing_pane.setEditorKit(c_editor_kit);
+        editing_pane.setText(ed_text);
+        
+        
+    }//GEN-LAST:event_pref_apply_btnActionPerformed
+
+    private void pref_ok_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_ok_btnActionPerformed
+        String ed_text = editing_pane.getText();
+        editing_pane.setEditorKit(c_editor_kit);
+        editing_pane.setText(ed_text);
+    }//GEN-LAST:event_pref_ok_btnActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -3405,9 +3390,6 @@ public class Main_Frame extends javax.swing.JFrame {
     private javax.swing.JButton pref_import_btn;
     private javax.swing.JMenuItem pref_menu_item;
     private javax.swing.JButton pref_ok_btn;
-    private javax.swing.JEditorPane pref_preview_editing_pane;
-    private javax.swing.JLabel pref_preview_label;
-    private javax.swing.JScrollPane pref_preview_scroll_pane;
     private javax.swing.JButton pref_style_btn;
     private javax.swing.JLabel pref_style_label;
     private javax.swing.JTextField pref_style_txt_fld;
