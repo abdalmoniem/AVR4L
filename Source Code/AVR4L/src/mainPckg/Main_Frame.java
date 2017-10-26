@@ -181,8 +181,11 @@ public class Main_Frame extends javax.swing.JFrame {
                             || line.toLowerCase().contains("no such file")
                             || line.toLowerCase().contains("not found")
                             || line.toLowerCase().contains("undefined reference")
+                            || line.toLowerCase().contains("operable program or batch file")
                             || line.toLowerCase().contains("double check chip")
+                            || line.toLowerCase().contains("is not recognized")
                             || line.toLowerCase().contains("invalid")
+                            || line.toLowerCase().contains("cannot find")
                             || line.toLowerCase().contains("failed")
                             || line.toLowerCase().contains(";")
                             || line.toLowerCase().contains("^")
@@ -209,6 +212,9 @@ public class Main_Frame extends javax.swing.JFrame {
                         append_to_pane(pane, line + "\n", MODE_NO_ERROR);
                     }
                 } else if (line.toLowerCase().contains("error")
+                        || line.toLowerCase().contains("cannot find")
+                        || line.toLowerCase().contains("is not recognized")
+                        || line.toLowerCase().contains("operable program or batch file")
                         || line.toLowerCase().contains("stop")
                         || line.toLowerCase().contains("note: previous")
                         || line.toLowerCase().contains("no such file")
@@ -413,6 +419,8 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private void compile_file() {
         console_pane.setText("");
+        tab_pane.setSelectedIndex(0);
+        
         if (mkfl_build_item.isSelected()) {
             save_all_method();
 
@@ -591,7 +599,7 @@ public class Main_Frame extends javax.swing.JFrame {
                     }
 
                     if (!error) {
-                        cmd = new String[]{"cmd", "/c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
+                        cmd = new String[]{"cmd", "/c", "rem -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
                             + file_to_open.getAbsolutePath().replace(".c", ".elf") + "\""};
                         System.out.println(cmd[2]);
                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
@@ -1813,7 +1821,7 @@ public class Main_Frame extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 12,389");
+        iteration_label.setText("Iteration: 16,129");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -2569,7 +2577,9 @@ public class Main_Frame extends javax.swing.JFrame {
                   + "Compiled, Edited and Designed by AbdAlMoniem AlHifnawy"
                   + "\n"
                   + "**********************************************************************************";
-
+          
+          System.out.println(copy_left);
+          
           if (os.equals("windows")) {
               privacy_text_pane.setFont(new Font("Consolas", Font.PLAIN, 15));
           }
