@@ -93,7 +93,7 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private String default_font = null;
     private int default_font_size = 15;
-    private int font_size = default_font_size;
+    private int current_font_size = default_font_size;
 
     Color color = null;
     int style = -1;
@@ -420,7 +420,7 @@ public class Main_Frame extends javax.swing.JFrame {
     private void compile_file() {
         console_pane.setText("");
         tab_pane.setSelectedIndex(0);
-        
+
         if (mkfl_build_item.isSelected()) {
             save_all_method();
 
@@ -599,8 +599,7 @@ public class Main_Frame extends javax.swing.JFrame {
                     }
 
                     if (!error) {
-                        cmd = new String[]{"cmd", "/c", "rem -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
-                            + file_to_open.getAbsolutePath().replace(".c", ".elf") + "\""};
+                        cmd = new String[]{"cmd", "/c", "del \"" + file_to_open.getAbsolutePath().replace(".c", ".o")};
                         System.out.println(cmd[2]);
                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
@@ -689,8 +688,7 @@ public class Main_Frame extends javax.swing.JFrame {
                     }
 
                     if (!error) {
-                        cmd = new String[]{"/bin/sh", "-c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\" \""
-                            + file_to_open.getAbsolutePath().replace(".c", ".elf") + "\""};
+                        cmd = new String[]{"/bin/sh", "-c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o")};
                         System.out.println(cmd[2]);
                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
@@ -762,121 +760,39 @@ public class Main_Frame extends javax.swing.JFrame {
                 console_pane.setText("");
                 uploaded = false;
                 upload_hex();
-            } else {
-                if (verified) {
-                    if (error) {
-                        System.out.println("Fix compilation errors and then upload the sketch !!!");
-                        append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
-                        error = false;
-                    } else { //upload...
-                        if (std_build_item.isSelected()) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        System.out.println("Uploading...");
-                                        append_to_pane(console_pane, "\nUploading...\n", MODE_CONSOLE);
-                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
-                                        oPath = cPath.replace(".c", ".o");
-                                        elfPath = cPath.replace(".c", ".elf");
-                                        hexPath = cPath.replace(".c", ".hex");
-                                        editing_pane.setEnabled(false);
+            } else if (verified) {
+                if (error) {
+                    System.out.println("Fix compilation errors and then upload the sketch !!!");
+                    append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
+                    error = false;
+                } else //upload...
+                {
+                    if (std_build_item.isSelected()) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    System.out.println("Uploading...");
+                                    append_to_pane(console_pane, "\nUploading...\n", MODE_CONSOLE);
+                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                    editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
+                                    oPath = cPath.replace(".c", ".o");
+                                    elfPath = cPath.replace(".c", ".elf");
+                                    hexPath = cPath.replace(".c", ".hex");
+                                    editing_pane.setEnabled(false);
 
-                                        if (os.equals("windows")) {
-                                            try {
-                                                String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                                //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
-                                                System.out.println(cmd[2]);
-                                                append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                ProcessBuilder pb = new ProcessBuilder(cmd);
-                                                Process p = pb.start();
-                                                BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                                //checkForErrors(console_pane, br);  //no real-time output
-
-                                                int value = 0;
-                                                while (value != -1) {
-                                                    char ch = (char) value;
-                                                    System.out.print(ch);
-                                                    append_to_pane(console_pane, ch + "", MODE_CONSOLE);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    value = br.read();
-                                                }
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                String output = console_pane.getText();
-                                                if (output.contains("verified")) {
-                                                    System.out.println("Uploaded Successfully !!!");
-                                                    append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    uploaded = true;
-                                                } else {
-                                                    System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                    append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    uploaded = false;
-                                                }
-                                                editing_pane.setEnabled(true);
-
-                                            } catch (IOException | BadLocationException ex) {
-                                                System.err.println(ex.toString());
-                                            }
-                                        } else {
-                                            try {
-                                                String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                                //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
-                                                System.out.println(cmd[2]);
-                                                append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                ProcessBuilder pb = new ProcessBuilder(cmd);
-                                                Process p = pb.start();
-                                                BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                                //checkForErrors(console_pane, br);  //no real-time output
-                                                int value = 0;
-                                                while (value != -1) {
-                                                    char ch = (char) value;
-                                                    System.out.print(ch);
-                                                    append_to_pane(console_pane, ch + "", MODE_CONSOLE);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    value = br.read();
-                                                }
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                String output = console_pane.getText();
-                                                if (output.contains("verified")) {
-                                                    System.out.println("Uploaded Successfully !!!");
-                                                    append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    uploaded = true;
-                                                } else {
-                                                    System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                    append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
-                                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                    uploaded = false;
-                                                }
-                                                editing_pane.setEnabled(true);
-
-                                            } catch (IOException | BadLocationException ex) {
-                                                System.err.println(ex.toString());
-                                            }
-                                        }
-                                    } catch (BadLocationException ex) {
-                                        System.err.println(ex.toString());
-                                    }
-                                }
-                            }).start();
-                        } else if (mkfl_build_item.isSelected()) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
                                     if (os.equals("windows")) {
                                         try {
-                                            String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
+                                            String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                            //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
                                             System.out.println(cmd[2]);
                                             append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            Process p = new ProcessBuilder(cmd).start();
+                                            ProcessBuilder pb = new ProcessBuilder(cmd);
+                                            Process p = pb.start();
                                             BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                             //checkForErrors(console_pane, br);  //no real-time output
+
                                             int value = 0;
                                             while (value != -1) {
                                                 char ch = (char) value;
@@ -898,16 +814,20 @@ public class Main_Frame extends javax.swing.JFrame {
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                                 uploaded = false;
                                             }
-                                        } catch (BadLocationException | IOException ex) {
-                                            System.err.println(ex.getMessage());
+                                            editing_pane.setEnabled(true);
+
+                                        } catch (IOException | BadLocationException ex) {
+                                            System.err.println(ex.toString());
                                         }
                                     } else {
                                         try {
-                                            String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
+                                            String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                            //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
                                             System.out.println(cmd[2]);
                                             append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            Process p = new ProcessBuilder(cmd).start();
+                                            ProcessBuilder pb = new ProcessBuilder(cmd);
+                                            Process p = pb.start();
                                             BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                             //checkForErrors(console_pane, br);  //no real-time output
                                             int value = 0;
@@ -931,25 +851,102 @@ public class Main_Frame extends javax.swing.JFrame {
                                                 console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                                 uploaded = false;
                                             }
-                                        } catch (BadLocationException | IOException ex) {
-                                            System.err.println(ex.getMessage());
+                                            editing_pane.setEnabled(true);
+
+                                        } catch (IOException | BadLocationException ex) {
+                                            System.err.println(ex.toString());
                                         }
                                     }
+                                } catch (BadLocationException ex) {
+                                    System.err.println(ex.toString());
                                 }
-                            }).start();
-                        }
+                            }
+                        }).start();
+                    } else if (mkfl_build_item.isSelected()) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (os.equals("windows")) {
+                                    try {
+                                        String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
+                                        System.out.println(cmd[2]);
+                                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        Process p = new ProcessBuilder(cmd).start();
+                                        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                        //checkForErrors(console_pane, br);  //no real-time output
+                                        int value = 0;
+                                        while (value != -1) {
+                                            char ch = (char) value;
+                                            System.out.print(ch);
+                                            append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            value = br.read();
+                                        }
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        String output = console_pane.getText();
+                                        if (output.contains("verified")) {
+                                            System.out.println("Uploaded Successfully !!!");
+                                            append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            uploaded = true;
+                                        } else {
+                                            System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                            append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            uploaded = false;
+                                        }
+                                    } catch (BadLocationException | IOException ex) {
+                                        System.err.println(ex.getMessage());
+                                    }
+                                } else {
+                                    try {
+                                        String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
+                                        System.out.println(cmd[2]);
+                                        append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        Process p = new ProcessBuilder(cmd).start();
+                                        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                        //checkForErrors(console_pane, br);  //no real-time output
+                                        int value = 0;
+                                        while (value != -1) {
+                                            char ch = (char) value;
+                                            System.out.print(ch);
+                                            append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            value = br.read();
+                                        }
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        String output = console_pane.getText();
+                                        if (output.contains("verified")) {
+                                            System.out.println("Uploaded Successfully !!!");
+                                            append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            uploaded = true;
+                                        } else {
+                                            System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                            append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                            uploaded = false;
+                                        }
+                                    } catch (BadLocationException | IOException ex) {
+                                        System.err.println(ex.getMessage());
+                                    }
+                                }
+                            }
+                        }).start();
                     }
-                } else {
-                    compile_file();
-                    if (error) {
-                        System.out.println("Fix compilation errors and then upload the sketch !!!");
-                        append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
-                        error = false;
-                    } else {
-                        upload_hex();
-                    }
-
                 }
+            } else {
+                compile_file();
+                if (error) {
+                    System.out.println("Fix compilation errors and then upload the sketch !!!");
+                    append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
+                    error = false;
+                } else {
+                    upload_hex();
+                }
+
             }
         } catch (BadLocationException ex) {
             System.err.println(ex.toString());
@@ -1147,7 +1144,6 @@ public class Main_Frame extends javax.swing.JFrame {
             public void focusGained(FocusEvent e) {
                 chars_inserted = editing_pane.getText().length();
                 char_ins_label.setText("Characters inserted: " + chars_inserted);
-                info_label.setText(" Font Size: " + editing_pane.getFont().getSize());
             }
 
             @Override
@@ -1219,7 +1215,6 @@ public class Main_Frame extends javax.swing.JFrame {
             public void focusGained(FocusEvent e) {
                 chars_inserted = mkfl_editing_pane.getText().length();
                 char_ins_label.setText("Characters inserted: " + chars_inserted);
-                info_label.setText(" Font Size: " + mkfl_editing_pane.getFont().getSize());
             }
 
             @Override
@@ -1427,12 +1422,11 @@ public class Main_Frame extends javax.swing.JFrame {
         pref_font_label = new javax.swing.JLabel();
         pref_font_txt_fld = new javax.swing.JTextField();
         pref_font_btn = new javax.swing.JButton();
-        pref_style_btn = new javax.swing.JButton();
         pref_style_label = new javax.swing.JLabel();
-        pref_style_txt_fld = new javax.swing.JTextField();
         pref_color_btn = new javax.swing.JButton();
         pref_color_txt_fld = new javax.swing.JTextField();
         pref_color_label = new javax.swing.JLabel();
+        pref_style_combo_bx = new javax.swing.JComboBox<>();
         serial_frame = new javax.swing.JFrame();
         serial_send_txt_fld = new javax.swing.JTextField();
         serial_send_btn = new javax.swing.JButton();
@@ -1447,7 +1441,6 @@ public class Main_Frame extends javax.swing.JFrame {
         upload_button = new javax.swing.JButton();
         search_field = new javax.swing.JTextField();
         mcuCombo = new javax.swing.JComboBox();
-        info_label = new javax.swing.JLabel();
         status_label = new javax.swing.JLabel();
         iteration_label = new javax.swing.JLabel();
         tab_pane = new javax.swing.JTabbedPane();
@@ -1561,11 +1554,7 @@ public class Main_Frame extends javax.swing.JFrame {
             }
         });
 
-        pref_style_btn.setText("...");
-
         pref_style_label.setText("Style:");
-
-        pref_style_txt_fld.setEditable(false);
 
         pref_color_btn.setText("...");
         pref_color_btn.addActionListener(new java.awt.event.ActionListener() {
@@ -1577,6 +1566,13 @@ public class Main_Frame extends javax.swing.JFrame {
         pref_color_txt_fld.setEditable(false);
 
         pref_color_label.setText("Color:");
+
+        pref_style_combo_bx.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Plain", "Bold", "Italic", "Bold and Italic" }));
+        pref_style_combo_bx.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                pref_style_combo_bxItemStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout pref_frameLayout = new javax.swing.GroupLayout(pref_frame.getContentPane());
         pref_frame.getContentPane().setLayout(pref_frameLayout);
@@ -1603,24 +1599,20 @@ public class Main_Frame extends javax.swing.JFrame {
                         .addComponent(pref_font_btn))
                     .addGroup(pref_frameLayout.createSequentialGroup()
                         .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                .addComponent(pref_color_label)
-                                .addGap(18, 18, 18))
                             .addGroup(pref_frameLayout.createSequentialGroup()
-                                .addComponent(pref_style_label)
-                                .addGap(22, 22, 22)))
-                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGap(8, 8, 8)
+                                .addComponent(pref_style_label))
                             .addGroup(pref_frameLayout.createSequentialGroup()
-                                .addComponent(pref_style_txt_fld)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pref_style_btn))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pref_color_btn)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pref_color_label)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_color_txt_fld)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pref_color_btn))
+                            .addComponent(pref_style_combo_bx, 0, 291, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         pref_frameLayout.setVerticalGroup(
@@ -1643,8 +1635,7 @@ public class Main_Frame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(pref_style_label)
-                            .addComponent(pref_style_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(pref_style_btn))))
+                            .addComponent(pref_style_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pref_cancel_btn)
@@ -1735,14 +1726,6 @@ public class Main_Frame extends javax.swing.JFrame {
         verify_button.setFocusable(false);
         verify_button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         verify_button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        verify_button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                verify_buttonMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                verify_buttonMouseExited(evt);
-            }
-        });
         verify_button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 verify_buttonActionPerformed(evt);
@@ -1754,14 +1737,6 @@ public class Main_Frame extends javax.swing.JFrame {
         upload_button.setFocusable(false);
         upload_button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         upload_button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        upload_button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                upload_buttonMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                upload_buttonMouseExited(evt);
-            }
-        });
         upload_button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upload_buttonActionPerformed(evt);
@@ -1782,14 +1757,6 @@ public class Main_Frame extends javax.swing.JFrame {
                 search_fieldFocusLost(evt);
             }
         });
-        search_field.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                search_fieldMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                search_fieldMouseExited(evt);
-            }
-        });
         search_field.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 search_fieldKeyTyped(evt);
@@ -1804,24 +1771,13 @@ public class Main_Frame extends javax.swing.JFrame {
                 mcuComboItemStateChanged(evt);
             }
         });
-        mcuCombo.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                mcuComboMouseExited(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                mcuComboMouseEntered(evt);
-            }
-        });
         toolbar.add(mcuCombo);
-
-        info_label.setText(" Font Size: 15");
-        toolbar.add(info_label);
 
         status_label.setForeground(new java.awt.Color(1, 1, 1));
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 16,129");
+        iteration_label.setText("Iteration: 23,902");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1905,7 +1861,6 @@ public class Main_Frame extends javax.swing.JFrame {
 
         pref_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         pref_menu_item.setText("Preferences");
-        pref_menu_item.setEnabled(false);
         pref_menu_item.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pref_menu_itemActionPerformed(evt);
@@ -2577,9 +2532,9 @@ public class Main_Frame extends javax.swing.JFrame {
                   + "Compiled, Edited and Designed by AbdAlMoniem AlHifnawy"
                   + "\n"
                   + "**********************************************************************************";
-          
+
           System.out.println(copy_left);
-          
+
           if (os.equals("windows")) {
               privacy_text_pane.setFont(new Font("Consolas", Font.PLAIN, 15));
           }
@@ -2796,12 +2751,12 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private void inc_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inc_font_itemActionPerformed
         chars_inserted = 0;
-        font_size += 1;
+        current_font_size += 1;
 
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2811,7 +2766,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -2819,18 +2774,16 @@ public class Main_Frame extends javax.swing.JFrame {
             mkfl_editing_pane.setText(text);
             mkfl_editing_pane.setCaretPosition(caret_position);
         }
-
-        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_inc_font_itemActionPerformed
 
     private void dec_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dec_font_itemActionPerformed
         chars_inserted = 0;
-        font_size -= 1;
+        current_font_size -= 1;
 
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2840,7 +2793,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -2848,18 +2801,16 @@ public class Main_Frame extends javax.swing.JFrame {
             mkfl_editing_pane.setText(text);
             mkfl_editing_pane.setCaretPosition(caret_position);
         }
-
-        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_dec_font_itemActionPerformed
 
     private void def_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_def_font_itemActionPerformed
         chars_inserted = 0;
-        font_size = default_font_size;
+        current_font_size = default_font_size;
 
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2869,7 +2820,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + font_size);
+            config.put("DefaultFont", default_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -2877,8 +2828,6 @@ public class Main_Frame extends javax.swing.JFrame {
             mkfl_editing_pane.setText(text);
             mkfl_editing_pane.setCaretPosition(caret_position);
         }
-
-        info_label.setText(" Font Size: " + font_size);
     }//GEN-LAST:event_def_font_itemActionPerformed
 
       private void std_build_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_std_build_itemActionPerformed
@@ -2887,6 +2836,12 @@ public class Main_Frame extends javax.swing.JFrame {
               tab_pane.remove(1);
           }
           make = false;
+
+          if (makefile != null) {
+              makefile = os.equals("windows") ? new File(file_to_open.getParent() + "\\makefile") : new File(file_to_open.getParent() + "/makefile");
+              makefile.delete();
+          }
+
           makefile = null;
       }//GEN-LAST:event_std_build_itemActionPerformed
 
@@ -2903,17 +2858,19 @@ public class Main_Frame extends javax.swing.JFrame {
 
               if (makefile == null) {
                   sketch_name = sketch_name.replace(".c", "");
-                  String upload_string = os.equals("windows") ? "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
-                          : "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
+                  String upload_string = os.equals("windows") ? "\tavrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
+                          : "\tavrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n";
+                  String deletion_string = os.equals("windows") ? "\tdel " : "\trm -f ";
+
                   mkfl_editing_pane.setText(
                           "#when compiling you must name the compilation rule to compile\n"
                           + "#when uploading you must name the upload rule to upload\n\n"
                           + "target=" + sketch_name + "\n\n"
                           + "compile:\n"
-                          + "    avr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + "$(target).c" + " -o " + "$(target).o\n"
-                          + "    avr-gcc -g -mmcu=" + mmcu + " -o " + "$(target).elf" + " $(target).o\n"
-                          + "    avr-objcopy -j .text -j .data -O ihex " + "$(target).elf" + " $(target).hex\n"
-                          + "    rm -f " + "$(target).o " + "$(target).elf\n\n"
+                          + "\tavr-gcc -std=c99 -g -Os -mmcu=" + mmcu + " -c " + "$(target).c" + " -o " + "$(target).o\n"
+                          + "\tavr-gcc -g -mmcu=" + mmcu + " -o " + "$(target).elf" + " $(target).o\n"
+                          + "\tavr-objcopy -j .text -j .data -O ihex " + "$(target).elf" + " $(target).hex\n"
+                          + deletion_string + "$(target).o " + "\n\n"
                           + "upload:\n"
                           + upload_string);
                   sketch_name += ".c";
@@ -3024,20 +2981,6 @@ public class Main_Frame extends javax.swing.JFrame {
           }
       }//GEN-LAST:event_new_file_itemActionPerformed
 
-      private void search_fieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_search_fieldFocusGained
-          if (search_field.getText().toLowerCase().contains("find microcontrollers")) {
-              search_field.setForeground(new Color(76, 76, 76));
-              search_field.setText(null);
-          }
-      }//GEN-LAST:event_search_fieldFocusGained
-
-      private void search_fieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_search_fieldFocusLost
-          if (search_field.getText().length() < 1) {
-              search_field.setForeground(new Color(180, 180, 180));
-              search_field.setText("Find microcontrollers");
-          }
-      }//GEN-LAST:event_search_fieldFocusLost
-
       private void gen_makefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gen_makefileActionPerformed
           sketch_name = sketch_name.replace(".c", "");
           String upload_string = os.equals("windows") ? "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + "$(target).hex:i\n"
@@ -3058,43 +3001,11 @@ public class Main_Frame extends javax.swing.JFrame {
           mkfl_editing_pane.requestFocus();
       }//GEN-LAST:event_gen_makefileActionPerformed
 
-    private void verify_buttonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_verify_buttonMouseEntered
-        info_label.setText(verify_button.getText());
-    }//GEN-LAST:event_verify_buttonMouseEntered
-
-    private void verify_buttonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_verify_buttonMouseExited
-        info_label.setText(" Font Size: " + font_size);
-    }//GEN-LAST:event_verify_buttonMouseExited
-
-    private void upload_buttonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_upload_buttonMouseEntered
-        info_label.setText(upload_button.getText());
-    }//GEN-LAST:event_upload_buttonMouseEntered
-
-    private void upload_buttonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_upload_buttonMouseExited
-        info_label.setText(" Font Size: " + font_size);
-    }//GEN-LAST:event_upload_buttonMouseExited
-
-    private void search_fieldMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_search_fieldMouseEntered
-        info_label.setText(" search");
-    }//GEN-LAST:event_search_fieldMouseEntered
-
-    private void search_fieldMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_search_fieldMouseExited
-        info_label.setText(" Font Size: " + font_size);
-    }//GEN-LAST:event_search_fieldMouseExited
-
-    private void mcuComboMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mcuComboMouseEntered
-        info_label.setText(" select");
-    }//GEN-LAST:event_mcuComboMouseEntered
-
-    private void mcuComboMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mcuComboMouseExited
-        info_label.setText(" Font Size: " + font_size);
-    }//GEN-LAST:event_mcuComboMouseExited
-
     private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choose_font_itemActionPerformed
         String[] reslut = get_font();
         if (reslut != null) {
             default_font = reslut[0];
-            default_font_size = font_size = Integer.parseInt(reslut[1]);
+            default_font_size = current_font_size = Integer.parseInt(reslut[1]);
             int font_style = Integer.parseInt(reslut[2]);
 
             DefaultSyntaxKit.initKit();
@@ -3116,8 +3027,6 @@ public class Main_Frame extends javax.swing.JFrame {
             editing_pane.getDocument().addDocumentListener(listener);
             editing_pane.requestFocus();
             editing_pane.setText(text);
-
-            info_label.setText("Font Size: " + font_size);
         }
     }//GEN-LAST:event_choose_font_itemActionPerformed
 
@@ -3169,7 +3078,7 @@ public class Main_Frame extends javax.swing.JFrame {
 
                       pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
                       pref_color_txt_fld.setBackground(color);
-                      pref_style_txt_fld.setText(get_style(style));
+                      pref_style_combo_bx.setSelectedIndex(style);
                   } catch (Exception ex) {
                       System.err.println(ex.toString());
                   }
@@ -3183,7 +3092,7 @@ public class Main_Frame extends javax.swing.JFrame {
       private void pref_color_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_btnActionPerformed
           Color c = JColorChooser.showDialog(null, "Choose Color", color);
           old_c_syntax_kit = c_editor_kit;
-          
+
           if (c != null) {
               color = c;
               try {
@@ -3231,7 +3140,7 @@ public class Main_Frame extends javax.swing.JFrame {
                   }
                   pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
                   pref_color_txt_fld.setBackground(color);
-                  pref_style_txt_fld.setText(get_style(style));
+                  pref_style_combo_bx.setSelectedIndex(style);
               } catch (Exception ex) {
                   System.err.println(ex.getCause());
               }
@@ -3242,19 +3151,19 @@ public class Main_Frame extends javax.swing.JFrame {
 
       private void pref_cancel_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_cancel_btnActionPerformed
           pref_frame.setVisible(false);
-          
+
           c_editor_kit = old_c_syntax_kit;
       }//GEN-LAST:event_pref_cancel_btnActionPerformed
 
       private void pref_font_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_font_btnActionPerformed
           String[] reslut = get_font();
-          String new_font = reslut[0];
-          int new_font_size = Integer.parseInt(reslut[1]);
+          default_font = reslut[0];
+          current_font_size = default_font_size = Integer.parseInt(reslut[1]);
           int font_style = Integer.parseInt(reslut[2]);
 
           DefaultSyntaxKit.initKit();
           Configuration new_config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-          new_config.put("DefaultFont", new_font + new_font_size);
+          new_config.put("DefaultFont", default_font + default_font_size);
 
           CSyntaxKit pref_c_editor_kit = new CSyntaxKit();
           pref_c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
@@ -3262,8 +3171,8 @@ public class Main_Frame extends javax.swing.JFrame {
           pref_c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
           pref_c_editor_kit.setProperty("Style.STRING", string_color + font_style);
           pref_c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
-          
-          pref_font_txt_fld.setText(new_font);
+
+          pref_font_txt_fld.setText(default_font);
       }//GEN-LAST:event_pref_font_btnActionPerformed
 
     private void serial_terminal_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serial_terminal_menu_itemActionPerformed
@@ -3323,15 +3232,69 @@ public class Main_Frame extends javax.swing.JFrame {
         String ed_text = editing_pane.getText();
         editing_pane.setEditorKit(c_editor_kit);
         editing_pane.setText(ed_text);
-        
-        
     }//GEN-LAST:event_pref_apply_btnActionPerformed
 
     private void pref_ok_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_ok_btnActionPerformed
         String ed_text = editing_pane.getText();
         editing_pane.setEditorKit(c_editor_kit);
         editing_pane.setText(ed_text);
+        pref_frame.setVisible(false);
     }//GEN-LAST:event_pref_ok_btnActionPerformed
+
+    private void search_fieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_search_fieldFocusLost
+        if (search_field.getText().length() < 1) {
+            search_field.setForeground(new Color(180, 180, 180));
+            search_field.setText("Find microcontrollers");
+        }
+    }//GEN-LAST:event_search_fieldFocusLost
+
+    private void search_fieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_search_fieldFocusGained
+        if (search_field.getText().toLowerCase().contains("find microcontrollers")) {
+            search_field.setForeground(new Color(76, 76, 76));
+            search_field.setText(null);
+        }
+    }//GEN-LAST:event_search_fieldFocusGained
+
+    private void pref_style_combo_bxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_pref_style_combo_bxItemStateChanged
+        String hex_color = pref_color_txt_fld.getText().replace("#", "").toLowerCase();
+        int int_color = Integer.parseInt(hex_color, 16);
+        int style = pref_style_combo_bx.getSelectedIndex();
+
+        switch (pref_category_list.getSelectedIndex()) {
+            case 0:
+                String color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.KEYWORD", color_style);
+                break;
+            case 1:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.KEYWORD2", color_style);
+                break;
+            case 2:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.NUMBER", color_style);
+                break;
+            case 3:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.STRING", color_style);
+                break;
+            case 4:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.COMMENT", color_style);
+                break;
+            case 5:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.TYPE", color_style);
+                break;
+            case 6:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.OPERATOR", color_style);
+                break;
+            case 7:
+                color_style = "0x" + hex_color + ", " + style;
+                c_editor_kit.setProperty("Style.IDENTIFIER", color_style);
+                break;
+        }
+    }//GEN-LAST:event_pref_style_combo_bxItemStateChanged
 
     public static void main(String args[]) {
         try {
@@ -3372,7 +3335,6 @@ public class Main_Frame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator font_menu_sep;
     private javax.swing.JMenuItem gen_makefile;
     private javax.swing.JMenuItem inc_font_item;
-    private javax.swing.JLabel info_label;
     private javax.swing.JLabel iteration_label;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JComboBox mcuCombo;
@@ -3400,9 +3362,8 @@ public class Main_Frame extends javax.swing.JFrame {
     private javax.swing.JButton pref_import_btn;
     private javax.swing.JMenuItem pref_menu_item;
     private javax.swing.JButton pref_ok_btn;
-    private javax.swing.JButton pref_style_btn;
+    private javax.swing.JComboBox<String> pref_style_combo_bx;
     private javax.swing.JLabel pref_style_label;
-    private javax.swing.JTextField pref_style_txt_fld;
     private javax.swing.JDialog privacy_dialog;
     private javax.swing.JScrollPane privacy_scroll_pane;
     private javax.swing.JTextPane privacy_text_pane;
