@@ -33,6 +33,8 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Enumeration;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.UIManager.*;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.syntaxkits.BashSyntaxKit;
@@ -91,20 +93,23 @@ public class Main_Frame extends javax.swing.JFrame {
     private CSyntaxKit c_editor_kit = null;
 
     private String default_font = null;
-    private int default_font_size = 15;
-    private int current_font_size = default_font_size;
+    private String set_font = null;
+    private int set_font_size = 15;
+    private int current_font_size, default_font_size = set_font_size;
 
     Color color = null;
-    int style = -1;
+    int current_font_style = -1;
 
-    String keyword_color = null;
-    String keyword2_color = null;
-    String number_color = null;
-    String string_color = null;
-    String type_color = null;
-    String comment_color = null;
-    String operator_color = null;
-    String identifier_color = null;
+    String default_keyword_color_style = null;
+    String default_keyword2_color_style = null;
+    String default_number_color_style = null;
+    String default_string_color_style = null;
+    String default_type_color_style = null;
+    String default_comment_color_style = null;
+    String default_operator_color_style = null;
+    String default_identifier_color_style = null;
+
+    Preferences prefs = null;
 
     private final int MODE_NO_ERROR = 0;
     private final int MODE_WARNING = 1;
@@ -1035,9 +1040,11 @@ public class Main_Frame extends javax.swing.JFrame {
         }).start();
     }
 
-    private String[] get_font() {        
-        JFontChooser fc = new JFontChooser();
-        int result = fc.showDialog(null);
+    private String[] get_font() {
+        Font font = new Font(set_font.trim(), Font.PLAIN, set_font_size);
+
+        JFontChooser fc = new JFontChooser(font);
+        int result = fc.showDialog(this);
 
         String new_font = null;
         String new_font_size = null;
@@ -1048,8 +1055,8 @@ public class Main_Frame extends javax.swing.JFrame {
             new_font_size = Integer.toString(fc.getSelectedFontSize());
             new_font_style = Integer.toString(fc.getSelectedFontStyle());
         }
-        
-        return new String[]{new_font, new_font_size, new_font_style};
+
+        return new String[]{new_font.toLowerCase(), new_font_size, new_font_style};
     }
 
     public Main_Frame(String[] arguments) {
@@ -1222,14 +1229,24 @@ public class Main_Frame extends javax.swing.JFrame {
         };
 
         if (os.equals("windows")) {
-            default_font = "consolas ";
+            set_font = default_font = "consolas ";
         } else {
-            default_font = "liberation mono ";
+            set_font = default_font = "liberation mono ";
         }
+
+        prefs = Preferences.userRoot();
+
+//        try {
+//            prefs.clear();
+//        } catch (BackingStoreException ex) {
+//            System.err.println(ex.getMessage());
+//        }
+        set_font = prefs.get("default_font", default_font);
+        set_font_size = prefs.getInt("default_font_size", default_font_size);
 
         DefaultSyntaxKit.initKit();
         config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-        config.put("DefaultFont", default_font + default_font_size);
+        config.put("DefaultFont", set_font + set_font_size);
 
         //Style.KEYWORD     if, else, for, while, break...
         //Style.KEYWORD2    #define, #include, #if, #else...
@@ -1241,22 +1258,55 @@ public class Main_Frame extends javax.swing.JFrame {
         //Style.IDENTIFIER  variable names, other text
         //color, number
         //number:
-        //  0 = normal
+        //  0 = plain
         //  1 = bold
         //  2 = italic
-        //  3 = bold italic
-        keyword_color = "0x1e06c2, ";
-        keyword2_color = "0x1e06c2, ";
-        number_color = "0xbc2b13, ";
-        string_color = "0xfaba12, ";
-        type_color = "0x1e06c2, ";
+        //  3 = bold and italic
+        default_keyword_color_style = "0x1e06c2, 1";
+        default_keyword2_color_style = "0x1e06c2, 1";
+        default_number_color_style = "0xbc2b13, 1";
+        default_string_color_style = "0xfaba12, 2";
+        default_type_color_style = "0x1e06c2, 1";
+        default_comment_color_style = "0x339933, 2";
+        default_operator_color_style = "0x000000, 0";
+        default_identifier_color_style = "0x000000, 0";
 
         c_editor_kit = new CSyntaxKit();
-        c_editor_kit.setProperty("Style.KEYWORD", keyword_color + "1");
-        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + "1");
-        c_editor_kit.setProperty("Style.NUMBER", number_color + "1");
-        c_editor_kit.setProperty("Style.STRING", string_color + "2");
-        c_editor_kit.setProperty("Style.TYPE", type_color + "1");
+
+        c_editor_kit.setProperty("Style.KEYWORD", default_keyword_color_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", default_keyword2_color_style);
+        c_editor_kit.setProperty("Style.NUMBER", default_number_color_style);
+        c_editor_kit.setProperty("Style.STRING", default_string_color_style);
+        c_editor_kit.setProperty("Style.TYPE", default_type_color_style);
+        c_editor_kit.setProperty("Style.COMMENT", default_comment_color_style);
+        c_editor_kit.setProperty("Style.OPERATOR", default_operator_color_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", default_identifier_color_style);
+
+        String saved_keyword_color_style = prefs.get("keyword", default_keyword_color_style);
+        String saved_keyword2_color_style = prefs.get("keyword2", default_keyword2_color_style);
+        String saved_number_color_style = prefs.get("number", default_number_color_style);
+        String saved_string_color_style = prefs.get("string", default_string_color_style);
+        String saved_comment_color_style = prefs.get("type", default_type_color_style);
+        String saved_type_color_style = prefs.get("comment", default_comment_color_style);
+        String saved_operator_color_style = prefs.get("operator", default_operator_color_style);
+        String saved_identifier_color_style = prefs.get("identifier", default_identifier_color_style);
+
+//        System.out.println(c_editor_kit.getProperty("Style.KEYWORD"));
+//        System.out.println(c_editor_kit.getProperty("Style.KEYWORD2"));
+//        System.out.println(c_editor_kit.getProperty("Style.NUMBER"));
+//        System.out.println(c_editor_kit.getProperty("Style.STRING"));
+//        System.out.println(c_editor_kit.getProperty("Style.TYPE"));
+//        System.out.println(c_editor_kit.getProperty("Style.COMMENT"));
+//        System.out.println(c_editor_kit.getProperty("Style.OPERATOR"));
+//        System.out.println(c_editor_kit.getProperty("Style.IDENTIFIER"));
+        c_editor_kit.setProperty("Style.KEYWORD", saved_keyword_color_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", saved_keyword2_color_style);
+        c_editor_kit.setProperty("Style.NUMBER", saved_number_color_style);
+        c_editor_kit.setProperty("Style.STRING", saved_string_color_style);
+        c_editor_kit.setProperty("Style.TYPE", saved_type_color_style);
+        c_editor_kit.setProperty("Style.COMMENT", saved_comment_color_style);
+        c_editor_kit.setProperty("Style.OPERATOR", saved_operator_color_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", saved_identifier_color_style);
 
         editing_pane.setEditorKit(c_editor_kit);
         editing_pane.addFocusListener(f_listener);
@@ -1264,9 +1314,9 @@ public class Main_Frame extends javax.swing.JFrame {
         editing_pane.getDocument().addDocumentListener(listener);
         editing_pane.requestFocus();
 
-        def_font_item.setText(def_font_item.getText() + " (" + default_font_size + ")");
-        inc_font_item.setText(inc_font_item.getText() + " (" + (default_font_size + 1) + ")");
-        dec_font_item.setText(dec_font_item.getText() + " (" + (default_font_size - 1) + ")");
+        def_font_item.setText(def_font_item.getText() + " (" + set_font_size + ")");
+        inc_font_item.setText(inc_font_item.getText() + " (" + (set_font_size + 1) + ")");
+        dec_font_item.setText(dec_font_item.getText() + " (" + (set_font_size - 1) + ")");
 
         if (arguments.length > 0) {
             try {
@@ -1426,6 +1476,7 @@ public class Main_Frame extends javax.swing.JFrame {
         pref_color_txt_fld = new javax.swing.JTextField();
         pref_color_label = new javax.swing.JLabel();
         pref_style_combo_bx = new javax.swing.JComboBox<>();
+        pref_defaults_btn = new javax.swing.JButton();
         serial_frame = new javax.swing.JFrame();
         serial_send_txt_fld = new javax.swing.JTextField();
         serial_send_btn = new javax.swing.JButton();
@@ -1508,6 +1559,7 @@ public class Main_Frame extends javax.swing.JFrame {
         mkfl_editing_scroll_pane.setViewportView(mkfl_editing_pane);
 
         pref_frame.setTitle("Preferences");
+        pref_frame.setPreferredSize(new java.awt.Dimension(610, 335));
         pref_frame.setResizable(false);
 
         pref_category_list.setBorder(javax.swing.BorderFactory.createTitledBorder("Category:"));
@@ -1547,6 +1599,11 @@ public class Main_Frame extends javax.swing.JFrame {
         });
 
         pref_import_btn.setText("Import");
+        pref_import_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_import_btnActionPerformed(evt);
+            }
+        });
 
         pref_font_label.setText("Font:");
 
@@ -1569,6 +1626,12 @@ public class Main_Frame extends javax.swing.JFrame {
         });
 
         pref_color_txt_fld.setEditable(false);
+        pref_color_txt_fld.setText("#000000");
+        pref_color_txt_fld.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_color_txt_fldActionPerformed(evt);
+            }
+        });
 
         pref_color_label.setText("Color:");
 
@@ -1579,6 +1642,13 @@ public class Main_Frame extends javax.swing.JFrame {
             }
         });
 
+        pref_defaults_btn.setText("Defaults");
+        pref_defaults_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_defaults_btnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pref_frameLayout = new javax.swing.GroupLayout(pref_frame.getContentPane());
         pref_frame.getContentPane().setLayout(pref_frameLayout);
         pref_frameLayout.setHorizontalGroup(
@@ -1586,16 +1656,6 @@ public class Main_Frame extends javax.swing.JFrame {
             .addGroup(pref_frameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                        .addComponent(pref_export_btn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pref_import_btn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pref_ok_btn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pref_apply_btn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pref_cancel_btn))
                     .addGroup(pref_frameLayout.createSequentialGroup()
                         .addComponent(pref_font_label)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1604,46 +1664,59 @@ public class Main_Frame extends javax.swing.JFrame {
                         .addComponent(pref_font_btn))
                     .addGroup(pref_frameLayout.createSequentialGroup()
                         .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_style_label)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pref_style_combo_bx, 0, 249, Short.MAX_VALUE))
+                            .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_color_label)
                                 .addGap(8, 8, 8)
-                                .addComponent(pref_style_label))
-                            .addGroup(pref_frameLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pref_color_label)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pref_frameLayout.createSequentialGroup()
                                 .addComponent(pref_color_txt_fld)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pref_color_btn))
-                            .addComponent(pref_style_combo_bx, 0, 291, Short.MAX_VALUE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pref_color_btn))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                        .addComponent(pref_export_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_import_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pref_ok_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_apply_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pref_defaults_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pref_cancel_btn)))
                 .addContainerGap())
         );
         pref_frameLayout.setVerticalGroup(
             pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pref_frameLayout.createSequentialGroup()
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pref_font_label)
+                    .addComponent(pref_font_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pref_font_btn))
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(pref_font_label)
-                            .addComponent(pref_font_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(pref_font_btn))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pref_frameLayout.createSequentialGroup()
-                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(pref_color_label)
                             .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pref_color_label)
                             .addComponent(pref_color_btn))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(pref_style_label)
-                            .addComponent(pref_style_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pref_style_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pref_style_label))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pref_cancel_btn)
+                    .addComponent(pref_defaults_btn)
                     .addComponent(pref_apply_btn)
                     .addComponent(pref_ok_btn)
                     .addComponent(pref_export_btn)
@@ -1782,7 +1855,7 @@ public class Main_Frame extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 23,902");
+        iteration_label.setText("Iteration: 30.928");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -2763,7 +2836,7 @@ public class Main_Frame extends javax.swing.JFrame {
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2773,7 +2846,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -2790,7 +2863,7 @@ public class Main_Frame extends javax.swing.JFrame {
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2800,7 +2873,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -2812,12 +2885,12 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private void def_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_def_font_itemActionPerformed
         chars_inserted = 0;
-        current_font_size = default_font_size;
+        current_font_size = set_font_size;
 
         if (tab_pane.getSelectedIndex() == 0) {
             String text = editing_pane.getText();
             int caret_position = editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             editing_pane.setEditorKit(c_editor_kit);
             editing_pane.addFocusListener(f_listener);
             editing_pane.addCaretListener(c_listener);
@@ -2827,7 +2900,7 @@ public class Main_Frame extends javax.swing.JFrame {
         } else if (tab_pane.getSelectedIndex() == 1) {
             String text = mkfl_editing_pane.getText();
             int caret_position = mkfl_editing_pane.getCaretPosition();
-            config.put("DefaultFont", default_font + current_font_size);
+            config.put("DefaultFont", set_font + current_font_size);
             mkfl_editing_pane.setEditorKit(new BashSyntaxKit());
             mkfl_editing_pane.addFocusListener(mkfl_f_listener);
             mkfl_editing_pane.addCaretListener(mkfl_c_listener);
@@ -3017,21 +3090,22 @@ public class Main_Frame extends javax.swing.JFrame {
             }
         }
 
-        default_font = result[0];
-        default_font_size = current_font_size = Integer.parseInt(result[1]);
+        set_font = result[0];
+        set_font_size = current_font_size = Integer.parseInt(result[1]);
         int font_style = Integer.parseInt(result[2]);
+
+        System.out.println(font_style);
 
         DefaultSyntaxKit.initKit();
         config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-        config.put("DefaultFont", default_font + default_font_size);
+        config.put("DefaultFont", set_font + set_font_size);
 
         c_editor_kit = new CSyntaxKit();
-        c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
-        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
-        c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
-        c_editor_kit.setProperty("Style.STRING", string_color + font_style);
-        c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
-        //c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
+        c_editor_kit.setProperty("Style.KEYWORD", default_keyword_color_style.substring(0, 9) + font_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", default_keyword2_color_style.substring(0, 9) + font_style);
+        c_editor_kit.setProperty("Style.NUMBER", default_number_color_style.substring(0, 9) + font_style);
+        c_editor_kit.setProperty("Style.STRING", default_string_color_style.substring(0, 9) + font_style);
+        c_editor_kit.setProperty("Style.TYPE", default_type_color_style.substring(0, 9) + font_style);
 
         String text = editing_pane.getText();
         editing_pane.setEditorKit(c_editor_kit);
@@ -3044,10 +3118,10 @@ public class Main_Frame extends javax.swing.JFrame {
 
       private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
           pref_frame.setLocation(getLocation().x - 40, getLocation().y + 10);
-          pref_frame.setSize(630, 300);
+          pref_frame.setSize(600, 360);
           pref_frame.setVisible(true);
 
-          pref_font_txt_fld.setText(default_font);
+          pref_font_txt_fld.setText(set_font);
 
           ListSelectionListener list_sel_listener = new ListSelectionListener() {
               @Override
@@ -3056,41 +3130,41 @@ public class Main_Frame extends javax.swing.JFrame {
                       switch (pref_category_list.getSelectedIndex()) {
                           case 0:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
                               break;
                           case 1:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
                               break;
                           case 2:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
                               break;
                           case 3:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
                               break;
                           case 4:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
                               break;
                           case 5:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
                               break;
                           case 6:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
                               break;
                           case 7:
                               color = new Color(Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[0].replace("0x", ""), 16));
-                              style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                              current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
                               break;
                       }
 
                       pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
                       pref_color_txt_fld.setBackground(color);
-                      pref_style_combo_bx.setSelectedIndex(style);
+                      pref_style_combo_bx.setSelectedIndex(current_font_style);
                   } catch (Exception ex) {
                       System.err.println(ex.toString());
                   }
@@ -3110,49 +3184,49 @@ public class Main_Frame extends javax.swing.JFrame {
               try {
                   switch (pref_category_list.getSelectedIndex()) {
                       case 0:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
-                          String color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                          String color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.KEYWORD", color_style);
                           break;
                       case 1:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.KEYWORD2", color_style);
                           break;
                       case 2:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.NUMBER", color_style);
                           break;
                       case 3:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.STRING", color_style);
                           break;
                       case 4:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.COMMENT", color_style);
                           break;
                       case 5:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.TYPE", color_style);
                           break;
                       case 6:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.OPERATOR", color_style);
                           break;
                       case 7:
-                          style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
-                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + style;
+                          current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                          color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
                           c_editor_kit.setProperty("Style.IDENTIFIER", color_style);
                           break;
                   }
                   pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
                   pref_color_txt_fld.setBackground(color);
-                  pref_style_combo_bx.setSelectedIndex(style);
+                  pref_style_combo_bx.setSelectedIndex(current_font_style);
               } catch (Exception ex) {
                   System.err.println(ex.getCause());
               }
@@ -3168,23 +3242,23 @@ public class Main_Frame extends javax.swing.JFrame {
       }//GEN-LAST:event_pref_cancel_btnActionPerformed
 
       private void pref_font_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_font_btnActionPerformed
-          String[] reslut = get_font();
-          default_font = reslut[0];
-          current_font_size = default_font_size = Integer.parseInt(reslut[1]);
-          int font_style = Integer.parseInt(reslut[2]);
+          String[] result = get_font();
+
+          for (String s : result) {
+              if (s == null) {
+                  return;
+              }
+          }
+
+          set_font = result[0];
+          current_font_size = set_font_size = Integer.parseInt(result[1]);
+          int font_style = Integer.parseInt(result[2]);
 
           DefaultSyntaxKit.initKit();
           Configuration new_config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-          new_config.put("DefaultFont", default_font + default_font_size);
+          new_config.put("DefaultFont", set_font + set_font_size);
 
-          CSyntaxKit pref_c_editor_kit = new CSyntaxKit();
-          pref_c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
-          pref_c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
-          pref_c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
-          pref_c_editor_kit.setProperty("Style.STRING", string_color + font_style);
-          pref_c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
-
-          pref_font_txt_fld.setText(default_font);
+          pref_font_txt_fld.setText(set_font);
       }//GEN-LAST:event_pref_font_btnActionPerformed
 
     private void serial_terminal_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serial_terminal_menu_itemActionPerformed
@@ -3242,53 +3316,124 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private void pref_apply_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_apply_btnActionPerformed
         String ed_text = editing_pane.getText();
+
         String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
         String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
         String number_style = c_editor_kit.getProperty("Style.NUMBER");
         String string_style = c_editor_kit.getProperty("Style.STRING");
-        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
         String type_style = c_editor_kit.getProperty("Style.TYPE");
+        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
         String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
         String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
-        
+
         editing_pane.setEditorKit(c_editor_kit);
-        
+
         c_editor_kit.setProperty("Style.KEYWORD", keyword_style);
         c_editor_kit.setProperty("Style.KEYWORD2", keyword2_style);
         c_editor_kit.setProperty("Style.NUMBER", number_style);
         c_editor_kit.setProperty("Style.STRING", string_style);
-        c_editor_kit.setProperty("Style.COMMENT", comment_style);
         c_editor_kit.setProperty("Style.TYPE", type_style);
+        c_editor_kit.setProperty("Style.COMMENT", comment_style);
         c_editor_kit.setProperty("Style.OPERATOR", operator_style);
         c_editor_kit.setProperty("Style.IDENTIFIER", identifier_style);
-        
+
         editing_pane.setText(ed_text);
+
+        String imported_color = "";
+        int imported_style = -1;
+
+        switch (pref_category_list.getSelectedIndex()) {
+            case 0:
+                imported_color = c_editor_kit.getProperty("Style.KEYWORD").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                break;
+            case 1:
+                imported_color = c_editor_kit.getProperty("Style.KEYWORD2").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                break;
+            case 2:
+                imported_color = c_editor_kit.getProperty("Style.NUMBER").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                break;
+            case 3:
+                imported_color = c_editor_kit.getProperty("Style.STRING").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                break;
+            case 4:
+                imported_color = c_editor_kit.getProperty("Style.COMMENT").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                break;
+            case 5:
+                imported_color = c_editor_kit.getProperty("Style.TYPE").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                break;
+            case 6:
+                imported_color = c_editor_kit.getProperty("Style.OPERATOR").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                break;
+            case 7:
+                imported_color = c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[0].trim();
+                imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                break;
+        }
+        imported_color = imported_color.toLowerCase().replace("0x", "");
+        int int_imported_color = Integer.parseInt(imported_color, 16);
+        color = new Color(int_imported_color);
+        pref_color_txt_fld.setText("#" + imported_color.toUpperCase());
+        pref_color_txt_fld.setBackground(color);
+        pref_style_combo_bx.setSelectedIndex(imported_style);
     }//GEN-LAST:event_pref_apply_btnActionPerformed
 
     private void pref_ok_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_ok_btnActionPerformed
-        String ed_text = editing_pane.getText();
-        String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
-        String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
-        String number_style = c_editor_kit.getProperty("Style.NUMBER");
-        String string_style = c_editor_kit.getProperty("Style.STRING");
-        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
-        String type_style = c_editor_kit.getProperty("Style.TYPE");
-        String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
-        String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
-        
-        editing_pane.setEditorKit(c_editor_kit);
-        
-        c_editor_kit.setProperty("Style.KEYWORD", keyword_style);
-        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_style);
-        c_editor_kit.setProperty("Style.NUMBER", number_style);
-        c_editor_kit.setProperty("Style.STRING", string_style);
-        c_editor_kit.setProperty("Style.COMMENT", comment_style);
-        c_editor_kit.setProperty("Style.TYPE", type_style);
-        c_editor_kit.setProperty("Style.OPERATOR", operator_style);
-        c_editor_kit.setProperty("Style.IDENTIFIER", identifier_style);
-        
-        editing_pane.setText(ed_text);
-        pref_frame.setVisible(false);
+        try {
+            String ed_text = editing_pane.getText();
+            String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
+            String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
+            String number_style = c_editor_kit.getProperty("Style.NUMBER");
+            String string_style = c_editor_kit.getProperty("Style.STRING");
+            String type_style = c_editor_kit.getProperty("Style.TYPE");
+            String comment_style = c_editor_kit.getProperty("Style.COMMENT");
+            String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
+            String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
+
+            editing_pane.setEditorKit(c_editor_kit);
+
+            c_editor_kit.setProperty("Style.KEYWORD", keyword_style);
+            c_editor_kit.setProperty("Style.KEYWORD2", keyword2_style);
+            c_editor_kit.setProperty("Style.NUMBER", number_style);
+            c_editor_kit.setProperty("Style.STRING", string_style);
+            c_editor_kit.setProperty("Style.TYPE", type_style);
+            c_editor_kit.setProperty("Style.COMMENT", comment_style);
+            c_editor_kit.setProperty("Style.OPERATOR", operator_style);
+            c_editor_kit.setProperty("Style.IDENTIFIER", identifier_style);
+
+            editing_pane.setText(ed_text);
+
+            prefs.put("default_font", set_font);
+            prefs.putInt("default_font_size", set_font_size);
+            prefs.put("keyword", c_editor_kit.getProperty("Style.KEYWORD"));
+            prefs.put("keyword2", c_editor_kit.getProperty("Style.KEYWORD2"));
+            prefs.put("number", c_editor_kit.getProperty("Style.NUMBER"));
+            prefs.put("string", c_editor_kit.getProperty("Style.STRING"));
+            prefs.put("type", c_editor_kit.getProperty("Style.TYPE"));
+            prefs.put("comment", c_editor_kit.getProperty("Style.COMMENT"));
+            prefs.put("operator", c_editor_kit.getProperty("Style.OPERATOR"));
+            prefs.put("identifier", c_editor_kit.getProperty("Style.IDENTIFIER"));
+
+//            System.out.println(c_editor_kit.getProperty("Style.KEYWORD"));
+//            System.out.println(c_editor_kit.getProperty("Style.KEYWORD2"));
+//            System.out.println(c_editor_kit.getProperty("Style.NUMBER"));
+//            System.out.println(c_editor_kit.getProperty("Style.STRING"));
+//            System.out.println(c_editor_kit.getProperty("Style.TYPE"));
+//            System.out.println(c_editor_kit.getProperty("Style.COMMENT"));
+//            System.out.println(c_editor_kit.getProperty("Style.OPERATOR"));
+//            System.out.println(c_editor_kit.getProperty("Style.IDENTIFIER"));
+            prefs.sync();
+
+            pref_frame.setVisible(false);
+        } catch (BackingStoreException ex) {
+            System.err.println(ex.toString());
+        }
     }//GEN-LAST:event_pref_ok_btnActionPerformed
 
     private void search_fieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_search_fieldFocusLost
@@ -3347,29 +3492,156 @@ public class Main_Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_pref_style_combo_bxItemStateChanged
 
     private void pref_export_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_export_btnActionPerformed
-        JSONObject json_data = new JSONObject();
+        try {
+            JSONObject json_data = new JSONObject();
 
-        String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
-        String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
-        String number_style = c_editor_kit.getProperty("Style.NUMBER");
-        String string_style = c_editor_kit.getProperty("Style.STRING");
-        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
-        String type_style = c_editor_kit.getProperty("Style.TYPE");
-        String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
-        String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
+            String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
+            String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
+            String number_style = c_editor_kit.getProperty("Style.NUMBER");
+            String string_style = c_editor_kit.getProperty("Style.STRING");
+            String comment_style = c_editor_kit.getProperty("Style.COMMENT");
+            String type_style = c_editor_kit.getProperty("Style.TYPE");
+            String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
+            String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
 
-        json_data.put("font", default_font.trim() + ", " + default_font_size);
-        json_data.put("keyword", keyword_style);
-        json_data.put("keyword2", keyword2_style);
-        json_data.put("number", number_style);
-        json_data.put("string", string_style);
-        json_data.put("comment", comment_style);
-        json_data.put("type", type_style);
-        json_data.put("operator", operator_style);
-        json_data.put("identifier", identifier_style);
+            json_data.put("font", set_font.trim() + ", " + set_font_size);
+            json_data.put("keyword", keyword_style);
+            json_data.put("keyword2", keyword2_style);
+            json_data.put("number", number_style);
+            json_data.put("string", string_style);
+            json_data.put("comment", comment_style);
+            json_data.put("type", type_style);
+            json_data.put("operator", operator_style);
+            json_data.put("identifier", identifier_style);
 
-        System.out.println(json_data.toString(3));
+            String json_data_string = json_data.toString(3);
+
+            DateFormat dateFormat = new SimpleDateFormat("dd_MMM_YY_hh_mm_ss_a");
+            String date = dateFormat.format(Calendar.getInstance().getTime());
+
+            FileDialog fd = new FileDialog(this, "Export preferences", FileDialog.SAVE);
+            fd.setTitle("Export preferences");
+            fd.setFile("preferences_" + date + ".json");
+            fd.setVisible(true);
+            String selected = fd.getDirectory() + fd.getFile();
+
+            if (!selected.contains("null")) {
+                File json_data_file = new File(selected);
+
+                try (PrintWriter writer = new PrintWriter(json_data_file, "UTF-8")) {
+                    writer.println(json_data_string);
+                }
+            }
+
+            JOptionPane.showMessageDialog(this, "preferences exported successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            System.err.println(ex.getMessage());
+        }
     }//GEN-LAST:event_pref_export_btnActionPerformed
+
+    private void pref_import_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_import_btnActionPerformed
+        try {
+            FileDialog fd = new FileDialog(this, "Export preferences", FileDialog.LOAD);
+            fd.setTitle("Export preferences");
+            fd.setVisible(true);
+            String selected = fd.getDirectory() + fd.getFile();
+
+            if (!selected.contains("null")) {
+                File json_data_file = new File(selected);
+                Scanner scan = new Scanner(json_data_file);
+                String text = "";
+                while (scan.hasNext()) {
+                    text += scan.next();
+                }
+                scan.close();
+                JSONObject json_data = new JSONObject(text);
+
+                System.out.println(json_data.toString(3));
+
+                c_editor_kit.setProperty("Style.KEYWORD", json_data.getString("keyword"));
+                c_editor_kit.setProperty("Style.KEYWORD2", json_data.getString("keyword2"));
+                c_editor_kit.setProperty("Style.NUMBER", json_data.getString("number"));
+                c_editor_kit.setProperty("Style.STRING", json_data.getString("string"));
+                c_editor_kit.setProperty("Style.COMMENT", json_data.getString("comment"));
+                c_editor_kit.setProperty("Style.TYPE", json_data.getString("type"));
+                c_editor_kit.setProperty("Style.OPERATOR", json_data.getString("operator"));
+                c_editor_kit.setProperty("Style.IDENTIFIER", json_data.getString("identifier"));
+
+                String imported_color = "";
+                int imported_style = -1;
+
+                switch (pref_category_list.getSelectedIndex()) {
+                    case 0:
+                        imported_color = c_editor_kit.getProperty("Style.KEYWORD").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                        break;
+                    case 1:
+                        imported_color = c_editor_kit.getProperty("Style.KEYWORD2").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                        break;
+                    case 2:
+                        imported_color = c_editor_kit.getProperty("Style.NUMBER").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                        break;
+                    case 3:
+                        imported_color = c_editor_kit.getProperty("Style.STRING").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                        break;
+                    case 4:
+                        imported_color = c_editor_kit.getProperty("Style.COMMENT").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                        break;
+                    case 5:
+                        imported_color = c_editor_kit.getProperty("Style.TYPE").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                        break;
+                    case 6:
+                        imported_color = c_editor_kit.getProperty("Style.OPERATOR").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                        break;
+                    case 7:
+                        imported_color = c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[0].trim();
+                        imported_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                        break;
+                }
+                imported_color = imported_color.toLowerCase().replace("0x", "");
+                int int_imported_color = Integer.parseInt(imported_color, 16);
+                color = new Color(int_imported_color);
+                pref_color_txt_fld.setText("#" + imported_color.toUpperCase());
+                pref_color_txt_fld.setBackground(color);
+                pref_style_combo_bx.setSelectedIndex(imported_style);
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+        }
+    }//GEN-LAST:event_pref_import_btnActionPerformed
+
+    private void pref_defaults_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_defaults_btnActionPerformed
+        String ed_text = editing_pane.getText();
+        
+        pref_font_txt_fld.setText(default_font);
+        
+        DefaultSyntaxKit.initKit();
+        Configuration new_config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+        new_config.put("DefaultFont", default_font + default_font_size);
+
+        c_editor_kit.setProperty("Style.KEYWORD", default_keyword_color_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", default_keyword2_color_style);
+        c_editor_kit.setProperty("Style.NUMBER", default_number_color_style);
+        c_editor_kit.setProperty("Style.STRING", default_string_color_style);
+        c_editor_kit.setProperty("Style.TYPE", default_type_color_style);
+        c_editor_kit.setProperty("Style.COMMENT", default_comment_color_style);
+        c_editor_kit.setProperty("Style.OPERATOR", default_operator_color_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", default_identifier_color_style);
+
+        editing_pane.setText(ed_text);
+
+        pref_apply_btnActionPerformed(new ActionEvent(this, 0, "apply defaults"));
+    }//GEN-LAST:event_pref_defaults_btnActionPerformed
+
+    private void pref_color_txt_fldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_txt_fldActionPerformed
+        pref_color_btnActionPerformed(new ActionEvent(this, 0, "change color"));
+    }//GEN-LAST:event_pref_color_txt_fldActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -3429,6 +3701,7 @@ public class Main_Frame extends javax.swing.JFrame {
     private javax.swing.JButton pref_color_btn;
     private javax.swing.JLabel pref_color_label;
     private javax.swing.JTextField pref_color_txt_fld;
+    private javax.swing.JButton pref_defaults_btn;
     private javax.swing.JButton pref_export_btn;
     private javax.swing.JButton pref_font_btn;
     private javax.swing.JLabel pref_font_label;
