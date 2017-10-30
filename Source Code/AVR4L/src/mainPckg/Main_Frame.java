@@ -603,7 +603,7 @@ public class Main_Frame extends javax.swing.JFrame {
                     }
 
                     if (!error) {
-                        cmd = new String[]{"cmd", "/c", "del \"" + file_to_open.getAbsolutePath().replace(".c", ".o")};
+                        cmd = new String[]{"cmd", "/c", "del \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\""};
                         System.out.println(cmd[2]);
                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
@@ -692,7 +692,7 @@ public class Main_Frame extends javax.swing.JFrame {
                     }
 
                     if (!error) {
-                        cmd = new String[]{"/bin/sh", "-c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o")};
+                        cmd = new String[]{"/bin/sh", "-c", "rm -f \"" + file_to_open.getAbsolutePath().replace(".c", ".o") + "\""};
                         System.out.println(cmd[2]);
                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
@@ -1855,7 +1855,7 @@ public class Main_Frame extends javax.swing.JFrame {
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 30.928");
+        iteration_label.setText("Iteration: 31.011");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

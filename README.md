@@ -1,6 +1,6 @@
 # AVR4L
 
-![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_7.png)
+![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_8.png)
 
 ## About:
 AVR4L aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR4L is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
@@ -42,7 +42,7 @@ further development and testing is needed.
 
 ## Features:
 1. Cross platform (Linux, Mac OSX, Windows)
-2. Creative coding environment with auto-complete, suggestions and other features.
+2. Creative coding environment with auto-complete, suggestions and many more features.
 3. Two options for compiling your code:
 	1. standard mode.
 	2. makefile mode.
