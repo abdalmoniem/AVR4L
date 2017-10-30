@@ -1,6 +1,6 @@
 # AVR4L
 
-![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_6.png)
+![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_7.png)
 
 ## About:
 AVR4L aims to deliver an easy to use and user friendly Integrated Development Environment for developing Codes for microcontrollers based on Atmel's AVR families. AVR4L is a Creative coding / Integrated Development Environment for Linux operating systems intended for AVR beginners as well as professionals, it has many features from professional IDEs as well as the simplicity of editing.
@@ -9,6 +9,15 @@ AVR4L aims to deliver an easy to use and user friendly Integrated Development En
 ### Linux:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
 	1. How to install: [https://java.com/en/download/help/linux_x64_install.xml](https://java.com/en/download/help/linux_x64_install.xml)
+	2. Set `JAVA_HOME` environment variable, by doing the following:
+		1. Depending on where you installed your Java, you will need to provide the full path.
+			For this example, I installed Oracle JDK 8 in the `/usr/lib/jvm/java-8-oracle` directory.
+		2. Open the file `/etc/environment` and scroll to the end of the file and enter the following:
+			
+			`JAVA_HOME=/usr/lib/jvm/java-8-oracle`
+		3. Save and source the file by doing:
+
+			`. /etc/environment` or `source /etc/environment`
 2. Clone/download this folder to your computer.
 3. cd into the `Binaries/Linux` directory.
 4. run `sudo -E ./install.sh` within this folder.

@@ -21,7 +21,7 @@ then
 	exit 1
 fi
 
-echo "Installing..."
+echo "Starting AVR4L installation..."
 
 # install avr toolchain
 apt-get install gcc-avr binutils-avr avr-libc
@@ -38,16 +38,16 @@ fi
 
 # copy AVR4L core files and folders
 mkdir /usr/share/avr4l
-cp -r ./bin/AVR4L.jar /usr/share/avr4l
-cp -r ./bin/lib /usr/share/avr4l
-cp -r ./bin/dependencies/RXTXcomm.jar $JAVA_HOME/jre/lib/ext/RXTXcomm.jar
-cp -r ./bin/dependencies/librxtxSerial.so $JAVA_HOME/jre/lib/amd64/librxtxSerial.so
-cp -r ./bin/dependencies/librxtxParallel.so $JAVA_HOME/jre/lib/amd64/librxtxParallel.so
+cp -r ./AVR4L.jar /usr/share/avr4l
+cp -r ./lib /usr/share/avr4l
+cp -r ./dependencies/RXTXcomm.jar $JAVA_HOME/jre/lib/ext/RXTXcomm.jar
+cp -r ./dependencies/librxtxSerial.so $JAVA_HOME/jre/lib/amd64/librxtxSerial.so
+cp -r ./dependencies/librxtxParallel.so $JAVA_HOME/jre/lib/amd64/librxtxParallel.so
 
-cp -r ./bin/icon.png /usr/share/avr4l
-cp -r ./bin/avr4l-about.png /usr/share/avr4l
-cp -r ./bin/avr4l.desktop /usr/share/applications/avr4l.desktop
-cp -r ./bin/avr4l /usr/bin
+cp -r ./icon.png /usr/share/avr4l
+cp -r ./avr4l-about.png /usr/share/avr4l
+cp -r ./avr4l.desktop /usr/share/applications/avr4l.desktop
+cp -r ./avr4l /usr/bin
 
 chmod a+rw -R /usr/share/avr4l/*
 chmod a+x -R /usr/share/avr4l/lib
@@ -85,7 +85,7 @@ then
 			then
 				GREEN='\033[0;32m'
 				NC='\033[0m'
-				printf "${GREEN}\nAVR for Linux was installed successfully !!!${NC}\n\n"
+				printf "${GREEN}\nAVR4L was installed successfully !!!${NC}\n\n"
 				# printf "\nPLEASE RESTART TERMINAL !!!\n"
 			fi
 		fi
