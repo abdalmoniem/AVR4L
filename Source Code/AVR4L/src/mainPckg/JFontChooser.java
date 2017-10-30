@@ -12,6 +12,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -54,19 +55,16 @@ import javax.swing.text.Position;
  * @e-mail hifnawy_moniem@hotmail.com
  *
  */
-
 /**
- * The JFontChooser class is a swing component for font selection.
- * This class has JFileChooser like APIs.
- * 
+ * The JFontChooser class is a swing component for font selection. This class
+ * has JFileChooser like APIs.
+ *
  * The following code pops up a font chooser dialog:
- * 
- *   JFontChooser fontChooser = new JFontChooser();
- *   int result = fontChooser.showDialog(parent);
- *   if (result == JFontChooser.OK_OPTION) {
- *      Font font = fontChooser.getSelectedFont();
- *      System.out.println("Selected Font : " + font);
- *   }
+ *
+ * JFontChooser fontChooser = new JFontChooser(); int result =
+ * fontChooser.showDialog(parent); if (result == JFontChooser.OK_OPTION) { Font
+ * font = fontChooser.getSelectedFont(); System.out.println("Selected Font : " +
+ * font); }
  *
  */
 public class JFontChooser extends JComponent {
@@ -93,8 +91,8 @@ public class JFontChooser extends JComponent {
      *
      */
     public static final int ERROR_OPTION = -1;
-    private static final Font DEFAULT_SELECTED_FONT = new Font("Serif", Font.PLAIN, 12);
-    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 10);
+    private static final Font DEFAULT_SELECTED_FONT = new Font("Consolas", Font.PLAIN, 12);
+    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 15);
     private static final int[] FONT_STYLE_CODES
             = {
                 Font.PLAIN, Font.BOLD, Font.ITALIC, Font.BOLD | Font.ITALIC
@@ -148,9 +146,10 @@ public class JFontChooser extends JComponent {
         selectPanel.add(getFontFamilyPanel());
         selectPanel.add(getFontStylePanel());
         selectPanel.add(getFontSizePanel());
-
+        
+        GridLayout layout = new GridLayout(2, 1);
         JPanel contentsPanel = new JPanel();
-        contentsPanel.setLayout(new GridLayout(2, 1));
+        contentsPanel.setLayout(layout);
         contentsPanel.add(selectPanel, BorderLayout.NORTH);
         contentsPanel.add(getSamplePanel(), BorderLayout.CENTER);
 
@@ -405,6 +404,9 @@ public class JFontChooser extends JComponent {
      *
      */
     public int showDialog(Component parent) {
+        int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
+        int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
+        
         dialogResultValue = ERROR_OPTION;
         JDialog dialog = createDialog(parent);
         dialog.setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
@@ -413,7 +415,8 @@ public class JFontChooser extends JComponent {
                 dialogResultValue = CANCEL_OPTION;
             }
         });
-
+        
+        dialog.setLocation(screen_width / 4, screen_height / 10);
         dialog.setVisible(true);
         dialog.dispose();
         dialog = null;
@@ -625,6 +628,7 @@ public class JFontChooser extends JComponent {
         dialog.getContentPane().add(dialogEastPanel, BorderLayout.EAST);
         dialog.pack();
         dialog.setLocationRelativeTo(frame);
+        dialog.setSize(900, 600);
         return dialog;
     }
 
@@ -738,9 +742,10 @@ public class JFontChooser extends JComponent {
         if (sampleText == null) {
             Border lowered = BorderFactory.createLoweredBevelBorder();
 
-            sampleText = new JTextField(("AaBbYyZz"));
+            sampleText = new JTextField(("The quick brown fox jumps over the lazy dog"));
             sampleText.setBorder(lowered);
-            sampleText.setPreferredSize(new Dimension(300, 100));
+            sampleText.setPreferredSize(new Dimension(300, 50));
+//            sampleText.setSize(100, 40);
         }
         return sampleText;
     }
@@ -760,7 +765,7 @@ public class JFontChooser extends JComponent {
             fontStyleNames[i++] = ("Plain");
             fontStyleNames[i++] = ("Bold");
             fontStyleNames[i++] = ("Italic");
-            fontStyleNames[i++] = ("BoldItalic");
+            fontStyleNames[i++] = ("Bold and Italic");
         }
         return fontStyleNames;
     }

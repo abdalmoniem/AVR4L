@@ -216,6 +216,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Export"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pref_export_btnActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="pref_import_btn">
           <Properties>
@@ -467,6 +470,8 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="save_as_menu_itemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="separator">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="pref_menu_item">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
@@ -613,6 +618,9 @@
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="choose_font_item">
                   <Properties>
+                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                      <KeyStroke key="Ctrl+SEMICOLON"/>
+                    </Property>
                     <Property name="text" type="java.lang.String" value="Choose font"/>
                   </Properties>
                   <Events>

@@ -35,11 +35,10 @@ import java.awt.event.FocusListener;
 import java.util.Enumeration;
 import javax.swing.UIManager.*;
 import jsyntaxpane.DefaultSyntaxKit;
-import jsyntaxpane.Lexer;
-import jsyntaxpane.Token;
 import jsyntaxpane.syntaxkits.BashSyntaxKit;
 import jsyntaxpane.syntaxkits.CSyntaxKit;
 import jsyntaxpane.util.Configuration;
+import org.json.JSONObject;
 
 /**
  *
@@ -1036,7 +1035,7 @@ public class Main_Frame extends javax.swing.JFrame {
         }).start();
     }
 
-    private String[] get_font() {
+    private String[] get_font() {        
         JFontChooser fc = new JFontChooser();
         int result = fc.showDialog(null);
 
@@ -1049,7 +1048,7 @@ public class Main_Frame extends javax.swing.JFrame {
             new_font_size = Integer.toString(fc.getSelectedFontSize());
             new_font_style = Integer.toString(fc.getSelectedFontStyle());
         }
-
+        
         return new String[]{new_font, new_font_size, new_font_style};
     }
 
@@ -1459,6 +1458,7 @@ public class Main_Frame extends javax.swing.JFrame {
         openMenuItem = new javax.swing.JMenuItem();
         save_menu_item = new javax.swing.JMenuItem();
         save_as_menu_item = new javax.swing.JMenuItem();
+        separator = new javax.swing.JPopupMenu.Separator();
         pref_menu_item = new javax.swing.JMenuItem();
         about_menu_item = new javax.swing.JMenuItem();
         exit_menu_item = new javax.swing.JMenuItem();
@@ -1540,6 +1540,11 @@ public class Main_Frame extends javax.swing.JFrame {
         });
 
         pref_export_btn.setText("Export");
+        pref_export_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_export_btnActionPerformed(evt);
+            }
+        });
 
         pref_import_btn.setText("Import");
 
@@ -1858,6 +1863,7 @@ public class Main_Frame extends javax.swing.JFrame {
             }
         });
         file_menu.add(save_as_menu_item);
+        file_menu.add(separator);
 
         pref_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         pref_menu_item.setText("Preferences");
@@ -1970,6 +1976,7 @@ public class Main_Frame extends javax.swing.JFrame {
 
         font_menu.setText("Font");
 
+        choose_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SEMICOLON, java.awt.event.InputEvent.CTRL_MASK));
         choose_font_item.setText("Choose font");
         choose_font_item.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3002,32 +3009,37 @@ public class Main_Frame extends javax.swing.JFrame {
       }//GEN-LAST:event_gen_makefileActionPerformed
 
     private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choose_font_itemActionPerformed
-        String[] reslut = get_font();
-        if (reslut != null) {
-            default_font = reslut[0];
-            default_font_size = current_font_size = Integer.parseInt(reslut[1]);
-            int font_style = Integer.parseInt(reslut[2]);
+        String[] result = get_font();
 
-            DefaultSyntaxKit.initKit();
-            config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-            config.put("DefaultFont", default_font + default_font_size);
-
-            c_editor_kit = new CSyntaxKit();
-            c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
-            c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
-            c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
-            c_editor_kit.setProperty("Style.STRING", string_color + font_style);
-            c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
-            //c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
-
-            String text = editing_pane.getText();
-            editing_pane.setEditorKit(c_editor_kit);
-            editing_pane.addFocusListener(f_listener);
-            editing_pane.addCaretListener(c_listener);
-            editing_pane.getDocument().addDocumentListener(listener);
-            editing_pane.requestFocus();
-            editing_pane.setText(text);
+        for (String s : result) {
+            if (s == null) {
+                return;
+            }
         }
+
+        default_font = result[0];
+        default_font_size = current_font_size = Integer.parseInt(result[1]);
+        int font_style = Integer.parseInt(result[2]);
+
+        DefaultSyntaxKit.initKit();
+        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+        config.put("DefaultFont", default_font + default_font_size);
+
+        c_editor_kit = new CSyntaxKit();
+        c_editor_kit.setProperty("Style.KEYWORD", keyword_color + font_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_color + font_style);
+        c_editor_kit.setProperty("Style.NUMBER", number_color + font_style);
+        c_editor_kit.setProperty("Style.STRING", string_color + font_style);
+        c_editor_kit.setProperty("Style.TYPE", type_color + font_style);
+        //c_editor_kit.setProperty("Style.IDENTIFIER", "0x000000, " + font_style);
+
+        String text = editing_pane.getText();
+        editing_pane.setEditorKit(c_editor_kit);
+        editing_pane.addFocusListener(f_listener);
+        editing_pane.addCaretListener(c_listener);
+        editing_pane.getDocument().addDocumentListener(listener);
+        editing_pane.requestFocus();
+        editing_pane.setText(text);
     }//GEN-LAST:event_choose_font_itemActionPerformed
 
       private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
@@ -3230,13 +3242,51 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private void pref_apply_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_apply_btnActionPerformed
         String ed_text = editing_pane.getText();
+        String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
+        String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
+        String number_style = c_editor_kit.getProperty("Style.NUMBER");
+        String string_style = c_editor_kit.getProperty("Style.STRING");
+        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
+        String type_style = c_editor_kit.getProperty("Style.TYPE");
+        String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
+        String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
+        
         editing_pane.setEditorKit(c_editor_kit);
+        
+        c_editor_kit.setProperty("Style.KEYWORD", keyword_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_style);
+        c_editor_kit.setProperty("Style.NUMBER", number_style);
+        c_editor_kit.setProperty("Style.STRING", string_style);
+        c_editor_kit.setProperty("Style.COMMENT", comment_style);
+        c_editor_kit.setProperty("Style.TYPE", type_style);
+        c_editor_kit.setProperty("Style.OPERATOR", operator_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", identifier_style);
+        
         editing_pane.setText(ed_text);
     }//GEN-LAST:event_pref_apply_btnActionPerformed
 
     private void pref_ok_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_ok_btnActionPerformed
         String ed_text = editing_pane.getText();
+        String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
+        String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
+        String number_style = c_editor_kit.getProperty("Style.NUMBER");
+        String string_style = c_editor_kit.getProperty("Style.STRING");
+        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
+        String type_style = c_editor_kit.getProperty("Style.TYPE");
+        String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
+        String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
+        
         editing_pane.setEditorKit(c_editor_kit);
+        
+        c_editor_kit.setProperty("Style.KEYWORD", keyword_style);
+        c_editor_kit.setProperty("Style.KEYWORD2", keyword2_style);
+        c_editor_kit.setProperty("Style.NUMBER", number_style);
+        c_editor_kit.setProperty("Style.STRING", string_style);
+        c_editor_kit.setProperty("Style.COMMENT", comment_style);
+        c_editor_kit.setProperty("Style.TYPE", type_style);
+        c_editor_kit.setProperty("Style.OPERATOR", operator_style);
+        c_editor_kit.setProperty("Style.IDENTIFIER", identifier_style);
+        
         editing_pane.setText(ed_text);
         pref_frame.setVisible(false);
     }//GEN-LAST:event_pref_ok_btnActionPerformed
@@ -3295,6 +3345,31 @@ public class Main_Frame extends javax.swing.JFrame {
                 break;
         }
     }//GEN-LAST:event_pref_style_combo_bxItemStateChanged
+
+    private void pref_export_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_export_btnActionPerformed
+        JSONObject json_data = new JSONObject();
+
+        String keyword_style = c_editor_kit.getProperty("Style.KEYWORD");
+        String keyword2_style = c_editor_kit.getProperty("Style.KEYWORD2");
+        String number_style = c_editor_kit.getProperty("Style.NUMBER");
+        String string_style = c_editor_kit.getProperty("Style.STRING");
+        String comment_style = c_editor_kit.getProperty("Style.COMMENT");
+        String type_style = c_editor_kit.getProperty("Style.TYPE");
+        String operator_style = c_editor_kit.getProperty("Style.OPERATOR");
+        String identifier_style = c_editor_kit.getProperty("Style.IDENTIFIER");
+
+        json_data.put("font", default_font.trim() + ", " + default_font_size);
+        json_data.put("keyword", keyword_style);
+        json_data.put("keyword2", keyword2_style);
+        json_data.put("number", number_style);
+        json_data.put("string", string_style);
+        json_data.put("comment", comment_style);
+        json_data.put("type", type_style);
+        json_data.put("operator", operator_style);
+        json_data.put("identifier", identifier_style);
+
+        System.out.println(json_data.toString(3));
+    }//GEN-LAST:event_pref_export_btnActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -3373,6 +3448,7 @@ public class Main_Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem save_as_menu_item;
     private javax.swing.JMenuItem save_menu_item;
     private javax.swing.JTextField search_field;
+    private javax.swing.JPopupMenu.Separator separator;
     private javax.swing.JCheckBox serial_autoscroll_chk_bx;
     private javax.swing.JComboBox<String> serial_baud_rate_combo_bx;
     private javax.swing.JLabel serial_baud_rate_label;
