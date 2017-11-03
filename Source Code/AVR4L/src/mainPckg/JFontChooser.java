@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -92,13 +93,13 @@ public class JFontChooser extends JComponent {
      */
     public static final int ERROR_OPTION = -1;
     private static final Font DEFAULT_SELECTED_FONT = new Font("Consolas", Font.PLAIN, 12);
-    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 15);
+    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 11);
     private static final int[] FONT_STYLE_CODES
             = {
                 Font.PLAIN, Font.BOLD, Font.ITALIC, Font.BOLD | Font.ITALIC
             };
     private static final String[] DEFAULT_FONT_SIZE_STRINGS
-            = {"8", "9", "10", "11", "12", "14", "16", "18", "20",
+            = {"8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "20",
                 "22", "24", "26", "28", "36", "48", "72",};
 
     // instance variables
@@ -150,14 +151,21 @@ public class JFontChooser extends JComponent {
         selectPanel.add(getFontStylePanel());
         selectPanel.add(getFontSizePanel());
 
-        GridLayout layout = new GridLayout(2, 1);
-        JPanel contentsPanel = new JPanel();
-        contentsPanel.setLayout(layout);
-        contentsPanel.add(selectPanel, BorderLayout.NORTH);
-        contentsPanel.add(getSamplePanel(), BorderLayout.CENTER);
+//        GridLayout layout = new GridLayout(2, 1);
+//        JPanel contentsPanel = new JPanel();
+//        contentsPanel.setLayout(layout);
+//        contentsPanel.add(selectPanel, BorderLayout.NORTH);
+//        contentsPanel.add(getSamplePanel(), BorderLayout.CENTER);
+        JSplitPane contentsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        contentsSplitPane.setContinuousLayout(true);
+//        contentsSplitPane.setResizeWeight(0.9);
+        contentsSplitPane.setDividerLocation(170);
+        contentsSplitPane.setLeftComponent(selectPanel);
+        contentsSplitPane.setRightComponent(getSamplePanel());
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.add(contentsPanel);
+//        this.add(contentsPanel);
+        this.add(contentsSplitPane);
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.setSelectedFont(DEFAULT_SELECTED_FONT);
     }
@@ -174,14 +182,21 @@ public class JFontChooser extends JComponent {
         selectPanel.add(getFontStylePanel(selected_font));
         selectPanel.add(getFontSizePanel(selected_font));
 
-        GridLayout layout = new GridLayout(2, 1);
-        JPanel contentsPanel = new JPanel();
-        contentsPanel.setLayout(layout);
-        contentsPanel.add(selectPanel, BorderLayout.NORTH);
-        contentsPanel.add(getSamplePanel(), BorderLayout.CENTER);
+//        GridLayout layout = new GridLayout(2, 1);
+//        JPanel contentsPanel = new JPanel();
+//        contentsPanel.setLayout(layout);
+//        contentsPanel.add(selectPanel, BorderLayout.NORTH);
+//        contentsPanel.add(getSamplePanel(), BorderLayout.CENTER);
+        JSplitPane contentsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        contentsSplitPane.setContinuousLayout(true);
+//        contentsSplitPane.setResizeWeight(0.9);
+        contentsSplitPane.setDividerLocation(170);
+        contentsSplitPane.setLeftComponent(selectPanel);
+        contentsSplitPane.setRightComponent(getSamplePanel());
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.add(contentsPanel);
+//        this.add(contentsPanel);
+        this.add(contentsSplitPane);
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.setSelectedFont(selected_font);
     }
@@ -469,6 +484,7 @@ public class JFontChooser extends JComponent {
      * Show font selection dialog.
      *
      * @param parent Dialog's Parent component.
+     *
      * @return OK_OPTION, CANCEL_OPTION or ERROR_OPTION
      *
      * @see #OK_OPTION
@@ -488,11 +504,13 @@ public class JFontChooser extends JComponent {
                 dialogResultValue = CANCEL_OPTION;
             }
         });
-
-        dialog.setLocation(screen_width / 4, screen_height / 10);
+        
+        dialog.setSize(500, 300);
+        dialog.setResizable(false);
+        dialog.setLocation(screen_width / 2 - dialog.getWidth() / 2, screen_height / 2 - dialog.getHeight() / 2);
         dialog.setVisible(true);
         dialog.dispose();
-        dialog = null;
+//        dialog = null;
 
         return dialogResultValue;
     }
@@ -580,14 +598,17 @@ public class JFontChooser extends JComponent {
             this.targetList = targetList;
         }
 
+        @Override
         public void insertUpdate(DocumentEvent e) {
             update(e);
         }
 
+        @Override
         public void removeUpdate(DocumentEvent e) {
             update(e);
         }
 
+        @Override
         public void changedUpdate(DocumentEvent e) {
             update(e);
         }
@@ -701,7 +722,6 @@ public class JFontChooser extends JComponent {
         dialog.getContentPane().add(dialogEastPanel, BorderLayout.EAST);
         dialog.pack();
         dialog.setLocationRelativeTo(frame);
-        dialog.setSize(900, 600);
         return dialog;
     }
 
@@ -744,7 +764,7 @@ public class JFontChooser extends JComponent {
             fontNamePanel = new JPanel();
             fontNamePanel.setLayout(new BorderLayout());
             fontNamePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            fontNamePanel.setPreferredSize(new Dimension(180, 130));
+            fontNamePanel.setPreferredSize(new Dimension(250, 130));
 
             JScrollPane scrollPane = new JScrollPane(getFontFamilyList());
             scrollPane.getVerticalScrollBar().setFocusable(false);

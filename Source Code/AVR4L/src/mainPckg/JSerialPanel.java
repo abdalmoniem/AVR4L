@@ -15,11 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.TooManyListenersException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -31,8 +28,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import com.fazecast.jSerialComm.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Toolkit;
 import javax.swing.JLabel;
 
 /**
@@ -57,7 +53,7 @@ public class JSerialPanel {
     private String port;
 
     private static final int TIME_OUT = 2000;
-    
+
     private final int MODE_WARNING = 0;
     private final int MODE_ERROR = 1;
     private final int MODE_CONSOLE = 2;
@@ -91,7 +87,11 @@ public class JSerialPanel {
     }
 
     public void showPanel() {
+        int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
+        int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
+        
         serial_frame.setSize(700, 500);
+        serial_frame.setLocation(screen_width / 2 - serial_frame.getWidth() / 2, screen_height / 2 - serial_frame.getHeight() / 2);
         serial_frame.setVisible(true);
         rcv_editor_pane.setText(null);
         serial_port_label.setText("Port: " + port);
@@ -104,7 +104,7 @@ public class JSerialPanel {
 
         serial_port.addDataListener(spdl);
 
-        append_to_pane(rcv_editor_pane, "Serial Monitor Ready.\n", MODE_CONSOLE);
+        append_to_pane(rcv_editor_pane, "Serial Terminal Ready.\n", MODE_CONSOLE);
     }
 
     public void set_serial_frame(JFrame frame) {
@@ -134,7 +134,7 @@ public class JSerialPanel {
         this.autoscroll_chkbx = chkbx;
         this.autoscroll_chkbx.setSelected(true);
     }
-    
+
     public void set_port_label(JLabel lbl) {
         this.serial_port_label = lbl;
     }

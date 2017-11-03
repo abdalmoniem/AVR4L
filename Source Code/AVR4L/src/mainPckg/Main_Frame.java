@@ -2,9 +2,11 @@ package mainPckg;
 
 import com.sun.glass.ui.Cursor;
 import gnu.io.*;
-import java.awt.Color;
-import java.awt.FileDialog;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,29 +15,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.ImageIcon;
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.util.Enumeration;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import javax.swing.UIManager.*;
+import javax.swing.text.*;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.syntaxkits.BashSyntaxKit;
 import jsyntaxpane.syntaxkits.CSyntaxKit;
@@ -91,7 +85,6 @@ public class Main_Frame extends javax.swing.JFrame {
 
     private Configuration config = null;
     private CSyntaxKit c_editor_kit = null;
-    private CSyntaxKit old_c_syntax_kit = null;
 
     private String default_font = null;
     private int default_font_size = 15;
@@ -1045,17 +1038,25 @@ public class Main_Frame extends javax.swing.JFrame {
         JFontChooser fc = new JFontChooser(font);
         int result = fc.showDialog(this);
 
-        String new_font = null;
-        String new_font_size = null;
-        String new_font_style = null;
-
         if (result == JFontChooser.OK_OPTION) {
-            new_font = fc.getSelectedFont().getFontName() + " ";
-            new_font_size = Integer.toString(fc.getSelectedFontSize());
-            new_font_style = Integer.toString(fc.getSelectedFontStyle());
+            String new_font = fc.getSelectedFont().getFontName() + " ";
+            String new_font_size = Integer.toString(fc.getSelectedFontSize());
+            String new_font_style = Integer.toString(fc.getSelectedFontStyle());
+            return new String[]{new_font.toLowerCase(), new_font_size, new_font_style};
+        } else {
+            return new String[]{null};
         }
+    }
 
-        return new String[]{new_font.toLowerCase(), new_font_size, new_font_style};
+    public void set_chooser_panel(JColorChooser chooser, String name) {
+        AbstractColorChooserPanel[] panels = chooser.getChooserPanels();
+        for (AbstractColorChooserPanel panel : panels) {
+            String panel_name = panel.getDisplayName().toLowerCase();
+            String item_name = name.toLowerCase();
+            if (!panel_name.equals(item_name)) {
+                chooser.removeChooserPanel(panel);
+            }
+        }
     }
 
     public Main_Frame(String[] arguments) {
@@ -1072,7 +1073,7 @@ public class Main_Frame extends javax.swing.JFrame {
 
         setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        setLocation(screen_width / 3, screen_height / 15);
+        setLocation(screen_width / 2 - getWidth() / 2, screen_height / 2 - getHeight() / 2);
 
         prog_option = "avrisp -b19200 -P " + port;
         mcuCombo.setSelectedItem("atmega328p");
@@ -1450,8 +1451,8 @@ public class Main_Frame extends javax.swing.JFrame {
                     + "}");
         }
     }
-// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-private void initComponents() {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
         programmer_options_button_group = new javax.swing.ButtonGroup();
         privacy_dialog = new javax.swing.JDialog();
@@ -1486,6 +1487,7 @@ private void initComponents() {
         serial_rcv_scroll_pane = new javax.swing.JScrollPane();
         serial_rcv_text_pane = new javax.swing.JTextPane();
         serial_port_label = new javax.swing.JLabel();
+        serial_clear_btn = new javax.swing.JButton();
         toolbar = new javax.swing.JToolBar();
         verify_button = new javax.swing.JButton();
         upload_button = new javax.swing.JButton();
@@ -1548,66 +1550,61 @@ private void initComponents() {
         javax.swing.GroupLayout privacy_dialogLayout = new javax.swing.GroupLayout(privacy_dialog.getContentPane());
         privacy_dialog.getContentPane().setLayout(privacy_dialogLayout);
         privacy_dialogLayout.setHorizontalGroup(
-                privacy_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(privacy_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
-                );
+            privacy_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(privacy_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+        );
         privacy_dialogLayout.setVerticalGroup(
-                privacy_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(privacy_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-                );
+            privacy_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(privacy_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+        );
 
         mkfl_editing_scroll_pane.setViewportView(mkfl_editing_pane);
 
         pref_frame.setTitle("Preferences");
-        pref_frame.setPreferredSize(new java.awt.Dimension(610, 335));
         pref_frame.setResizable(false);
 
         pref_category_list.setBorder(javax.swing.BorderFactory.createTitledBorder("Category:"));
         pref_category_list.setModel(new javax.swing.AbstractListModel() {
-                        String[] strings = { "Keywords", "Preprocessor Keywords", "Numbers", "Strings", "Comments", "Types", "Operators", "Identifiers" };
-                        public int getSize() {
-                                return strings.length;
-                        }
-                        public Object getElementAt(int i) {
-                                return strings[i];
-                        }
-                });
+            String[] strings = { "Keywords", "Preprocessor Keywords", "Numbers", "Strings", "Comments", "Types", "Operators", "Identifiers" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
         pref_category_scroll_pane.setViewportView(pref_category_list);
 
         pref_cancel_btn.setText("Cancel");
         pref_cancel_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_cancel_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_cancel_btnActionPerformed(evt);
+            }
+        });
 
         pref_apply_btn.setText("Apply");
         pref_apply_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_apply_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_apply_btnActionPerformed(evt);
+            }
+        });
 
         pref_ok_btn.setText("Ok");
         pref_ok_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_ok_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_ok_btnActionPerformed(evt);
+            }
+        });
 
         pref_export_btn.setText("Export");
         pref_export_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_export_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_export_btnActionPerformed(evt);
+            }
+        });
 
         pref_import_btn.setText("Import");
         pref_import_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_import_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_import_btnActionPerformed(evt);
+            }
+        });
 
         pref_font_label.setText("Font:");
 
@@ -1615,118 +1612,118 @@ private void initComponents() {
 
         pref_font_btn.setText("...");
         pref_font_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_font_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_font_btnActionPerformed(evt);
+            }
+        });
 
         pref_style_label.setText("Style:");
 
         pref_color_btn.setText("...");
         pref_color_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_color_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_color_btnActionPerformed(evt);
+            }
+        });
 
         pref_color_txt_fld.setEditable(false);
         pref_color_txt_fld.setText("#000000");
-        pref_color_txt_fld.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_color_txt_fldActionPerformed(evt);
-                        }
-                });
+        pref_color_txt_fld.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pref_color_txt_fldMouseClicked(evt);
+            }
+        });
 
         pref_color_label.setText("Color:");
 
         pref_style_combo_bx.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Plain", "Bold", "Italic", "Bold and Italic" }));
         pref_style_combo_bx.addItemListener(new java.awt.event.ItemListener() {
-                        public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                                pref_style_combo_bxItemStateChanged(evt);
-                        }
-                });
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                pref_style_combo_bxItemStateChanged(evt);
+            }
+        });
 
         pref_defaults_btn.setText("Defaults");
         pref_defaults_btn.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_defaults_btnActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_defaults_btnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pref_frameLayout = new javax.swing.GroupLayout(pref_frame.getContentPane());
         pref_frame.getContentPane().setLayout(pref_frameLayout);
         pref_frameLayout.setHorizontalGroup(
-                pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pref_frameLayout.createSequentialGroup()
-                          .addContainerGap()
-                          .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pref_frameLayout.createSequentialGroup()
-                                              .addComponent(pref_font_label)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(pref_font_txt_fld)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(pref_font_btn))
-                                    .addGroup(pref_frameLayout.createSequentialGroup()
-                                              .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                              .addGap(18, 18, 18)
-                                              .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(pref_frameLayout.createSequentialGroup()
-                                                                  .addComponent(pref_style_label)
-                                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                  .addComponent(pref_style_combo_bx, 0, 249, Short.MAX_VALUE))
-                                                        .addGroup(pref_frameLayout.createSequentialGroup()
-                                                                  .addComponent(pref_color_label)
-                                                                  .addGap(8, 8, 8)
-                                                                  .addComponent(pref_color_txt_fld)
-                                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                  .addComponent(pref_color_btn))))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                              .addComponent(pref_export_btn)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(pref_import_btn)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                              .addComponent(pref_ok_btn)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(pref_apply_btn)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                              .addComponent(pref_defaults_btn)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                              .addComponent(pref_cancel_btn)))
-                          .addContainerGap())
-                );
+            pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pref_frameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addComponent(pref_font_label)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_font_txt_fld)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_font_btn))
+                    .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_style_label)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pref_style_combo_bx, 0, 231, Short.MAX_VALUE))
+                            .addGroup(pref_frameLayout.createSequentialGroup()
+                                .addComponent(pref_color_label)
+                                .addGap(8, 8, 8)
+                                .addComponent(pref_color_txt_fld)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pref_color_btn))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                        .addComponent(pref_export_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_import_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pref_ok_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_apply_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pref_defaults_btn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pref_cancel_btn)))
+                .addContainerGap())
+        );
         pref_frameLayout.setVerticalGroup(
-                pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                          .addContainerGap()
-                          .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(pref_font_label)
-                                    .addComponent(pref_font_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(pref_font_btn))
-                          .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                              .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(pref_color_label)
-                                                        .addComponent(pref_color_btn))
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(pref_style_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(pref_style_label))
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                                    .addGroup(pref_frameLayout.createSequentialGroup()
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                          .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(pref_cancel_btn)
-                                    .addComponent(pref_defaults_btn)
-                                    .addComponent(pref_apply_btn)
-                                    .addComponent(pref_ok_btn)
-                                    .addComponent(pref_export_btn)
-                                    .addComponent(pref_import_btn))
-                          .addContainerGap())
-                );
+            pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pref_font_label)
+                    .addComponent(pref_font_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pref_font_btn))
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pref_frameLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(pref_color_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pref_color_label)
+                            .addComponent(pref_color_btn))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(pref_style_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pref_style_label))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(pref_frameLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pref_category_scroll_pane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(pref_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pref_cancel_btn)
+                    .addComponent(pref_defaults_btn)
+                    .addComponent(pref_apply_btn)
+                    .addComponent(pref_ok_btn)
+                    .addComponent(pref_export_btn)
+                    .addComponent(pref_import_btn))
+                .addContainerGap())
+        );
 
         serial_frame.setTitle("Serial Terminal");
         serial_frame.setResizable(false);
@@ -1745,61 +1742,72 @@ private void initComponents() {
 
         serial_port_label.setText("Port:");
 
+        serial_clear_btn.setText("Clear");
+        serial_clear_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                serial_clear_btnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout serial_frameLayout = new javax.swing.GroupLayout(serial_frame.getContentPane());
         serial_frame.getContentPane().setLayout(serial_frameLayout);
         serial_frameLayout.setHorizontalGroup(
-                serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(serial_frameLayout.createSequentialGroup()
-                          .addContainerGap()
-                          .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(serial_rcv_scroll_pane)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
-                                              .addComponent(serial_send_txt_fld)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                              .addComponent(serial_send_btn))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
-                                              .addComponent(serial_autoscroll_chk_bx)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 289, Short.MAX_VALUE)
-                                              .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addGroup(serial_frameLayout.createSequentialGroup()
-                                                                  .addComponent(serial_baud_rate_label)
-                                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                  .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(serial_port_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                          .addContainerGap())
-                );
+            serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(serial_frameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(serial_rcv_scroll_pane)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
+                        .addComponent(serial_send_txt_fld)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(serial_send_btn))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
+                        .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(serial_autoscroll_chk_bx, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(serial_clear_btn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 289, Short.MAX_VALUE)
+                        .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, serial_frameLayout.createSequentialGroup()
+                                .addComponent(serial_baud_rate_label)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(serial_port_label, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
+        );
         serial_frameLayout.setVerticalGroup(
-                serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(serial_frameLayout.createSequentialGroup()
-                          .addContainerGap()
-                          .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(serial_send_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(serial_send_btn))
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addComponent(serial_rcv_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addComponent(serial_port_label)
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(serial_baud_rate_label)
-                                    .addComponent(serial_autoscroll_chk_bx))
-                          .addContainerGap())
-                );
+            serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(serial_frameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serial_send_txt_fld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(serial_send_btn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(serial_rcv_scroll_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serial_clear_btn)
+                    .addComponent(serial_baud_rate_combo_bx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(serial_baud_rate_label))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(serial_frameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serial_autoscroll_chk_bx)
+                    .addComponent(serial_port_label))
+                .addContainerGap())
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("AVR4L");
         setMinimumSize(new java.awt.Dimension(525, 650));
         addWindowStateListener(new java.awt.event.WindowStateListener() {
-                        public void windowStateChanged(java.awt.event.WindowEvent evt) {
-                                formWindowStateChanged(evt);
-                        }
-                });
+            public void windowStateChanged(java.awt.event.WindowEvent evt) {
+                formWindowStateChanged(evt);
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
-                        public void windowClosing(java.awt.event.WindowEvent evt) {
-                                formWindowClosing(evt);
-                        }
-                });
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         toolbar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         toolbar.setEnabled(false);
@@ -1809,10 +1817,10 @@ private void initComponents() {
         verify_button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         verify_button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         verify_button.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                verify_buttonActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verify_buttonActionPerformed(evt);
+            }
+        });
         toolbar.add(verify_button);
 
         upload_button.setText("upload");
@@ -1820,10 +1828,10 @@ private void initComponents() {
         upload_button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         upload_button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         upload_button.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                upload_buttonActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                upload_buttonActionPerformed(evt);
+            }
+        });
         toolbar.add(upload_button);
 
         search_field.setForeground(new java.awt.Color(180, 180, 180));
@@ -1832,40 +1840,40 @@ private void initComponents() {
         search_field.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         search_field.setPreferredSize(new java.awt.Dimension(200, 27));
         search_field.addFocusListener(new java.awt.event.FocusAdapter() {
-                        public void focusGained(java.awt.event.FocusEvent evt) {
-                                search_fieldFocusGained(evt);
-                        }
-                        public void focusLost(java.awt.event.FocusEvent evt) {
-                                search_fieldFocusLost(evt);
-                        }
-                });
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                search_fieldFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                search_fieldFocusLost(evt);
+            }
+        });
         search_field.addKeyListener(new java.awt.event.KeyAdapter() {
-                        public void keyTyped(java.awt.event.KeyEvent evt) {
-                                search_fieldKeyTyped(evt);
-                        }
-                });
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                search_fieldKeyTyped(evt);
+            }
+        });
         toolbar.add(search_field);
 
         mcuCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "avr2", "at90s2313", "at90s2323", "at90s2333", "at90s2343", "attiny22", "attiny26", "at90s4414", "at90s4433", "at90s4434", "at90s8515", "at90c8534", "at90s8535", "avr25", "ata6289", "attiny13", "attiny13a", "attiny2313", "attiny2313a", "attiny24", "attiny24a", "attiny4313", "attiny44", "attiny44a", "attiny84", "attiny25", "attiny45", "attiny85", "attiny261", "attiny261a", "attiny461", "attiny461a", "attiny861", "attiny861a", "attiny43u", "attiny87", "attiny48", "attiny88", "at86rf401", "avr3", "at43usb320", "at43usb355", "at76c711", "avr31", "atmega103", "avr35", "at90usb82", "at90usb162", "atmega8u2", "atmega16u2", "atmega32u2", "attiny167", "avr4", "atmega8", "atmega48", "atmega48a", "atmega48p", "atmega88", "atmega88a", "atmega88p", "atmega88pa", "atmega8515", "atmega8535", "atmega8hva", "atmega4hvd", "atmega8hvd", "at90pwm1", "at90pwm2", "at90pwm2b", "at90pwm3", "at90pwm3b", "at90pwm81", "avr5", "atmega16", "atmega16a", "atmega161", "atmega162", "atmega163", "atmega164a", "atmega164p", "atmega165", "atmega165a", "atmega165p", "atmega168", "atmega168a", "atmega168p", "atmega169", "atmega169a", "atmega169p", "atmega169pa", "atmega16c1", "atmega16hva", "atmega16hva2", "atmega16hvb", "atmega16m1", "atmega16u4", "atmega32", "atmega323", "atmega324a", "atmega324p", "atmega324pa", "atmega325", "atmega325p", "atmega3250", "atmega3250p", "atmega328", "atmega328p", "atmega329", "atmega329p", "atmega329pa", "atmega3290", "atmega3290p", "atmega32c1", "atmega32hvb", "atmega32m1", "atmega32u4", "atmega32u6", "atmega406", "atmega64", "atmega640", "atmega644", "atmega644a", "atmega644p", "atmega644pa", "atmega645", "atmega645a", "atmega645p", "atmega6450", "atmega6450a", "atmega6450p", "atmega649", "atmega649a", "atmega649p", "atmega6490", "atmega6490a", "atmega6490p", "atmega64c1", "atmega64m1", "atmega64hve", "at90can32", "at90can64", "at90pwm216", "at90pwm316", "at90scr100", "at90usb646", "at90usb647", "at94k", "avr51", "atmega128", "atmega1280", "atmega1281", "atmega1284p", "atmega128rfa1", "at90can128", "at90usb1286", "at90usb1287", "m3000f", "m3000s", "m3001b", "avr6", "atmega2560", "atmega2561", "avrxmega2", "atxmega16a4", "atxmega16d4", "atxmega32d4", "avrxmega3", "atxmega32a4", "avrxmega4", "atxmega64a3", "atxmega64d3", "avrxmega5", "atxmega64a1", "avrxmega6", "atxmega128a3", "atxmega128d3", "atxmega192a3", "atxmega192d3", "atxmega256a3", "atxmega256a3b", "atxmega256d3", "avrxmega7", "atxmega128a1", "avr1", "at90s1200", "attiny11", "attiny12", "attiny15", "attiny28" }));
         mcuCombo.setPreferredSize(new java.awt.Dimension(200, 27));
         mcuCombo.addItemListener(new java.awt.event.ItemListener() {
-                        public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                                mcuComboItemStateChanged(evt);
-                        }
-                });
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                mcuComboItemStateChanged(evt);
+            }
+        });
         toolbar.add(mcuCombo);
 
         status_label.setForeground(new java.awt.Color(1, 1, 1));
         status_label.setText("Status");
 
         iteration_label.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        iteration_label.setText("Iteration: 31.011");
+        iteration_label.setText("Iteration: 41,395");
 
         tab_pane.addMouseListener(new java.awt.event.MouseAdapter() {
-                        public void mouseClicked(java.awt.event.MouseEvent evt) {
-                                tab_paneMouseClicked(evt);
-                        }
-                });
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tab_paneMouseClicked(evt);
+            }
+        });
 
         split_pane.setDividerLocation(370);
         split_pane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -1901,10 +1909,10 @@ private void initComponents() {
         new_file_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
         new_file_item.setText("File");
         new_file_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                new_file_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                new_file_itemActionPerformed(evt);
+            }
+        });
         new_menu.add(new_file_item);
 
         file_menu.add(new_menu);
@@ -1914,10 +1922,10 @@ private void initComponents() {
         openMenuItem.setMnemonic('o');
         openMenuItem.setText("Open");
         openMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                openMenuItemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openMenuItemActionPerformed(evt);
+            }
+        });
         file_menu.add(openMenuItem);
 
         save_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
@@ -1925,49 +1933,49 @@ private void initComponents() {
         save_menu_item.setText("Save");
         save_menu_item.setToolTipText("");
         save_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                save_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                save_menu_itemActionPerformed(evt);
+            }
+        });
         file_menu.add(save_menu_item);
 
         save_as_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         save_as_menu_item.setMnemonic('a');
         save_as_menu_item.setText("Save As");
         save_as_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                save_as_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                save_as_menu_itemActionPerformed(evt);
+            }
+        });
         file_menu.add(save_as_menu_item);
         file_menu.add(separator);
 
         pref_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         pref_menu_item.setText("Preferences");
         pref_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                pref_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pref_menu_itemActionPerformed(evt);
+            }
+        });
         file_menu.add(pref_menu_item);
 
         about_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
         about_menu_item.setMnemonic('a');
         about_menu_item.setText("About");
         about_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                about_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                about_menu_itemActionPerformed(evt);
+            }
+        });
         file_menu.add(about_menu_item);
 
         exit_menu_item.setMnemonic('e');
         exit_menu_item.setText("Exit");
         exit_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                exit_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exit_menu_itemActionPerformed(evt);
+            }
+        });
         file_menu.add(exit_menu_item);
 
         menuBar.add(file_menu);
@@ -1977,19 +1985,19 @@ private void initComponents() {
         verify_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F6, java.awt.event.InputEvent.SHIFT_MASK));
         verify_menu_item.setText("Verify");
         verify_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                verify_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verify_menu_itemActionPerformed(evt);
+            }
+        });
         tools_menu.add(verify_menu_item);
 
         upload_menu_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F7, java.awt.event.InputEvent.SHIFT_MASK));
         upload_menu_item.setText("Upload");
         upload_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                upload_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                upload_menu_itemActionPerformed(evt);
+            }
+        });
         tools_menu.add(upload_menu_item);
         tools_menu.add(jSeparator1);
 
@@ -1997,10 +2005,10 @@ private void initComponents() {
         serial_terminal_menu_item.setText("Serial terminal");
         serial_terminal_menu_item.setEnabled(false);
         serial_terminal_menu_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                serial_terminal_menu_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                serial_terminal_menu_itemActionPerformed(evt);
+            }
+        });
         tools_menu.add(serial_terminal_menu_item);
 
         prog_options_menu.setText("Programmer");
@@ -2009,37 +2017,37 @@ private void initComponents() {
         avr_isp_item.setSelected(true);
         avr_isp_item.setText("AVR ISP");
         avr_isp_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                avr_isp_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avr_isp_itemActionPerformed(evt);
+            }
+        });
         prog_options_menu.add(avr_isp_item);
 
         programmer_options_button_group.add(arduino_item);
         arduino_item.setText("Arduino");
         arduino_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                arduino_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                arduino_itemActionPerformed(evt);
+            }
+        });
         prog_options_menu.add(arduino_item);
 
         programmer_options_button_group.add(stk500v1_item);
         stk500v1_item.setText("Atmel STK500 Version 1.x firmware (stk500v1)");
         stk500v1_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                stk500v1_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stk500v1_itemActionPerformed(evt);
+            }
+        });
         prog_options_menu.add(stk500v1_item);
 
         programmer_options_button_group.add(usbasp_item);
         usbasp_item.setText("USBasp");
         usbasp_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                usbasp_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usbasp_itemActionPerformed(evt);
+            }
+        });
         prog_options_menu.add(usbasp_item);
 
         tools_menu.add(prog_options_menu);
@@ -2056,38 +2064,38 @@ private void initComponents() {
         choose_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SEMICOLON, java.awt.event.InputEvent.CTRL_MASK));
         choose_font_item.setText("Choose font");
         choose_font_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                choose_font_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                choose_font_itemActionPerformed(evt);
+            }
+        });
         font_menu.add(choose_font_item);
         font_menu.add(font_menu_sep);
 
         def_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
         def_font_item.setText("Default size");
         def_font_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                def_font_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                def_font_itemActionPerformed(evt);
+            }
+        });
         font_menu.add(def_font_item);
 
         inc_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.InputEvent.CTRL_MASK));
         inc_font_item.setText("Increase font size");
         inc_font_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                inc_font_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inc_font_itemActionPerformed(evt);
+            }
+        });
         font_menu.add(inc_font_item);
 
         dec_font_item.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.event.InputEvent.CTRL_MASK));
         dec_font_item.setText("Decrease font size");
         dec_font_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                dec_font_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dec_font_itemActionPerformed(evt);
+            }
+        });
         font_menu.add(dec_font_item);
 
         view_menu.add(font_menu);
@@ -2100,29 +2108,29 @@ private void initComponents() {
         std_build_item.setSelected(true);
         std_build_item.setText("Use standard build options");
         std_build_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                std_build_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                std_build_itemActionPerformed(evt);
+            }
+        });
         build_opts_menu.add(std_build_item);
 
         build_options_button_group.add(mkfl_build_item);
         mkfl_build_item.setText("Use a makefile to build the project");
         mkfl_build_item.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                mkfl_build_itemActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mkfl_build_itemActionPerformed(evt);
+            }
+        });
         build_opts_menu.add(mkfl_build_item);
         build_opts_menu.add(build_menu_sep);
 
         gen_makefile.setText("Generate makefile contents");
         gen_makefile.setEnabled(false);
         gen_makefile.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                gen_makefileActionPerformed(evt);
-                        }
-                });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gen_makefileActionPerformed(evt);
+            }
+        });
         build_opts_menu.add(gen_makefile);
 
         menuBar.add(build_opts_menu);
@@ -2132,44 +2140,44 @@ private void initComponents() {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tab_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addGroup(layout.createSequentialGroup()
-                          .addContainerGap()
-                          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                              .addComponent(status_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                              .addGap(18, 18, 18)
-                                              .addComponent(iteration_label, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                              .addComponent(row_col_label)
-                                              .addGap(18, 18, 18)
-                                              .addComponent(char_ins_label)
-                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                              .addComponent(mmcu_port_label)))
-                          .addContainerGap())
-                );
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(tab_pane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(status_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(iteration_label, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(row_col_label)
+                        .addGap(18, 18, 18)
+                        .addComponent(char_ins_label)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(mmcu_port_label)))
+                .addContainerGap())
+        );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                          .addComponent(toolbar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(status_label, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(iteration_label))
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addComponent(tab_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
-                          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(row_col_label)
-                                    .addComponent(char_ins_label)
-                                    .addComponent(mmcu_port_label))
-                          .addContainerGap())
-                );
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(toolbar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(status_label, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(iteration_label))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tab_pane, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(row_col_label)
+                    .addComponent(char_ins_label)
+                    .addComponent(mmcu_port_label))
+                .addContainerGap())
+        );
 
         pack();
-}    // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
 private void save_as_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_save_as_menu_itemActionPerformed
     save_as_method();
@@ -2626,8 +2634,11 @@ private void about_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//G
     privacy_text_pane.setText(copy_left);
     privacy_text_pane.setCaretPosition(0);
 
-    privacy_dialog.setLocation(getLocation().x - 40, getLocation().y + 10);
+    int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
+    int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
+
     privacy_dialog.setSize(700, 500);
+    privacy_dialog.setLocation(screen_width / 2 - privacy_dialog.getWidth() / 2, screen_height / 2 - privacy_dialog.getHeight() / 2);
     privacy_dialog.setVisible(true);
 }//GEN-LAST:event_about_menu_itemActionPerformed
 
@@ -3127,8 +3138,11 @@ private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//
 }//GEN-LAST:event_choose_font_itemActionPerformed
 
 private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
-    pref_frame.setLocation(getLocation().x - 40, getLocation().y + 10);
-    pref_frame.setSize(600, 360);
+    int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
+    int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+    pref_frame.setSize(570, 268);
+    pref_frame.setLocation(screen_width / 2 - pref_frame.getWidth() / 2, screen_height / 2 - pref_frame.getHeight() / 2);
     pref_frame.setVisible(true);
 
     pref_font_txt_fld.setText(set_font);
@@ -3186,69 +3200,85 @@ private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 }//GEN-LAST:event_pref_menu_itemActionPerformed
 
 private void pref_color_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_btnActionPerformed
-    Color c = JColorChooser.showDialog(null, "Choose Color", color);
-    old_c_syntax_kit = c_editor_kit;
+    JColorChooser color_chooser = new JColorChooser(color);
+    color_chooser.setPreviewPanel(new JPanel());
+    set_chooser_panel(color_chooser, "hsv");
 
-    if (c != null) {
-        color = c;
-        try {
-            switch (pref_category_list.getSelectedIndex()) {
-                case 0:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
-                    String color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.KEYWORD", color_style);
-                    break;
-                case 1:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.KEYWORD2", color_style);
-                    break;
-                case 2:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.NUMBER", color_style);
-                    break;
-                case 3:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.STRING", color_style);
-                    break;
-                case 4:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.COMMENT", color_style);
-                    break;
-                case 5:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.TYPE", color_style);
-                    break;
-                case 6:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.OPERATOR", color_style);
-                    break;
-                case 7:
-                    current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
-                    color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
-                    c_editor_kit.setProperty("Style.IDENTIFIER", color_style);
-                    break;
+    ActionListener ok_action_listener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Color c = color_chooser.getColor();
+
+            if (c != null) {
+                color = c;
+                try {
+                    switch (pref_category_list.getSelectedIndex()) {
+                        case 0:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD").split(",")[1].trim());
+                            String color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.KEYWORD", color_style);
+                            break;
+                        case 1:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.KEYWORD2").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.KEYWORD2", color_style);
+                            break;
+                        case 2:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.NUMBER").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.NUMBER", color_style);
+                            break;
+                        case 3:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.STRING").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.STRING", color_style);
+                            break;
+                        case 4:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.COMMENT").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.COMMENT", color_style);
+                            break;
+                        case 5:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.TYPE").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.TYPE", color_style);
+                            break;
+                        case 6:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.OPERATOR").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.OPERATOR", color_style);
+                            break;
+                        case 7:
+                            current_font_style = Integer.parseInt(c_editor_kit.getProperty("Style.IDENTIFIER").split(",")[1].trim());
+                            color_style = "0x" + Integer.toHexString(color.getRGB()).substring(2) + ", " + current_font_style;
+                            c_editor_kit.setProperty("Style.IDENTIFIER", color_style);
+                            break;
+                    }
+
+                    pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
+                    pref_color_txt_fld.setBackground(color);
+                    pref_style_combo_bx.setSelectedIndex(current_font_style);
+                } catch (Exception ex) {
+                    System.err.println(ex.getCause());
+                }
             }
-            pref_color_txt_fld.setText("#" + Integer.toHexString(color.getRGB()).toUpperCase().substring(2));
-            pref_color_txt_fld.setBackground(color);
-            pref_style_combo_bx.setSelectedIndex(current_font_style);
-        } catch (Exception ex) {
-            System.err.println(ex.getCause());
         }
+    };
 
-    }
+    ActionListener cancel_action_listener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("No color selected.");
+        }
+    };
 
+    JDialog color_chooser_dialog = JColorChooser.createDialog(new JPanel(), "Choose a Color", true, color_chooser, ok_action_listener, cancel_action_listener);
+    color_chooser_dialog.setResizable(false);
+    color_chooser_dialog.setVisible(true);
 }//GEN-LAST:event_pref_color_btnActionPerformed
 
 private void pref_cancel_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_cancel_btnActionPerformed
     pref_frame.setVisible(false);
-
-    c_editor_kit = old_c_syntax_kit;
 }//GEN-LAST:event_pref_cancel_btnActionPerformed
 
 private void pref_font_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_font_btnActionPerformed
@@ -3669,9 +3699,13 @@ private void pref_defaults_btnActionPerformed(java.awt.event.ActionEvent evt) {/
     pref_apply_btnActionPerformed(new ActionEvent(this, 0, "apply defaults"));
 }//GEN-LAST:event_pref_defaults_btnActionPerformed
 
-private void pref_color_txt_fldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_txt_fldActionPerformed
-    pref_color_btnActionPerformed(new ActionEvent(this, 0, "change color"));
-}//GEN-LAST:event_pref_color_txt_fldActionPerformed
+    private void serial_clear_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serial_clear_btnActionPerformed
+        serial_rcv_text_pane.setText(null);
+    }//GEN-LAST:event_serial_clear_btnActionPerformed
+
+    private void pref_color_txt_fldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pref_color_txt_fldMouseClicked
+        pref_color_btnActionPerformed(new ActionEvent(this, 0, "change color"));
+    }//GEN-LAST:event_pref_color_txt_fldMouseClicked
 
     public static void main(String args[]) {
         try {
@@ -3693,89 +3727,90 @@ private void pref_color_txt_fldActionPerformed(java.awt.event.ActionEvent evt) {
         });
     }
 
-// Variables declaration - do not modify//GEN-BEGIN:variables
-private javax.swing.JMenuItem about_menu_item;
-private javax.swing.JCheckBoxMenuItem arduino_item;
-private javax.swing.JCheckBoxMenuItem avr_isp_item;
-private javax.swing.JPopupMenu.Separator build_menu_sep;
-private javax.swing.ButtonGroup build_options_button_group;
-private javax.swing.JMenu build_opts_menu;
-private javax.swing.JLabel char_ins_label;
-private javax.swing.JMenuItem choose_font_item;
-private javax.swing.JTextPane console_pane;
-private javax.swing.JScrollPane console_scroll_pane;
-private javax.swing.JMenuItem dec_font_item;
-private javax.swing.JMenuItem def_font_item;
-private javax.swing.JEditorPane editing_pane;
-public static javax.swing.JScrollPane editing_scroll_pane;
-private javax.swing.JMenuItem exit_menu_item;
-private javax.swing.JMenu file_menu;
-private javax.swing.JMenu font_menu;
-private javax.swing.JPopupMenu.Separator font_menu_sep;
-private javax.swing.JMenuItem gen_makefile;
-private javax.swing.JMenuItem inc_font_item;
-private javax.swing.JLabel iteration_label;
-private javax.swing.JPopupMenu.Separator jSeparator1;
-private javax.swing.JComboBox mcuCombo;
-private javax.swing.JMenuBar menuBar;
-private javax.swing.JCheckBoxMenuItem mkfl_build_item;
-private javax.swing.JEditorPane mkfl_editing_pane;
-public static javax.swing.JScrollPane mkfl_editing_scroll_pane;
-private javax.swing.JLabel mmcu_port_label;
-private javax.swing.JMenuItem new_file_item;
-private javax.swing.JMenu new_menu;
-private javax.swing.JMenuItem openMenuItem;
-private javax.swing.JMenu port_menu;
-private javax.swing.JButton pref_apply_btn;
-private javax.swing.JButton pref_cancel_btn;
-private javax.swing.JList pref_category_list;
-private javax.swing.JScrollPane pref_category_scroll_pane;
-private javax.swing.JButton pref_color_btn;
-private javax.swing.JLabel pref_color_label;
-private javax.swing.JTextField pref_color_txt_fld;
-private javax.swing.JButton pref_defaults_btn;
-private javax.swing.JButton pref_export_btn;
-private javax.swing.JButton pref_font_btn;
-private javax.swing.JLabel pref_font_label;
-private javax.swing.JTextField pref_font_txt_fld;
-private javax.swing.JFrame pref_frame;
-private javax.swing.JButton pref_import_btn;
-private javax.swing.JMenuItem pref_menu_item;
-private javax.swing.JButton pref_ok_btn;
-private javax.swing.JComboBox<String> pref_style_combo_bx;
-private javax.swing.JLabel pref_style_label;
-private javax.swing.JDialog privacy_dialog;
-private javax.swing.JScrollPane privacy_scroll_pane;
-private javax.swing.JTextPane privacy_text_pane;
-private javax.swing.JMenu prog_options_menu;
-private javax.swing.ButtonGroup programmer_options_button_group;
-private javax.swing.JLabel row_col_label;
-private javax.swing.JMenuItem save_as_menu_item;
-private javax.swing.JMenuItem save_menu_item;
-private javax.swing.JTextField search_field;
-private javax.swing.JPopupMenu.Separator separator;
-private javax.swing.JCheckBox serial_autoscroll_chk_bx;
-private javax.swing.JComboBox<String> serial_baud_rate_combo_bx;
-private javax.swing.JLabel serial_baud_rate_label;
-private javax.swing.JFrame serial_frame;
-private javax.swing.JLabel serial_port_label;
-private javax.swing.JScrollPane serial_rcv_scroll_pane;
-private javax.swing.JTextPane serial_rcv_text_pane;
-private javax.swing.JButton serial_send_btn;
-private javax.swing.JTextField serial_send_txt_fld;
-private javax.swing.JMenuItem serial_terminal_menu_item;
-private javax.swing.JSplitPane split_pane;
-private javax.swing.JLabel status_label;
-private javax.swing.JCheckBoxMenuItem std_build_item;
-private javax.swing.JCheckBoxMenuItem stk500v1_item;
-private javax.swing.JTabbedPane tab_pane;
-private javax.swing.JToolBar toolbar;
-private javax.swing.JMenu tools_menu;
-private javax.swing.JButton upload_button;
-private javax.swing.JMenuItem upload_menu_item;
-private javax.swing.JCheckBoxMenuItem usbasp_item;
-private javax.swing.JButton verify_button;
-private javax.swing.JMenuItem verify_menu_item;
-private javax.swing.JMenu view_menu;
-// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem about_menu_item;
+    private javax.swing.JCheckBoxMenuItem arduino_item;
+    private javax.swing.JCheckBoxMenuItem avr_isp_item;
+    private javax.swing.JPopupMenu.Separator build_menu_sep;
+    private javax.swing.ButtonGroup build_options_button_group;
+    private javax.swing.JMenu build_opts_menu;
+    private javax.swing.JLabel char_ins_label;
+    private javax.swing.JMenuItem choose_font_item;
+    private javax.swing.JTextPane console_pane;
+    private javax.swing.JScrollPane console_scroll_pane;
+    private javax.swing.JMenuItem dec_font_item;
+    private javax.swing.JMenuItem def_font_item;
+    private javax.swing.JEditorPane editing_pane;
+    public static javax.swing.JScrollPane editing_scroll_pane;
+    private javax.swing.JMenuItem exit_menu_item;
+    private javax.swing.JMenu file_menu;
+    private javax.swing.JMenu font_menu;
+    private javax.swing.JPopupMenu.Separator font_menu_sep;
+    private javax.swing.JMenuItem gen_makefile;
+    private javax.swing.JMenuItem inc_font_item;
+    private javax.swing.JLabel iteration_label;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JComboBox mcuCombo;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JCheckBoxMenuItem mkfl_build_item;
+    private javax.swing.JEditorPane mkfl_editing_pane;
+    public static javax.swing.JScrollPane mkfl_editing_scroll_pane;
+    private javax.swing.JLabel mmcu_port_label;
+    private javax.swing.JMenuItem new_file_item;
+    private javax.swing.JMenu new_menu;
+    private javax.swing.JMenuItem openMenuItem;
+    private javax.swing.JMenu port_menu;
+    private javax.swing.JButton pref_apply_btn;
+    private javax.swing.JButton pref_cancel_btn;
+    private javax.swing.JList pref_category_list;
+    private javax.swing.JScrollPane pref_category_scroll_pane;
+    private javax.swing.JButton pref_color_btn;
+    private javax.swing.JLabel pref_color_label;
+    private javax.swing.JTextField pref_color_txt_fld;
+    private javax.swing.JButton pref_defaults_btn;
+    private javax.swing.JButton pref_export_btn;
+    private javax.swing.JButton pref_font_btn;
+    private javax.swing.JLabel pref_font_label;
+    private javax.swing.JTextField pref_font_txt_fld;
+    private javax.swing.JFrame pref_frame;
+    private javax.swing.JButton pref_import_btn;
+    private javax.swing.JMenuItem pref_menu_item;
+    private javax.swing.JButton pref_ok_btn;
+    private javax.swing.JComboBox<String> pref_style_combo_bx;
+    private javax.swing.JLabel pref_style_label;
+    private javax.swing.JDialog privacy_dialog;
+    private javax.swing.JScrollPane privacy_scroll_pane;
+    private javax.swing.JTextPane privacy_text_pane;
+    private javax.swing.JMenu prog_options_menu;
+    private javax.swing.ButtonGroup programmer_options_button_group;
+    private javax.swing.JLabel row_col_label;
+    private javax.swing.JMenuItem save_as_menu_item;
+    private javax.swing.JMenuItem save_menu_item;
+    private javax.swing.JTextField search_field;
+    private javax.swing.JPopupMenu.Separator separator;
+    private javax.swing.JCheckBox serial_autoscroll_chk_bx;
+    private javax.swing.JComboBox<String> serial_baud_rate_combo_bx;
+    private javax.swing.JLabel serial_baud_rate_label;
+    private javax.swing.JButton serial_clear_btn;
+    private javax.swing.JFrame serial_frame;
+    private javax.swing.JLabel serial_port_label;
+    private javax.swing.JScrollPane serial_rcv_scroll_pane;
+    private javax.swing.JTextPane serial_rcv_text_pane;
+    private javax.swing.JButton serial_send_btn;
+    private javax.swing.JTextField serial_send_txt_fld;
+    private javax.swing.JMenuItem serial_terminal_menu_item;
+    private javax.swing.JSplitPane split_pane;
+    private javax.swing.JLabel status_label;
+    private javax.swing.JCheckBoxMenuItem std_build_item;
+    private javax.swing.JCheckBoxMenuItem stk500v1_item;
+    private javax.swing.JTabbedPane tab_pane;
+    private javax.swing.JToolBar toolbar;
+    private javax.swing.JMenu tools_menu;
+    private javax.swing.JButton upload_button;
+    private javax.swing.JMenuItem upload_menu_item;
+    private javax.swing.JCheckBoxMenuItem usbasp_item;
+    private javax.swing.JButton verify_button;
+    private javax.swing.JMenuItem verify_menu_item;
+    private javax.swing.JMenu view_menu;
+    // End of variables declaration//GEN-END:variables
 }

@@ -86,7 +86,7 @@
                               <Group type="102" attributes="0">
                                   <Component id="pref_style_label" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="pref_style_combo_bx" pref="249" max="32767" attributes="0"/>
+                                  <Component id="pref_style_combo_bx" pref="231" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Component id="pref_color_label" min="-2" max="-2" attributes="0"/>
@@ -266,7 +266,7 @@
             <Property name="text" type="java.lang.String" value="#000000"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pref_color_txt_fldActionPerformed"/>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pref_color_txt_fldMouseClicked"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="pref_color_label">
@@ -321,15 +321,18 @@
                           <Component id="serial_send_btn" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="serial_autoscroll_chk_bx" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="289" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Component id="serial_autoscroll_chk_bx" max="32767" attributes="0"/>
+                              <Component id="serial_clear_btn" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="289" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
                                   <Component id="serial_baud_rate_label" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="serial_baud_rate_combo_bx" min="-2" pref="110" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="serial_port_label" max="32767" attributes="0"/>
+                              <Component id="serial_port_label" alignment="1" min="-2" pref="168" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -346,14 +349,17 @@
                       <Component id="serial_send_btn" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="serial_rcv_scroll_pane" pref="400" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="serial_port_label" min="-2" max="-2" attributes="0"/>
+                  <Component id="serial_rcv_scroll_pane" pref="396" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="serial_clear_btn" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="serial_baud_rate_combo_bx" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="serial_baud_rate_label" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="serial_autoscroll_chk_bx" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="serial_port_label" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -418,6 +424,14 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Port:"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="serial_clear_btn">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Clear"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serial_clear_btnActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -1070,7 +1084,7 @@
     <Component class="javax.swing.JLabel" name="iteration_label">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="Iteration: 31.011"/>
+        <Property name="text" type="java.lang.String" value="Iteration: 41,395"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tab_pane">

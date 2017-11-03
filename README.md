@@ -27,11 +27,12 @@ AVR4L aims to deliver an easy to use and user friendly Integrated Development En
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
 	1. How to install: [https://java.com/en/download/windows_offline.jsp](https://java.com/en/download/windows_offline.jsp)
 3. Clone/download this folder to your computer.
-4. cd into the `Binaries\Windows` directory.
-5. (recommended) install `AVR4L Setup.exe` from `installer` folder.
+4. cd into the `Binaries\Windows\installer project\AVR4L-SetupFiles` directory.
+5. (recommended) install `AVR4L Setup.exe`
 6. or run the `AVR4L.exe` directly from the `portable` folder.
 
 	note: windows version is not fully tested and may be unstable, it is intended for cross platform compatability.
+	
 	note: if you want to use the portable version you must make sure that `portable\avr-tools\bin` and `portable\tools\bin` directories are added to the `PATH` system environment variable.
 
 	The project's full focus is on the linux version as it aims to be an alternative to Atmel's Studio for linux users.
