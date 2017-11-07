@@ -764,114 +764,32 @@ public class Main_Frame extends javax.swing.JFrame {
                     append_to_pane(console_pane, "Fix compilation errors and then upload the sketch !!!\n", MODE_ERROR);
                     error = false;
                 } else //upload...
-                 if (std_build_item.isSelected()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    System.out.println("Uploading...");
-                                    append_to_pane(console_pane, "\nUploading...\n", MODE_CONSOLE);
-                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                    editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
-                                    oPath = cPath.replace(".c", ".o");
-                                    elfPath = cPath.replace(".c", ".elf");
-                                    hexPath = cPath.replace(".c", ".hex");
-                                    editing_pane.setEnabled(false);
+                if (std_build_item.isSelected()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                System.out.println("Uploading...");
+                                append_to_pane(console_pane, "\nUploading...\n", MODE_CONSOLE);
+                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                editing_pane.setCaretPosition(editing_pane.getDocument().getLength());
+                                oPath = cPath.replace(".c", ".o");
+                                elfPath = cPath.replace(".c", ".elf");
+                                hexPath = cPath.replace(".c", ".hex");
+                                editing_pane.setEnabled(false);
 
-                                    if (os.equals("windows")) {
-                                        try {
-                                            String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                            //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
-                                            System.out.println(cmd[2]);
-                                            append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            ProcessBuilder pb = new ProcessBuilder(cmd);
-                                            Process p = pb.start();
-                                            BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                            //checkForErrors(console_pane, br);  //no real-time output
-
-                                            int value = 0;
-                                            while (value != -1) {
-                                                char ch = (char) value;
-                                                System.out.print(ch);
-                                                append_to_pane(console_pane, ch + "", MODE_CONSOLE);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                value = br.read();
-                                            }
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            String output = console_pane.getText();
-                                            if (output.contains("verified")) {
-                                                System.out.println("Uploaded Successfully !!!");
-                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                uploaded = true;
-                                            } else {
-                                                System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                uploaded = false;
-                                            }
-                                            editing_pane.setEnabled(true);
-
-                                        } catch (IOException | BadLocationException ex) {
-                                            System.err.println(ex.toString());
-                                        }
-                                    } else {
-                                        try {
-                                            String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
-                                            //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
-                                            System.out.println(cmd[2]);
-                                            append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            ProcessBuilder pb = new ProcessBuilder(cmd);
-                                            Process p = pb.start();
-                                            BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                                            //checkForErrors(console_pane, br);  //no real-time output
-                                            int value = 0;
-                                            while (value != -1) {
-                                                char ch = (char) value;
-                                                System.out.print(ch);
-                                                append_to_pane(console_pane, ch + "", MODE_CONSOLE);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                value = br.read();
-                                            }
-                                            console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                            String output = console_pane.getText();
-                                            if (output.contains("verified")) {
-                                                System.out.println("Uploaded Successfully !!!");
-                                                append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                uploaded = true;
-                                            } else {
-                                                System.out.println("Could not upload hex file !!!\nPlease check for errors...");
-                                                append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
-                                                console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                                uploaded = false;
-                                            }
-                                            editing_pane.setEnabled(true);
-
-                                        } catch (IOException | BadLocationException ex) {
-                                            System.err.println(ex.toString());
-                                        }
-                                    }
-                                } catch (BadLocationException ex) {
-                                    System.err.println(ex.toString());
-                                }
-                            }
-                        }).start();
-                    } else if (mkfl_build_item.isSelected()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
                                 if (os.equals("windows")) {
                                     try {
-                                        String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
+                                        String[] cmd = {"cmd", "/c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                        //String[] cmd = {"cmd", "/c", "ping 127.0.0.1"};     //for testing
                                         System.out.println(cmd[2]);
                                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        Process p = new ProcessBuilder(cmd).start();
+                                        ProcessBuilder pb = new ProcessBuilder(cmd);
+                                        Process p = pb.start();
                                         BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                         //checkForErrors(console_pane, br);  //no real-time output
+
                                         int value = 0;
                                         while (value != -1) {
                                             char ch = (char) value;
@@ -893,16 +811,20 @@ public class Main_Frame extends javax.swing.JFrame {
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                             uploaded = false;
                                         }
-                                    } catch (BadLocationException | IOException ex) {
-                                        System.err.println(ex.getMessage());
+                                        editing_pane.setEnabled(true);
+
+                                    } catch (IOException | BadLocationException ex) {
+                                        System.err.println(ex.toString());
                                     }
                                 } else {
                                     try {
-                                        String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
+                                        String[] cmd = {"/bin/sh", "-c", "avrdude -v -c " + prog_option + " -p " + mmcu + " -u -U flash:w:" + hexPath.replace("\\", "/") + ":i"};
+                                        //String[] cmd = {"/bin/sh", "-c", "ping 127.0.0.1"};     //for testing
                                         System.out.println(cmd[2]);
                                         append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
                                         console_pane.setCaretPosition(console_pane.getDocument().getLength());
-                                        Process p = new ProcessBuilder(cmd).start();
+                                        ProcessBuilder pb = new ProcessBuilder(cmd);
+                                        Process p = pb.start();
                                         BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                                         //checkForErrors(console_pane, br);  //no real-time output
                                         int value = 0;
@@ -926,13 +848,91 @@ public class Main_Frame extends javax.swing.JFrame {
                                             console_pane.setCaretPosition(console_pane.getDocument().getLength());
                                             uploaded = false;
                                         }
-                                    } catch (BadLocationException | IOException ex) {
-                                        System.err.println(ex.getMessage());
+                                        editing_pane.setEnabled(true);
+
+                                    } catch (IOException | BadLocationException ex) {
+                                        System.err.println(ex.toString());
                                     }
                                 }
+                            } catch (BadLocationException ex) {
+                                System.err.println(ex.toString());
                             }
-                        }).start();
-                    }
+                        }
+                    }).start();
+                } else if (mkfl_build_item.isSelected()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (os.equals("windows")) {
+                                try {
+                                    String[] cmd = {"cmd", "/c", "cd /d " + file_to_open.getParent() + " && make upload"};
+                                    System.out.println(cmd[2]);
+                                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                    Process p = new ProcessBuilder(cmd).start();
+                                    BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                    //checkForErrors(console_pane, br);  //no real-time output
+                                    int value = 0;
+                                    while (value != -1) {
+                                        char ch = (char) value;
+                                        System.out.print(ch);
+                                        append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        value = br.read();
+                                    }
+                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                    String output = console_pane.getText();
+                                    if (output.contains("verified")) {
+                                        System.out.println("Uploaded Successfully !!!");
+                                        append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        uploaded = true;
+                                    } else {
+                                        System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                        append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        uploaded = false;
+                                    }
+                                } catch (BadLocationException | IOException ex) {
+                                    System.err.println(ex.getMessage());
+                                }
+                            } else {
+                                try {
+                                    String[] cmd = {"/bin/sh", "-c", "cd " + file_to_open.getParent() + " && make upload"};
+                                    System.out.println(cmd[2]);
+                                    append_to_pane(console_pane, cmd[2] + "\n", MODE_CONSOLE);
+                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                    Process p = new ProcessBuilder(cmd).start();
+                                    BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                                    //checkForErrors(console_pane, br);  //no real-time output
+                                    int value = 0;
+                                    while (value != -1) {
+                                        char ch = (char) value;
+                                        System.out.print(ch);
+                                        append_to_pane(console_pane, ch + "", MODE_CONSOLE);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        value = br.read();
+                                    }
+                                    console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                    String output = console_pane.getText();
+                                    if (output.contains("verified")) {
+                                        System.out.println("Uploaded Successfully !!!");
+                                        append_to_pane(console_pane, "Uploaded Successfully !!!\n", MODE_NO_ERROR);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        uploaded = true;
+                                    } else {
+                                        System.out.println("Could not upload hex file !!!\nPlease check for errors...");
+                                        append_to_pane(console_pane, "Could not upload hex file !!!\nPlease check for errors...", MODE_ERROR);
+                                        console_pane.setCaretPosition(console_pane.getDocument().getLength());
+                                        uploaded = false;
+                                    }
+                                } catch (BadLocationException | IOException ex) {
+                                    System.err.println(ex.getMessage());
+                                }
+                            }
+                        }
+                    }).start();
+                }
             } else {
                 compile_file();
                 if (error) {
@@ -1052,6 +1052,7 @@ public class Main_Frame extends javax.swing.JFrame {
         AbstractColorChooserPanel[] panels = chooser.getChooserPanels();
         for (AbstractColorChooserPanel panel : panels) {
             String panel_name = panel.getDisplayName().toLowerCase();
+            System.out.println(panel_name);
             String item_name = name.toLowerCase();
             if (!panel_name.equals(item_name)) {
                 chooser.removeChooserPanel(panel);
@@ -3140,8 +3141,12 @@ private void choose_font_itemActionPerformed(java.awt.event.ActionEvent evt) {//
 private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_menu_itemActionPerformed
     int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
     int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
-
-    pref_frame.setSize(570, 268);
+    
+    if (os.equals("windows")) {
+    pref_frame.setSize(570, 270);
+    } else {
+    pref_frame.setSize(570, 357);    
+    }
     pref_frame.setLocation(screen_width / 2 - pref_frame.getWidth() / 2, screen_height / 2 - pref_frame.getHeight() / 2);
     pref_frame.setVisible(true);
 
@@ -3202,7 +3207,9 @@ private void pref_menu_itemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 private void pref_color_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref_color_btnActionPerformed
     JColorChooser color_chooser = new JColorChooser(color);
     color_chooser.setPreviewPanel(new JPanel());
-    set_chooser_panel(color_chooser, "hsv");
+    if (os.equals("windows")) {
+        set_chooser_panel(color_chooser, "hsv");
+    }
 
     ActionListener ok_action_listener = new ActionListener() {
         @Override

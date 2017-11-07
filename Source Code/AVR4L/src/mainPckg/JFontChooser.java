@@ -39,6 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -159,7 +160,12 @@ public class JFontChooser extends JComponent {
         JSplitPane contentsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         contentsSplitPane.setContinuousLayout(true);
 //        contentsSplitPane.setResizeWeight(0.9);
-        contentsSplitPane.setDividerLocation(170);
+        String os = UIManager.getInstalledLookAndFeels()[3].getName().toLowerCase();
+        if (os.equals("windows")) {
+            contentsSplitPane.setDividerLocation(170);
+        } else {
+            contentsSplitPane.setDividerLocation(195);
+        }
         contentsSplitPane.setLeftComponent(selectPanel);
         contentsSplitPane.setRightComponent(getSamplePanel());
 
@@ -190,7 +196,12 @@ public class JFontChooser extends JComponent {
         JSplitPane contentsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         contentsSplitPane.setContinuousLayout(true);
 //        contentsSplitPane.setResizeWeight(0.9);
-        contentsSplitPane.setDividerLocation(170);
+        String os = UIManager.getInstalledLookAndFeels()[3].getName().toLowerCase();
+        if (os.equals("windows")) {
+            contentsSplitPane.setDividerLocation(170);
+        } else {
+            contentsSplitPane.setDividerLocation(195);
+        }
         contentsSplitPane.setLeftComponent(selectPanel);
         contentsSplitPane.setRightComponent(getSamplePanel());
 
@@ -504,7 +515,7 @@ public class JFontChooser extends JComponent {
                 dialogResultValue = CANCEL_OPTION;
             }
         });
-        
+
         dialog.setSize(500, 300);
         dialog.setResizable(false);
         dialog.setLocation(screen_width / 2 - dialog.getWidth() / 2, screen_height / 2 - dialog.getHeight() / 2);
@@ -876,7 +887,7 @@ public class JFontChooser extends JComponent {
         if (fontSizePanel == null) {
             fontSizePanel = new JPanel();
             fontSizePanel.setLayout(new BorderLayout());
-            fontSizePanel.setPreferredSize(new Dimension(70, 130));
+            fontSizePanel.setPreferredSize(new Dimension(80, 130));
             fontSizePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
             JScrollPane scrollPane = new JScrollPane(getFontSizeList());
