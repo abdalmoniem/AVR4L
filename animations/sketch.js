@@ -1,24 +1,26 @@
 var font;
+var title;
 var bounds;
 var particles = [];
 var fontSize = 500;
-var skip_factor = 8;
-var window_limit = 20;
+var skip_factor = 30;
+var window_limit = 15;
 
 function preload() {
-   // img = loadImage('avr4l_small.png');
-   font = loadFont('fonts/avenir_next_lt_pro_demi.otf');
+   title = select("#title_animation");
+   // var font_family = title.elt.style.fontFamily;
+   // font = loadFont('fonts/' + font_family + '.otf');
+   // font = loadFont('fonts/avenir_next_lt_pro_demi.otf');
+   // fontSize = parseFloat(title.elt.style.fontSize.replace(/[^\d\.]*/g, ''));
 }
 
 function setup() {
    // var canvas = createCanvas(img.width, img.height);
-   // var canvas = createCanvas(windowWidth - window_limit, windowHeight - window_limit);
-   var canvas = createCanvas(displayWidth, displayHeight);
+   // var canvas = createCanvas(displayWidth, displayHeight);
+   var canvas = createCanvas(windowWidth - window_limit, windowHeight + window_limit);
    canvas.position(0, 0);
-   clear();
-   var btn = select("#learn_more_btn");
-   var btn_pos_y = btn.position().y;
-   createParticlesFromText('AVR4L', windowWidth / 2, btn_pos_y + 150);
+   createParticles();
+   // createParticlesFromText(title.elt.innerText, width / 2, height / 2);
 }
 
 function draw() {
@@ -33,10 +35,28 @@ function draw() {
 
 function windowResized() {
    particles = [];
-   resizeCanvas(windowWidth - window_limit, windowHeight - window_limit);
-   var btn = select("#learn_more_btn");
-   var btn_pos_y = btn.position().y;
-   createParticlesFromText('AVR4L', windowWidth / 2, btn_pos_y);
+   resizeCanvas(windowWidth - window_limit, windowHeight + window_limit);
+   createParticles();
+   // createParticlesFromText(title.elt.innerText, width / 2, height / 2);
+}
+
+function createParticles() {
+   loadPixels();
+   console.log('pixels loaded');
+
+   for (y = 0; y < height; y += skip_factor) {
+      for (x = 0; x < width; x += skip_factor) {
+         var index = floor((x + y * width) * 4);
+         var r = pixels[index + 0];
+         var g = pixels[index + 1];
+         var b = pixels[index + 2];
+         var brightness = (r + g + b) / 3;
+
+         var vehicle = new Particle(x, y);
+         particles.push(vehicle);
+      }
+   }
+   console.log(particles.length + ' particles created');
 }
 
 function createParticlesFromText(line, line_x, line_y) {
@@ -50,7 +70,6 @@ function createParticlesFromText(line, line_x, line_y) {
 
    var bounds = font.textBounds(line, line_x, line_y);
 
-   fill(0, 0, 255);
    for (y = 0; y < height; y += skip_factor) {
       for (x = 0; x < width; x += skip_factor) {
          if (x > bounds.x && x < bounds.x + bounds.w && y > bounds.y && y < bounds.y + bounds.h) {
@@ -59,6 +78,9 @@ function createParticlesFromText(line, line_x, line_y) {
             var g = pixels[index + 1];
             var b = pixels[index + 2];
             var brightness = (r + g + b) / 3;
+
+            var vehicle = new Particle(x, y);
+            particles.push(vehicle);
 
             if (brightness > 0) {
                var vehicle = new Particle(x, y);

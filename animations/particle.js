@@ -3,7 +3,7 @@ function Particle(x, y) {
    this.target = createVector(x, y);
    this.vel = p5.Vector.random2D();
    this.acc = createVector();
-   this.r = 2;
+   this.r = 20;
 
    this.max_flee_speed = 17;
    this.max_arrive_speed = 30;
@@ -11,8 +11,14 @@ function Particle(x, y) {
    this.max_flee_force = 5;
    this.max_arrive_force = 5;
 
-   this.flee_distance = 50;
+   this.flee_distance = 100;
    this.arrive_distance = 500;
+
+   this.red = random(0, 255);
+   this.green = random(0, 255);
+   this.blue = random(0, 255);
+
+   this.color_shift_value = 5;
 }
 
 Particle.prototype.behaviors = function() {
@@ -74,17 +80,19 @@ Particle.prototype.update = function() {
 }
 
 Particle.prototype.show = function() {
-   var r = random(0, 255);
-   var g = random(0, 255);
-   var b = random(0, 255);
+   this.red = (this.red + this.color_shift_value) % 255;
+   this.green = (this.green + this.color_shift_value) % 255;
+   this.blue = (this.blue + this.color_shift_value) % 255;
+
+   stroke(this.red, this.green, this.blue, 30);
+   strokeWeight(this.r);
 
    // noStroke();
    // fill(255);
-   // fill(r, g, b);
+   // fill(this.red, this.green, this.blue);
    // ellipse(this.pos.x, this.pos.y, this.r);
 
    // stroke(255);
-   stroke(r, g, b);
-   strokeWeight(this.r);
+
    point(this.pos.x, this.pos.y);
 }
