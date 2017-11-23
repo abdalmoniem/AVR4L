@@ -1,8 +1,3 @@
-// Daniel Shiffman
-// http://codingtra.in
-// Steering Text Paths
-// Video: https://www.youtube.com/watch?v=4hA7G3gup-4
-
 function Particle(x, y) {
    this.pos = createVector(random(width), random(height));
    this.target = createVector(x, y);
