@@ -3,7 +3,7 @@ function Particle(x, y) {
    this.target = createVector(x, y);
    this.vel = p5.Vector.random2D();
    this.acc = createVector();
-   this.r = 20;
+   this.r = random(5, 30);
 
    this.max_flee_speed = 17;
    this.max_arrive_speed = 30;
@@ -80,11 +80,27 @@ Particle.prototype.update = function() {
 }
 
 Particle.prototype.show = function() {
-   this.red = (this.red + this.color_shift_value) % 255;
-   this.green = (this.green + this.color_shift_value) % 255;
-   this.blue = (this.blue + this.color_shift_value) % 255;
+   if (randomOn) {
+      this.red = (this.red + this.color_shift_value) % 255;
+      this.green = (this.green + this.color_shift_value) % 255;
+      this.blue = (this.blue + this.color_shift_value) % 255;
+   }
 
-   stroke(this.red, this.green, this.blue, 30);
+   if (increaseAlpha) {
+      if (!reverseAlpha) {
+         color_alpha = (color_alpha + 0.003);
+      } else {
+         color_alpha = (color_alpha - 0.003);
+      }
+      if (color_alpha >= 255) {
+         reverseAlpha = true;
+      }
+      if (color_alpha <= 30) {
+         reverseAlpha = false;
+      }
+   }
+
+   stroke(this.red, this.green, this.blue, color_alpha);
    strokeWeight(this.r);
 
    // noStroke();

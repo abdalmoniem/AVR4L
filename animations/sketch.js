@@ -1,10 +1,13 @@
 var font;
 var title;
-var bounds;
 var particles = [];
 var fontSize = 500;
 var skip_factor = 30;
+var color_alpha = 30;
 var window_limit = 15;
+var randomOn = false;
+var increaseAlpha = false;
+var reverseAlpha = false;
 
 function preload() {
    title = select("#title_animation");
@@ -19,6 +22,10 @@ function setup() {
    // var canvas = createCanvas(displayWidth, displayHeight);
    var canvas = createCanvas(windowWidth - window_limit, windowHeight + window_limit);
    canvas.position(0, 0);
+
+   // var vehicle = new Particle(100, 100);
+   // particles.push(vehicle);
+
    createParticles();
    // createParticlesFromText(title.elt.innerText, width / 2, height / 2);
 }
@@ -31,6 +38,24 @@ function draw() {
       v.update();
       v.show();
    }
+}
+
+function keyPressed() {
+   if (key == 'A') {
+      increaseAlpha = true;
+      console.log('alpha up');
+   }
+}
+
+function keyReleased() {
+   if (key == 'A') {
+      increaseAlpha = false;
+      console.log('alpha stop');
+   }
+}
+
+function mousePressed() {
+   randomOn = !randomOn;
 }
 
 function windowResized() {
