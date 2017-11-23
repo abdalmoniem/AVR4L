@@ -1,0 +1,135 @@
+/*
+	Drift by Pixelarity
+	pixelarity.com @pixelarity
+	License: pixelarity.com/license
+*/
+
+/* Basic */
+
+	body, input, select, textarea {
+		font-size: 12pt;
+	}
+
+	h2 {
+		font-size: 1.25em;
+		line-height: 1.5em;
+	}
+
+	h3 {
+		font-size: 1.1em;
+		line-height: 1.5em;
+	}
+
+	h4 {
+		font-size: 1em;
+		line-height: 1.5em;
+	}
+
+/* Section/Article */
+
+	header h2 + p {
+		font-size: 1em;
+		margin-top: -0.85em;
+		line-height: 1.5em;
+	}
+
+	header h3 + p {
+		font-size: 1em;
+		margin-top: -0.85em;
+		line-height: 1.5em;
+	}
+
+	header.major h2 {
+		font-size: 1.5em;
+	}
+
+	header.major p {
+		margin: -1em 0 2.5em 0;
+	}
+
+/* List */
+
+	ul.icons li {
+		padding: 0 0.75em 0 0;
+	}
+
+		ul.icons li .icon {
+			font-size: 0.9em;
+		}
+
+/* Button */
+
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"],
+	.button {
+		font-size: 0.8em !important;
+	}
+
+/* Box */
+
+	.box.post {
+		max-width: 23em;
+	}
+
+/* Slider */
+
+	.slider .viewer {
+		border-width: 0.5em;
+	}
+
+/* Wrapper */
+
+	.wrapper {
+		padding: 3em 0 1em 0;
+	}
+
+/* Banner */
+
+	#banner {
+		padding: 5em 2em 4em 2em;
+	}
+
+		#banner h2 {
+			font-size: 2em;
+		}
+
+		#banner p {
+			font-size: 1.1em;
+		}
+
+/* Main */
+
+	#main > header {
+		padding: 0 2em;
+	}
+
+	#main > .container {
+		padding: 2em 1em;
+	}
+
+	#content > .image.fit:first-child {
+		margin: -2em 0 2em -1em;
+		width: calc(100% + 2em);
+	}
+
+		#content > .image.fit:first-child img {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+
+/* CTA */
+
+	#cta {
+		padding: 2em 0;
+	}
+
+/* Footer */
+
+	#footer {
+		padding: 2em 0;
+	}
+
+		#footer .icons {
+			margin: 0 0 2em 0;
+		}

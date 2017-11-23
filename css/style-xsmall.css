@@ -1,0 +1,112 @@
+/*
+	Drift by Pixelarity
+	pixelarity.com @pixelarity
+	License: pixelarity.com/license
+*/
+
+/* Basic */
+
+	html, body {
+		min-width: 320px;
+	}
+
+	body, input, select, textarea {
+		font-size: 12pt;
+	}
+
+/* List */
+
+	ul.actions {
+		margin: 0 0 2em 0;
+	}
+
+		ul.actions li {
+			display: block;
+			padding: 1em 0 0 0;
+			text-align: center;
+			width: 100%;
+		}
+
+			ul.actions li:first-child {
+				padding-top: 0;
+			}
+
+			ul.actions li > * {
+				margin: 0 !important;
+				width: 100%;
+			}
+
+				ul.actions li > *.icon:before {
+					margin-left: -2em;
+				}
+
+		ul.actions.small li {
+			padding: 0.5em 0 0 0;
+		}
+
+			ul.actions.small li:first-child {
+				padding-top: 0;
+			}
+
+	ul.menu {
+		font-size: 0.8em;
+		line-height: 2em;
+	}
+
+		ul.menu li {
+			border: 0;
+			margin: 0;
+			padding: 0 0.5em !important;
+		}
+
+/* Button */
+
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"],
+	.button {
+		padding: 0;
+	}
+
+/* Slider */
+
+	.slider {
+		position: relative;
+	}
+
+		.slider .viewer {
+			border-radius: 0 !important;
+			border-width: 0em;
+			margin-left: -5vw;
+			width: 100vw;
+		}
+
+		.slider .slide img {
+			border-radius: 0 !important;
+		}
+
+		.slider .nav-next:before,
+		.slider .nav-previous:before {
+			font-size: 0.8em;
+		}
+
+/* Banner */
+
+	#banner {
+		padding: 5em 2em 4em 2em;
+	}
+
+/* CTA */
+
+	#cta {
+		padding: 2em;
+	}
+
+		#cta h2 {
+			display: block;
+			margin: 0 0 1em 0;
+		}
+
+		#cta .actions {
+			display: block;
+		}

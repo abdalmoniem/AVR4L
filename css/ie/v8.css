@@ -1,0 +1,76 @@
+/*
+	Drift by Pixelarity
+	pixelarity.com @pixelarity
+	License: pixelarity.com/license
+*/
+
+/* Border Fix */
+
+	.image,
+	.image > img,
+	.box,
+	.slider .viewer,
+	.slider .nav-next,
+	.slider .nav-previous,
+	#main > .container {
+		-ms-behavior: url("css/ie/PIE.htc");
+	}
+
+	code,
+	table td,
+	ul.icons li .icon,
+	.feature:before,
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"],
+	.button,
+	input[type="text"],
+	input[type="password"],
+	input[type="email"],
+	select,
+	textarea {
+		border: solid 1px #ccc;
+	}
+
+/* Box */
+
+	.box {
+		position: relative;
+	}
+
+		.box.post .image:first-child {
+			margin: 0 0 2em;
+			width: 100%;
+		}
+
+/* Header */
+
+	#header {
+		border-bottom: solid 1px #ccc;
+	}
+
+		#header.alt {
+			border-bottom: 0;
+		}
+
+	.dropotron {
+		border: solid 1px #ccc;
+	}
+
+		.dropotron.level-0 {
+			margin-top: -4px;
+			border-top: 0;
+		}
+
+			.dropotron.level-0:before {
+				display: none;
+			}
+
+/* Banner */
+
+	#banner {
+		background-image: url("../../images/banner.jpg");
+		background-repeat: no-repeat;
+		background-size: cover;
+		-ms-behavior: url("css/ie/backgroundsize.min.htc");
+	}

@@ -1,1 +1,0 @@
-java -jar -splash:avr4l-about.png AVR4L.jar
