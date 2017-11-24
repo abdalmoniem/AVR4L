@@ -3,7 +3,7 @@ function Particle(x, y) {
    this.target = createVector(x, y);
    this.vel = p5.Vector.random2D();
    this.acc = createVector();
-   this.r = random(5, 30);
+   this.r = random(5, 40);
 
    this.max_flee_speed = 17;
    this.max_arrive_speed = 30;
