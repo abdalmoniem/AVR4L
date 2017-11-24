@@ -5,14 +5,14 @@ function Particle(x, y) {
    this.acc = createVector();
    this.r = random(5, 40);
 
-   this.max_flee_speed = 17;
-   this.max_arrive_speed = 30;
+   this.max_flee_speed = 10;
+   this.max_arrive_speed = 20;
 
    this.max_flee_force = 5;
    this.max_arrive_force = 5;
 
    this.flee_distance = 100;
-   this.arrive_distance = 500;
+   this.arrive_distance = 300;
 
    this.red = random(0, 255);
    this.green = random(0, 255);

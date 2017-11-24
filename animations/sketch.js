@@ -18,7 +18,19 @@ function preload() {
    // font = loadFont('fonts/avenir_next_lt_pro_demi.otf');
    // fontSize = parseFloat(title.elt.style.fontSize.replace(/[^\d\.]*/g, ''));
 
-   downloads_html_element = select('#download_count');
+
+   let links = document.getElementsByClassName('link depth-0');
+
+   if (links.length < 1) {
+      downloads_html_element = select('#download_count').elt;
+   } else {
+      for (let i = 0; i < links.length; i++) {
+         if (links[i].innerText.includes("Downloads")) {
+            downloads_html_element = links[i];
+         }
+      }
+   }
+
    loadJSON('https://api.github.com/repos/abdalmoniem/avr4l/releases', onDataReceivedSuccessfully);
 }
 
@@ -67,14 +79,26 @@ function windowResized() {
    let banner = select('#banner');
    resizeCanvas(windowWidth - window_limit, banner.height);
    createParticles();
-   // createParticlesFromText(title.elt.innerText, width / 2, height / 2);
+
+   let links = document.getElementsByClassName('link depth-0');
+
+   if (links.length < 1) {
+      downloads_html_element = select('#download_count').elt;
+   } else {
+      for (let i = 0; i < links.length; i++) {
+         if (links[i].innerText.includes("Downloads")) {
+            downloads_html_element = links[i];
+         }
+      }
+   }
+
+   loadJSON('https://api.github.com/repos/abdalmoniem/avr4l/releases', onDataReceivedSuccessfully);
 }
 
 function onDataReceivedSuccessfully(data) {
-   console.log('new data');
    let totalCount = data[0].assets[0].download_count + data[0].assets[1].download_count;
    console.log('data received, total count: ' + totalCount);
-   downloads_html_element.elt.innerHTML = 'Downloads (' + totalCount + ')';
+   downloads_html_element.innerText = 'Downloads (' + totalCount + ')';
 }
 
 function createParticles() {
