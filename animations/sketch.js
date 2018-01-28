@@ -96,9 +96,18 @@ function windowResized() {
 }
 
 function onDataReceivedSuccessfully(data) {
-   let totalCount = data[0].assets[0].download_count + data[0].assets[1].download_count;
-   console.log('data received, total count: ' + totalCount);
-   downloads_html_element.innerText = 'Downloads (' + totalCount + ')';
+    // console.log(data);
+
+    let totalDownloadCount = 0;
+    for (let i = 0; i < data.length; i++) {
+        let assets = data[i].assets;
+        for (let j = 0; j < assets.length; j++) {
+            totalDownloadCount += assets[j].download_count;
+        }
+    }
+
+    console.log('data received, total count: ' + totalDownloadCount);
+    downloads_html_element.innerText = 'Downloads (' + totalDownloadCount + ')';
 }
 
 function createParticles() {
