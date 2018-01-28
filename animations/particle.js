@@ -5,20 +5,20 @@ function Particle(x, y) {
    this.acc = createVector();
    this.r = random(5, 40);
 
-   this.max_flee_speed = 20;
-   this.max_arrive_speed = 20;
+   this.maxFleeSpeed = 20;
+   this.maxArriveSpeed = 20;
 
-   this.max_flee_force = 5;
-   this.max_arrive_force = 5;
+   this.maxFleeForce = 5;
+   this.maxArriveForce = 5;
 
-   this.flee_distance = 50;
-   this.arrive_distance = 50;
+   this.fleeDistance = 50;
+   this.arriveDistance = 50;
 
    this.red = random(0, 255);
    this.green = random(0, 255);
    this.blue = random(0, 255);
 
-   this.color_shift_value = 5;
+   this.colorShiftValue = 5;
 }
 
 Particle.prototype.behaviors = function() {
@@ -35,33 +35,33 @@ Particle.prototype.behaviors = function() {
 
 Particle.prototype.arrive = function(target) {
    var desired = p5.Vector.sub(target, this.pos);
-   var d = desired.mag();
-   var speed = this.max_arrive_speed;
-   if (d < this.arrive_distance) {
-      speed = map(d, 0, this.arrive_distance, 0, this.max_arrive_speed);
+   var distance = desired.mag();
+   var speed = this.maxArriveSpeed;
+   if (distance < this.arriveDistance) {
+      speed = map(distance, 0, this.arriveDistance, 0, this.maxArriveSpeed);
    }
    desired.setMag(speed);
    var steer = p5.Vector.sub(desired, this.vel);
-   steer.limit(this.max_arrive_force);
+   steer.limit(this.maxArriveForce);
    return steer;
 }
 
 Particle.prototype.flee = function(target) {
    var desired = p5.Vector.sub(target, this.pos);
-   var d = desired.mag();
-   if (d < this.flee_distance) {
-      desired.setMag(this.max_flee_speed);
+   var distance = desired.mag();
+   if (distance < this.fleeDistance) {
+      desired.setMag(this.maxFleeSpeed);
       desired.mult(-1);
       var steer = p5.Vector.sub(desired, this.vel);
-      steer.limit(this.max_flee_force);
+      steer.limit(this.maxFleeForce);
       return steer;
    } else {
       return createVector(0, 0);
    }
 }
 
-Particle.prototype.applyForce = function(f) {
-   this.acc.add(f);
+Particle.prototype.applyForce = function(force) {
+   this.acc.add(force);
 }
 
 Particle.prototype.update = function() {
@@ -81,27 +81,41 @@ Particle.prototype.update = function() {
 
 Particle.prototype.show = function() {
    if (randomOn) {
-      this.red = (this.red + this.color_shift_value) % 255;
-      this.green = (this.green + this.color_shift_value) % 255;
-      this.blue = (this.blue + this.color_shift_value) % 255;
+      this.red = (this.red + this.colorShiftValue) % 255;
+      this.green = (this.green + this.colorShiftValue) % 255;
+      this.blue = (this.blue + this.colorShiftValue) % 255;
    }
 
    if (increaseAlpha) {
       if (!reverseAlpha) {
-         color_alpha = (color_alpha + 0.003);
+        colorAlpha = (colorAlpha + 0.003);
       } else {
-         color_alpha = (color_alpha - 0.003);
+        colorAlpha = (colorAlpha - 0.003);
       }
-      if (color_alpha >= 255) {
+      if (colorAlpha >= 255) {
          reverseAlpha = true;
       }
-      if (color_alpha <= 30) {
+      if (colorAlpha <= 30) {
          reverseAlpha = false;
       }
    }
 
-   stroke(this.red, this.green, this.blue, color_alpha);
+   if (decreaseAlpha) {
+    if (!reverseAlpha) {
+        colorAlpha = (colorAlpha - 0.003);
+      } else {
+        colorAlpha = (colorAlpha + 0.003);
+      }
+      if (colorAlpha <= 30) {
+         reverseAlpha = true;
+      }
+      if (colorAlpha >= 255) {
+         reverseAlpha = false;
+      }
+   }
+
    strokeWeight(this.r);
+   stroke(this.red, this.green, this.blue, colorAlpha);
 
    // noStroke();
    // fill(255);
