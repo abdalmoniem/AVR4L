@@ -37,14 +37,10 @@ AVR4L aims to deliver an easy to use and user friendly Integrated Development En
 
 	The project's full focus is on the linux version as it aims to be an alternative to Atmel's Studio for linux users.
 
-
-### Mac OSX:
-further development and testing is needed.
-
 ## Features:
-1. Cross platform (Linux, Mac OSX, Windows)
+1. Cross platform (Linux, Windows)
 2. Creative coding environment with auto-complete, suggestions and many more features.
-3. Two options for compiling your code:
+3. Two options for compiling and uploading your code:
 	1. standard mode.
 	2. makefile mode.
 4. Compiling .c files of various atmega parts or microcontrollers.
