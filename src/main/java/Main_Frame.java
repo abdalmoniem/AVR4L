@@ -1,4 +1,4 @@
-package mainPckg;
+package betteravr;
 
 import com.sun.glass.ui.Cursor;
 import gnu.io.*;
@@ -1083,7 +1083,7 @@ public class Main_Frame extends javax.swing.JFrame {
         os = UIManager.getInstalledLookAndFeels()[3].getName().toLowerCase();
         username = System.getProperty("user.name");
 
-        setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
+        // TODO: FIXME setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setLocation(screen_width / 2 - getWidth() / 2, screen_height / 2 - getHeight() / 2);
 
