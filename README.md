@@ -12,12 +12,22 @@ AVR4L aims to deliver an easy to use and user friendly Integrated Development En
 ## Installation and Running:
 
 AVR4L works on any system that supports Openjdk 8 and Gradle.
-In order to run AVR4L, all one needs to do is clone the repository, and enter the gradle run task.
+The 'fatJar' task will build an executable jar that should run on any system.
+There is script to install it onto any linux system, Windows users can run the Jar 
+directly.
 
-*Linux Example*
+### Linux Installation
 
 ```
 $ git clone https://github.com/abdalmoniem/AVR4L
 $ cd AVR4L
-$ ./gradlew run
+$ ./gradlew fatJar
+$ cd assets
+$ ./install-linux.sh
 ```
+
+### Windows Installation
+- clone git repo with your choice of git client
+- open CMD and navigate to repository
+- run .\gradlew fatJar
+- jar file can be found in build/libs
