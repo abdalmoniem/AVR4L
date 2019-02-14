@@ -1,4 +1,4 @@
-package betteravr;
+package avr4l;
 
 import com.sun.glass.ui.Cursor;
 import gnu.io.*;

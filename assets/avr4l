@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar /usr/share/AVR4L/libs/AVR4L-.91.jar
