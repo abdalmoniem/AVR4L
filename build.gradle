@@ -1,13 +1,10 @@
 plugins {
     id 'java'
+    id "edu.sc.seis.launch4j" version "2.4.4"
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-version = '.91'
-
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
@@ -17,6 +14,10 @@ dependencies {
     compile 'de.sciss:jsyntaxpane:1.0.0'
 }
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+version = '.91'
+
 task fatJar(type: Jar) {
     manifest {
 	attributes 'Main-Class': 'avr4l.Main_Frame'
@@ -24,3 +25,11 @@ task fatJar(type: Jar) {
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } with jar
 }
+
+launch4j {
+    outfile = 'AVR4L.exe'
+    mainClassName = 'avr4l.Main_Frame'
+    copyConfigurable = project.tasks.fatJar.outputs.files
+    jar = "lib/${project.tasks.fatJar.archiveName}"
+}
+
