@@ -27,7 +27,5 @@ $ ./install-linux.sh
 ```
 
 ### Windows Installation
-- clone git repo with your choice of git client
-- open CMD and navigate to repository
-- run .\gradlew fatJar
-- jar file can be found in build/libs
+- run the gradle task launch4j
+- collect portable .exe from build/launch4j folder
