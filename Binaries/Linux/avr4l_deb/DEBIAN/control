@@ -1,0 +1,10 @@
+Package: avr4l
+Version: 1.1+c2610da
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: gcc-avr, binutils-avr, avr-libc, gdb-avr, avrdude
+Maintainer: Bence Csókás <bence98@sch.bme.hu>
+Homepage: https://github.com/abdalmoniem/AVR4L
+Description: AVR for Linux
+ A AVR Studio alternative written in Java
