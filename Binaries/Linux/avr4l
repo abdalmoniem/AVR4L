@@ -1,2 +1,0 @@
-#!/bin/bash
-java -jar -splash:/usr/share/avr4l/avr4l-about.png /usr/share/avr4l/AVR4L.jar
