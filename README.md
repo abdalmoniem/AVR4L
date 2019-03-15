@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/fossmediaa/AVR4L/master/assets/logo/logo.png" width="450" title="logo">
+<img src="https://raw.githubusercontent.com/fossmediaa/AVR4L/master/assets/logo/logo.png" width="300" title="logo">
 
 ![AVR4L Screenshot](https://raw.githubusercontent.com/abdalmoniem/AVR4L/master/assets/screenshot_8.png)
 
