@@ -20,8 +20,8 @@ AVR4L aims to deliver an easy to use and user friendly Integrated Development En
 			`. /etc/environment` or `source /etc/environment`
 2. Clone/download this folder to your computer.
 3. cd into the `Binaries/Linux` directory.
-4. run `sudo -E ./install.sh` within this folder.
-5. you can now type `avr4l` in any terminal session or find it in the dash if you have `Ubuntu` installed.
+4. On Debian/Ubuntu/Mint etc., you can double-click the DEB to install it. On other Linuxes, run `sudo -E ./install.sh` within this folder.
+6. you can now type `avr4l` in any terminal session or find it in the dash if you have `Ubuntu` installed.
 
 ### Windows:
 1. Make sure `Java JDK / JRE v1.8` is installed on your computer.
